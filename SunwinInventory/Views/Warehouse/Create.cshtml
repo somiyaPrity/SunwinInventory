@@ -1,0 +1,85 @@
+﻿@model SunwinInventory.DTOs.Warehouse.CreateWarehouseDto
+
+@{
+    ViewData["Title"] = "Create Warehouse";
+}
+
+<div class="container mt-4">
+
+    <div class="card">
+
+        <div class="card-header bg-primary text-white">
+
+            <h4>Create Warehouse</h4>
+
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Create" method="post">
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+
+                    <label asp-for="WarehouseName" class="form-label"></label>
+
+                    <input asp-for="WarehouseName" class="form-control" />
+
+                    <span asp-validation-for="WarehouseName" class="text-danger"></span>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="Address"></label>
+
+                    <textarea asp-for="Address" class="form-control"></textarea>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="Phone"></label>
+
+                    <input asp-for="Phone" class="form-control" />
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="Email"></label>
+
+                    <input asp-for="Email" class="form-control" />
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="ContactPerson"></label>
+
+                    <input asp-for="ContactPerson" class="form-control" />
+
+                </div>
+
+                <button class="btn btn-success">
+                    Save
+                </button>
+
+                <a asp-action="Index" class="btn btn-secondary">
+                    Back
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+}

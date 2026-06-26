@@ -1,0 +1,295 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container-fluid">
+
+    <div class="row mb-4">
+
+        <div class="col-md-3">
+
+            <div class="card dashboard-card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between">
+
+                        <div>
+
+                            <h6 class="text-muted">
+                                Total Products
+                            </h6>
+
+                            <h2 class="fw-bold">
+                                150
+                            </h2>
+
+                        </div>
+
+                        <div class="fs-1 text-primary">
+
+                            <i class="bi bi-box-seam"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card dashboard-card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between">
+
+                        <div>
+
+                            <h6 class="text-muted">
+                                Warehouses
+                            </h6>
+
+                            <h2 class="fw-bold">
+                                4
+                            </h2>
+
+                        </div>
+
+                        <div class="fs-1 text-success">
+
+                            <i class="bi bi-building"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card dashboard-card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between">
+
+                        <div>
+
+                            <h6 class="text-muted">
+                                Today's Sales
+                            </h6>
+
+                            <h2 class="fw-bold">
+
+                                ৳25,000
+
+                            </h2>
+
+                        </div>
+
+                        <div class="fs-1 text-warning">
+
+                            <i class="bi bi-cart-check"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card dashboard-card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between">
+
+                        <div>
+
+                            <h6 class="text-muted">
+
+                                Low Stock
+
+                            </h6>
+
+                            <h2 class="fw-bold text-danger">
+
+                                12
+
+                            </h2>
+
+                        </div>
+
+                        <div class="fs-1 text-danger">
+
+                            <i class="bi bi-exclamation-triangle"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-8">
+
+            <div class="card dashboard-card shadow-sm border-0">
+
+                <div class="card-header bg-white">
+
+                    <h5 class="mb-0">
+
+                        Recent Sales
+
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <table class="table table-hover">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Invoice</th>
+
+                                <th>Customer</th>
+
+                                <th>Amount</th>
+
+                                <th>Date</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            <tr>
+
+                                <td>INV-001</td>
+
+                                <td>ABC Traders</td>
+
+                                <td>৳5,000</td>
+
+                                <td>Today</td>
+
+                            </tr>
+
+                            <tr>
+
+                                <td>INV-002</td>
+
+                                <td>XYZ Store</td>
+
+                                <td>৳8,500</td>
+
+                                <td>Today</td>
+
+                            </tr>
+
+                            <tr>
+
+                                <td>INV-003</td>
+
+                                <td>Rahman Enterprise</td>
+
+                                <td>৳3,200</td>
+
+                                <td>Today</td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card dashboard-card shadow-sm border-0">
+
+                <div class="card-header bg-white">
+
+                    <h5 class="mb-0">
+
+                        Quick Menu
+
+                    </h5>
+
+                </div>
+
+                <div class="card-body d-grid gap-2">
+
+                    <a asp-controller="Warehouse"
+                       asp-action="Create"
+                       class="btn btn-primary">
+
+                        <i class="bi bi-building-add"></i>
+
+                        Add Warehouse
+
+                    </a>
+
+                    <button class="btn btn-success">
+
+                        <i class="bi bi-box-seam"></i>
+
+                        Add Product
+
+                    </button>
+
+                    <button class="btn btn-warning">
+
+                        <i class="bi bi-cart-plus"></i>
+
+                        New Purchase
+
+                    </button>
+
+                    <button class="btn btn-danger">
+
+                        <i class="bi bi-cart-check"></i>
+
+                        New Sale
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

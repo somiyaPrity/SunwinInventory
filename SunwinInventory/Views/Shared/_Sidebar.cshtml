@@ -1,0 +1,250 @@
+﻿@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+
+<aside class="sidebar" id="sidebar">
+
+    <!-- Logo -->
+    <div class="logo">
+
+        <div class="logo-icon">
+            S
+        </div>
+
+        <div class="logo-text">
+
+            <h5>SUNWIN</h5>
+
+            <small>Inventory System</small>
+
+        </div>
+
+    </div>
+
+    <!-- Menu -->
+
+    <ul class="sidebar-menu">
+
+        <li>
+
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="@(controller=="Home" ? "active" : "")">
+
+                <i class="bi bi-speedometer2"></i>
+
+                <span>Dashboard</span>
+
+            </a>
+
+        </li>
+
+        <li class="menu-title">
+
+            <span>MASTER SETUP</span>
+
+        </li>
+
+        <li>
+
+            <a asp-controller="Warehouse"
+               asp-action="Index"
+               class="@(controller=="Warehouse" ? "active" : "")">
+
+                <i class="bi bi-building"></i>
+
+                <span>Warehouse</span>
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="#">
+
+                <i class="bi bi-box-seam"></i>
+
+                <span>Product</span>
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="#">
+
+                <i class="bi bi-tags"></i>
+
+                <span>Category</span>
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="#">
+
+                <i class="bi bi-award"></i>
+
+                <span>Brand</span>
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="#">
+
+                <i class="bi bi-rulers"></i>
+
+                <span>Unit</span>
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="#">
+
+                <i class="bi bi-truck"></i>
+
+                <span>Supplier</span>
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="#">
+
+                <i class="bi bi-people"></i>
+
+                <span>Customer</span>
+
+            </a>
+
+        </li>
+
+        <li class="menu-title">
+
+            <span>TRANSACTIONS</span>
+
+        </li>
+
+        <li>
+
+            <a href="#">
+
+                <i class="bi bi-cart-plus"></i>
+
+                <span>Purchase</span>
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="#">
+
+                <i class="bi bi-cart-check"></i>
+
+                <span>Sales</span>
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="#">
+
+                <i class="bi bi-arrow-left-right"></i>
+
+                <span>Stock Transfer</span>
+
+            </a>
+
+        </li>
+
+        <li class="menu-title">
+
+            <span>REPORTS</span>
+
+        </li>
+
+        <li>
+
+            <a href="#">
+
+                <i class="bi bi-file-earmark-bar-graph"></i>
+
+                <span>Purchase Report</span>
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="#">
+
+                <i class="bi bi-bar-chart"></i>
+
+                <span>Sales Report</span>
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="#">
+
+                <i class="bi bi-clipboard-data"></i>
+
+                <span>Stock Report</span>
+
+            </a>
+
+        </li>
+
+        <li class="menu-title">
+
+            <span>SETTINGS</span>
+
+        </li>
+
+        <li>
+
+            <a href="#">
+
+                <i class="bi bi-person-gear"></i>
+
+                <span>Users</span>
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="#">
+
+                <i class="bi bi-shield-lock"></i>
+
+                <span>Roles</span>
+
+            </a>
+
+        </li>
+
+    </ul>
+
+</aside>

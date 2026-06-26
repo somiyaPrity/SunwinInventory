@@ -1,0 +1,246 @@
+/* =========================
+   SUNWIN INVENTORY THEME
+========================= */
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* =========================
+   LAYOUT STRUCTURE
+========================= */
+
+.app {
+    display: flex;
+}
+
+.main-wrapper {
+    flex: 1;
+    margin-left: 260px;
+    transition: 0.3s;
+}
+
+.main-content {
+    padding: 20px;
+}
+
+/* =========================
+   LOADER
+========================= */
+
+#loader {
+    position: fixed;
+    inset: 0;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+    width: 260px;
+    height: 100vh;
+    background: #1f2937;
+    color: #fff;
+    position: fixed;
+    left: 0;
+    top: 0;
+    overflow-y: auto;
+    transition: 0.3s;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.logo-icon {
+    width: 42px;
+    height: 42px;
+    background: #ff8c00;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border-radius: 10px;
+    margin-right: 10px;
+}
+
+.logo-text h5 {
+    margin: 0;
+}
+
+.logo-text small {
+    font-size: 12px;
+    color: #cbd5e1;
+}
+
+/* =========================
+   MENU
+========================= */
+
+.sidebar-menu {
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
+}
+
+    .sidebar-menu li {
+        width: 100%;
+    }
+
+    .sidebar-menu a {
+        display: flex;
+        align-items: center;
+        padding: 12px 18px;
+        color: #cbd5e1;
+        text-decoration: none;
+        transition: 0.3s;
+        gap: 10px;
+    }
+
+        .sidebar-menu a:hover {
+            background: #374151;
+            color: #fff;
+        }
+
+        .sidebar-menu a.active {
+            background: #0d6efd;
+            color: #fff;
+        }
+
+    .sidebar-menu i {
+        width: 22px;
+        text-align: center;
+    }
+
+.menu-title {
+    padding: 12px 18px;
+    font-size: 11px;
+    color: #9ca3af;
+    letter-spacing: 1px;
+}
+
+/* =========================
+   TOPBAR
+========================= */
+
+.topbar {
+    height: 65px;
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    transition: 0.3s;
+}
+
+    .card:hover {
+        transform: translateY(-4px);
+    }
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn {
+    border-radius: 8px;
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.table thead {
+    background: #f3f4f6;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+.footer {
+    text-align: center;
+    padding: 15px;
+    background: #fff;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* =========================
+   COLLAPSED SIDEBAR (DESKTOP)
+========================= */
+
+.sidebar.collapsed {
+    width: 70px;
+}
+
+    .sidebar.collapsed .logo-text {
+        display: none;
+    }
+
+    .sidebar.collapsed .sidebar-menu a span {
+        display: none;
+    }
+
+    .sidebar.collapsed .sidebar-menu a {
+        justify-content: center;
+    }
+
+.main-wrapper.expanded {
+    margin-left: 70px;
+}
+
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
+
+@media (max-width: 992px) {
+
+    .sidebar {
+        left: -260px;
+        position: fixed;
+    }
+
+        .sidebar.show {
+            left: 0;
+        }
+
+    .main-wrapper {
+        margin-left: 0;
+    }
+}
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #6b7280;
+    border-radius: 10px;
+}

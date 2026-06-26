@@ -1,0 +1,84 @@
+﻿@model IEnumerable<SunwinInventory.DTOs.Warehouse.WarehouseDto>
+
+@{
+    ViewData["Title"] = "Warehouse List";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between mb-3">
+        <h3>Warehouse List</h3>
+
+        <a asp-action="Create" class="btn btn-primary">
+            Add Warehouse
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    <table class="table table-bordered table-striped">
+
+        <thead class="table-dark">
+
+            <tr>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Contact Person</th>
+                <th>Status</th>
+                <th width="170">Action</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+
+                    <td>@item.WarehouseName</td>
+
+                    <td>@item.Address</td>
+
+                    <td>@item.Phone</td>
+
+                    <td>@item.Email</td>
+
+                    <td>@item.ContactPerson</td>
+
+                    <td>
+                        @(item.IsActive ? "Active" : "Inactive")
+                    </td>
+
+                    <td>
+
+                        <a asp-action="Edit"
+                           asp-route-id="@item.WarehouseId"
+                           class="btn btn-warning btn-sm">
+                            Edit
+                        </a>
+
+                        <a asp-action="Delete"
+                           asp-route-id="@item.WarehouseId"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Delete this warehouse?');">
+                            Delete
+                        </a>
+
+                    </td>
+
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+
+</div>
