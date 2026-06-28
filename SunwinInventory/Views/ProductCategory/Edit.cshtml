@@ -1,0 +1,152 @@
+﻿@model SunwinInventory.DTOs.ProductCategory.ProductCategoryDto
+
+@{
+    ViewData["Title"] = "Edit Product Category";
+}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h3 class="fw-bold mb-1">
+
+                <i class="bi bi-pencil-square"></i>
+
+                Edit Product Category
+
+            </h3>
+
+            <small class="text-muted">
+
+                Update product category information
+
+            </small>
+
+        </div>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+
+            <i class="bi bi-arrow-left"></i>
+
+            Back to List
+
+        </a>
+
+    </div>
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <h5 class="mb-0">
+
+                Product Category Information
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Edit" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input asp-for="CategoryId" type="hidden" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger">
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label asp-for="CategoryName" class="form-label fw-semibold"></label>
+
+                        <span class="text-danger">*</span>
+
+                        <input asp-for="CategoryName"
+                               class="form-control" />
+
+                        <span asp-validation-for="CategoryName"
+                              class="text-danger"></span>
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label asp-for="IsActive"
+                               class="form-label fw-semibold"></label>
+
+                        <div class="form-check mt-2">
+
+                            <input asp-for="IsActive"
+                                   class="form-check-input" />
+
+                            <label class="form-check-label">
+
+                                Active
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="Description"
+                           class="form-label fw-semibold"></label>
+
+                    <textarea asp-for="Description"
+                              rows="4"
+                              class="form-control"></textarea>
+
+                    <span asp-validation-for="Description"
+                          class="text-danger"></span>
+
+                </div>
+
+                <hr />
+
+                <div class="d-flex justify-content-end">
+
+                    <a asp-action="Index"
+                       class="btn btn-secondary me-2">
+
+                        <i class="bi bi-x-circle"></i>
+
+                        Cancel
+
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        <i class="bi bi-check-circle"></i>
+
+                        Update
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+}

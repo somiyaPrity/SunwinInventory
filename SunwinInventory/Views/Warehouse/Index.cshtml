@@ -1,84 +1,144 @@
-﻿@model IEnumerable<SunwinInventory.DTOs.Warehouse.WarehouseDto>
+﻿
+@model IEnumerable<SunwinInventory.DTOs.Warehouse.WarehouseDto>
 
 @{
-    ViewData["Title"] = "Warehouse List";
+    ViewData["Title"] = "Warehouse";
 }
 
-<div class="container mt-4">
+<div class="container-fluid">
 
-    <div class="d-flex justify-content-between mb-3">
-        <h3>Warehouse List</h3>
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h3 class="fw-bold mb-0">
+                <i class="bi bi-building"></i>
+                Warehouse Management
+            </h3>
+
+            <small class="text-muted">
+                Manage all warehouses from one place.
+            </small>
+        </div>
 
         <a asp-action="Create" class="btn btn-primary">
+
+            <i class="bi bi-plus-circle"></i>
+
             Add Warehouse
+
         </a>
+
     </div>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">
-            @TempData["Success"]
+    <!-- Card -->
+
+    <div class="card shadow-sm">
+
+        <div class="card-header bg-white">
+
+            <h5 class="mb-0">
+
+                Warehouse List
+
+            </h5>
+
         </div>
-    }
 
-    <table class="table table-bordered table-striped">
+        <div class="card-body">
 
-        <thead class="table-dark">
+            <table class="table table-striped table-hover align-middle datatable">
 
-            <tr>
-                <th>Name</th>
-                <th>Address</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>Contact Person</th>
-                <th>Status</th>
-                <th width="170">Action</th>
-            </tr>
+                <thead>
 
-        </thead>
+                    <tr>
 
-        <tbody>
+                        <th>ID</th>
 
-            @foreach (var item in Model)
-            {
-                <tr>
+                        <th>Name</th>
 
-                    <td>@item.WarehouseName</td>
+                        <th>Phone</th>
 
-                    <td>@item.Address</td>
+                        <th>Email</th>
 
-                    <td>@item.Phone</td>
+                        <th>Contact Person</th>
 
-                    <td>@item.Email</td>
+                        <th>Status</th>
 
-                    <td>@item.ContactPerson</td>
+                        <th width="150">Action</th>
 
-                    <td>
-                        @(item.IsActive ? "Active" : "Inactive")
-                    </td>
+                    </tr>
 
-                    <td>
+                </thead>
 
-                        <a asp-action="Edit"
-                           asp-route-id="@item.WarehouseId"
-                           class="btn btn-warning btn-sm">
-                            Edit
-                        </a>
+                <tbody>
 
-                        <a asp-action="Delete"
-                           asp-route-id="@item.WarehouseId"
-                           class="btn btn-danger btn-sm"
-                           onclick="return confirm('Delete this warehouse?');">
-                            Delete
-                        </a>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
 
-                    </td>
+                            <td>@item.WarehouseId</td>
 
-                </tr>
-            }
+                            <td>@item.WarehouseName</td>
 
-        </tbody>
+                            <td>@item.Phone</td>
 
-    </table>
+                            <td>@item.Email</td>
+
+                            <td>@item.ContactPerson</td>
+
+                            <td>
+
+                                @if (item.IsActive == true)
+                                {
+                                    <span class="badge bg-success">
+                                        Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">
+                                        Inactive
+                                    </span>
+                                }
+
+                            </td>
+
+                            <td>
+
+                                <a asp-action="Edit"
+                                   asp-route-id="@item.WarehouseId"
+                                   class="btn btn-warning btn-sm">
+
+                                    <i class="bi bi-pencil-square"></i>
+
+                                </a>
+
+                                <form asp-action="Delete"
+                                      asp-route-id="@item.WarehouseId"
+                                      method="post"
+                                      class="d-inline">
+
+                                    <button type="submit"
+                                            class="btn btn-danger btn-sm btnDelete">
+
+                                        <i class="bi bi-trash"></i>
+
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 
 </div>

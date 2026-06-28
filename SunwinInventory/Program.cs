@@ -4,6 +4,8 @@ using SunwinInventory.Repositories.Interfaces;
 using SunwinInventory.Repositories;
 using SunwinInventory.Services;
 using SunwinInventory.Services.Interfaces;
+using SunwinInventory.Repositories.Implementations;
+using SunwinInventory.Services.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +20,8 @@ builder.Services.AddDbContext<SunwinInventoryContext>(options =>
 //di register
 builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
-
+builder.Services.AddScoped<IProductCategoryRepository, ProductCategoryRepository>();
+builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

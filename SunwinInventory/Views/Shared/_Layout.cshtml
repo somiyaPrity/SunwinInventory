@@ -3,52 +3,115 @@
 <head>
 
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>@ViewData["Title"] - SUNWIN Inventory</title>
 
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet" />
 
+    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- DataTables -->
+    <link href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.css" rel="stylesheet" />
+
+    <!-- Toastr -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+    <!-- Site CSS -->
     <link href="~/css/site.css" rel="stylesheet" asp-append-version="true" />
 
-    @RenderSection("Styles", required: false)
+    @await RenderSectionAsync("Styles", required: false)
 
 </head>
 
 <body>
 
+    <!-- Loader -->
     <div id="loader">
         <div class="spinner-border text-primary"></div>
     </div>
 
     <div class="app">
 
+        <!-- Sidebar -->
         @await Html.PartialAsync("_Sidebar")
 
         <div class="main-wrapper">
 
+            <!-- Navbar -->
             @await Html.PartialAsync("_Navbar")
 
+            <!-- Page -->
             <main class="main-content">
 
                 @RenderBody()
 
             </main>
 
-            @await Html.PartialAsync("_Footer")
+            <!-- Footer -->
+            @* @await Html.PartialAsync("_Footer") *@
 
         </div>
 
     </div>
 
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Toastr -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <!-- Site JS -->
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-    @RenderSection("Scripts", required: false)
+    <!-- Common JS -->
+    <script src="~/js/common.js" asp-append-version="true"></script>
+
+    <!-- Toastr Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <script>
+            toastr.options = {
+                closeButton: true,
+                progressBar: true,
+                positionClass: "toast-top-right",
+                timeOut: "3000"
+            };
+
+            toastr.success('@TempData["Success"]');
+        </script>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <script>
+            toastr.options = {
+                closeButton: true,
+                progressBar: true,
+                positionClass: "toast-top-right",
+                timeOut: "3000"
+            };
+
+            toastr.error('@TempData["Error"]');
+        </script>
+    }
+
+    @await RenderSectionAsync("Scripts", required: false)
 
 </body>
 

@@ -244,3 +244,32 @@ body {
     background: #6b7280;
     border-radius: 10px;
 }
+.page-header {
+    margin-bottom: 25px;
+}
+
+    .page-header h3 {
+        font-weight: 600;
+    }
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.table tbody tr:hover {
+    background: #f8fbff;
+}
+
+.btn-sm {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
