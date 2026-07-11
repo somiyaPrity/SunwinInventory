@@ -227,18 +227,45 @@
             </a>
 
         </li>
-
+        @* ----------Administrative-------- *@
         <li class="menu-title">
 
-            <span>SETTINGS</span>
+            <span>Administrative</span>
 
         </li>
-
         <li>
 
-            <a href="#">
+            <a asp-controller="Designation"
+               asp-action="Index"
+               class="@(controller=="Designation" ? "active" : "")">
 
-                <i class="bi bi-person-gear"></i>
+                <i class="bi bi-person-badge"></i>
+
+                <span>Designation</span>
+
+            </a>
+
+        </li>
+        <li>
+
+            <a asp-controller="Role"
+               asp-action="Index"
+               class="@(controller=="Role" ? "active" : "")">
+
+                <i class="bi bi-shield-lock"></i>
+
+                <span>Role</span>
+
+            </a>
+
+        </li>
+        <li>
+
+            <a asp-controller="User"
+               asp-action="Index"
+               class="@(controller=="User" ? "active" : "")">
+
+                <i class="bi bi-people-fill"></i>
 
                 <span>Users</span>
 
@@ -246,17 +273,7 @@
 
         </li>
 
-        <li>
-
-            <a href="#">
-
-                <i class="bi bi-shield-lock"></i>
-
-                <span>Roles</span>
-
-            </a>
-
-        </li>
+     
 
     </ul>
 

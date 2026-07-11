@@ -1,39 +1,69 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var fullName = HttpContextAccessor.HttpContext?.Session.GetString("FullName");
+    var userName = HttpContextAccessor.HttpContext?.Session.GetString("UserName");
+}
+
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
 
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>@ViewData["Title"] - SUNWIN Inventory</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] | SUNWIN ERP</title>
 
     <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+          rel="stylesheet" />
 
     <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+          rel="stylesheet" />
 
     <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
 
     <!-- DataTables -->
-    <link href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.css"
+          rel="stylesheet" />
 
     <!-- Toastr -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"
+          rel="stylesheet" />
 
     <!-- Site CSS -->
-    <link href="~/css/site.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/site.css"
+          rel="stylesheet"
+          asp-append-version="true" />
 
     @await RenderSectionAsync("Styles", required: false)
 
 </head>
 
-<body>
+<body class="bg-light">
 
     <!-- Loader -->
     <div id="loader">
-        <div class="spinner-border text-primary"></div>
+
+        <div class="text-center">
+
+            <div class="spinner-border text-primary mb-3"></div>
+
+            <div class="fw-semibold">
+
+                Loading...
+
+            </div>
+
+        </div>
+
     </div>
 
     <div class="app">
@@ -46,7 +76,7 @@
             <!-- Navbar -->
             @await Html.PartialAsync("_Navbar")
 
-            <!-- Page -->
+            <!-- Page Content -->
             <main class="main-content">
 
                 @RenderBody()
@@ -54,7 +84,7 @@
             </main>
 
             <!-- Footer -->
-            @* @await Html.PartialAsync("_Footer") *@
+            @await Html.PartialAsync("_Footer")
 
         </div>
 
@@ -68,6 +98,7 @@
 
     <!-- DataTables -->
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
+
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.js"></script>
 
     <!-- SweetAlert2 -->
@@ -77,37 +108,54 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <!-- Site JS -->
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/site.js"
+            asp-append-version="true"></script>
 
     <!-- Common JS -->
-    <script src="~/js/common.js" asp-append-version="true"></script>
+    <script src="~/js/common.js"
+            asp-append-version="true"></script>
 
-    <!-- Toastr Messages -->
+    <script>
+
+        $.ajaxSetup({
+            cache: false
+        });
+
+    </script>
+
     @if (TempData["Success"] != null)
     {
         <script>
+
             toastr.options = {
                 closeButton: true,
                 progressBar: true,
+                newestOnTop: true,
                 positionClass: "toast-top-right",
-                timeOut: "3000"
+                timeOut: 3000,
+                preventDuplicates: true
             };
 
-            toastr.success('@TempData["Success"]');
+            toastr.success("@TempData["Success"]");
+
         </script>
     }
 
     @if (TempData["Error"] != null)
     {
         <script>
+
             toastr.options = {
                 closeButton: true,
                 progressBar: true,
+                newestOnTop: true,
                 positionClass: "toast-top-right",
-                timeOut: "3000"
+                timeOut: 3000,
+                preventDuplicates: true
             };
 
-            toastr.error('@TempData["Error"]');
+            toastr.error("@TempData["Error"]");
+
         </script>
     }
 

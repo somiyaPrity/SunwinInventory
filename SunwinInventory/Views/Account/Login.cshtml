@@ -1,0 +1,108 @@
+﻿@model SunwinInventory.DTOs.Account.LoginDto
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <title>Sunwin ERP Login</title>
+
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <link href="~/lib/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+
+</head>
+
+<body class="bg-light">
+
+    <div class="container">
+
+        <div class="row vh-100 justify-content-center align-items-center">
+
+            <div class="col-md-4">
+
+                <div class="card shadow">
+
+                    <div class="card-body p-4">
+
+                        <h3 class="text-center mb-4">
+
+                            Sunwin ERP
+
+                        </h3>
+
+                        @if (ViewBag.Error != null)
+                        {
+                            <div class="alert alert-danger">
+
+                                @ViewBag.Error
+
+                            </div>
+                        }
+                        @if (TempData["Success"] != null)
+                        {
+                            <div class="alert alert-success">
+
+                                @TempData["Success"]
+
+                            </div>
+                        }
+
+                        @if (TempData["Error"] != null)
+                        {
+                            <div class="alert alert-danger">
+
+                                @TempData["Error"]
+
+                            </div>
+                        }
+                        <form asp-action="Login">
+
+                            <div class="mb-3">
+
+                                <label>User Name</label>
+
+                                <input asp-for="UserName" class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Password</label>
+
+                                <input asp-for="Password"
+                                       type="password"
+                                       class="form-control" />
+
+                            </div>
+
+                            <button class="btn btn-primary w-100">
+
+                                <i class="bi bi-box-arrow-in-right"></i>
+
+                                Login
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
