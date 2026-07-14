@@ -1,0 +1,156 @@
+﻿@model IEnumerable<SunwinInventory.DTOs.Supplier.SupplierDto>
+
+@{
+    ViewData["Title"] = "Supplier";
+}
+
+<div class="card shadow-sm">
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+
+        <h4 class="mb-0">
+            <i class="bi bi-truck"></i>
+            Supplier List
+        </h4>
+
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i>
+            Add Supplier
+        </a>
+
+    </div>
+
+    <div class="card-body">
+
+        <table id="tblSupplier" class="table table-bordered table-hover">
+
+            <thead class="table-light">
+
+                <tr>
+                    <th>Code</th>
+                    <th>Supplier Name</th>
+                    <th>Contact Person</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th width="150">Action</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <td>@item.SupplierCode</td>
+
+                        <td>@item.SupplierName</td>
+
+                        <td>@item.ContactPerson</td>
+
+                        <td>@item.Phone</td>
+
+                        <td>@item.Email</td>
+
+                        <td>
+
+                            @if (item.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Inactive</span>
+                            }
+
+                        </td>
+
+                        <td>
+
+                            <a asp-action="Edit"
+                               asp-route-id="@item.SupplierId"
+                               class="btn btn-warning btn-sm">
+
+                                <i class="bi bi-pencil-square"></i>
+
+                            </a>
+
+                            <button class="btn btn-danger btn-sm deleteBtn"
+                                    data-id="@item.SupplierId">
+
+                                <i class="bi bi-trash"></i>
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<form id="deleteForm"
+      asp-action="Delete"
+      method="post">
+
+    @Html.AntiForgeryToken()
+
+    <input type="hidden"
+           id="deleteId"
+           name="id" />
+
+</form>
+
+@section Scripts {
+
+    <script>
+
+        $(function(){
+
+            $('#tblSupplier').DataTable();
+
+            $('.deleteBtn').click(function(){
+
+                let id=$(this).data('id');
+
+                Swal.fire({
+
+                    title:'Delete Supplier?',
+
+                    text:'This record will be deleted.',
+
+                    icon:'warning',
+
+                    showCancelButton:true,
+
+                    confirmButtonColor:'#dc3545',
+
+                    confirmButtonText:'Delete'
+
+                }).then((result)=>{
+
+                    if(result.isConfirmed){
+
+                        $('#deleteId').val(id);
+
+                        $('#deleteForm').submit();
+
+                    }
+
+                });
+
+            });
+
+        });
+
+    </script>
+
+}

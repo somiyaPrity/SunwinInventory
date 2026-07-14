@@ -1,0 +1,144 @@
+﻿@model SunwinInventory.DTOs.ProductName.ProductNameDto
+
+@{
+    ViewData["Title"] = "Edit Product Name";
+}
+
+<div class="card shadow-sm">
+
+    <div class="card-header">
+
+        <h4>
+
+            <i class="bi bi-pencil-square"></i>
+
+            Edit Product Name
+
+        </h4>
+
+    </div>
+
+    <div class="card-body">
+
+        <form asp-action="Edit" method="post">
+
+            <input asp-for="ProductNameId" type="hidden" />
+
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger mb-3"></div>
+
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
+
+                    <label asp-for="ProductCode" class="form-label"></label>
+
+                    <input asp-for="ProductCode"
+                           class="form-control" />
+
+                    <span asp-validation-for="ProductCode"
+                          class="text-danger"></span>
+
+                </div>
+
+                <div class="col-md-8 mb-3">
+
+                    <label asp-for="Name" class="form-label"></label>
+
+                    <input asp-for="Name"
+                           class="form-control" />
+
+                    <span asp-validation-for="Name"
+                          class="text-danger"></span>
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+
+                    <label asp-for="CategoryId"
+                           class="form-label"></label>
+
+                    <select asp-for="CategoryId"
+                            asp-items="ViewBag.CategoryList"
+                            class="form-select">
+
+                        <option value="">-- Select Category --</option>
+
+                    </select>
+
+                    <span asp-validation-for="CategoryId"
+                          class="text-danger"></span>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label d-block">
+
+                        Status
+
+                    </label>
+
+                    <div class="form-check form-switch mt-2">
+
+                        <input asp-for="IsActive"
+                               class="form-check-input" />
+
+                        <label class="form-check-label">
+
+                            Active
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label asp-for="Description"
+                       class="form-label"></label>
+
+                <textarea asp-for="Description"
+                          class="form-control"
+                          rows="4"></textarea>
+
+            </div>
+
+            <hr />
+
+            <button type="submit"
+                    class="btn btn-primary">
+
+                <i class="bi bi-save"></i>
+
+                Update
+
+            </button>
+
+            <a asp-action="Index"
+               class="btn btn-secondary">
+
+                <i class="bi bi-arrow-left"></i>
+
+                Back
+
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+}

@@ -74,11 +74,13 @@
 
         <li>
 
-            <a href="#">
+            <a asp-controller="ProductName"
+               asp-action="Index"
+               class="@(controller == "ProductName" ? "active" : "")">
 
                 <i class="bi bi-box-seam"></i>
 
-                <span>Product </span>
+                <span>Product Name</span>
 
             </a>
 
@@ -86,11 +88,13 @@
 
         <li>
 
-            <a href="#">
+            <a asp-controller="Supplier"
+               asp-action="Index"
+               class="@(controller=="Supplier" ? "active" : "")">
 
-                <i class="bi bi-tags"></i>
+                <i class="bi bi-truck"></i>
 
-                <span>Category</span>
+                <span>Supplier</span>
 
             </a>
 

@@ -1,0 +1,108 @@
+﻿@model SunwinInventory.DTOs.Supplier.SupplierDto
+
+@{
+    ViewData["Title"] = "Create Supplier";
+}
+
+<div class="card shadow-sm">
+
+    <div class="card-header">
+
+        <h4>
+            <i class="bi bi-plus-circle"></i>
+            Create Supplier
+        </h4>
+
+    </div>
+
+    <div class="card-body">
+
+        <form asp-action="Create">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="row">
+
+                <div class="col-md-3 mb-3">
+                    <label asp-for="SupplierCode"></label>
+                    <input asp-for="SupplierCode"
+                           class="form-control"
+                           readonly />
+                    <span asp-validation-for="SupplierCode" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-9 mb-3">
+                    <label asp-for="SupplierName"></label>
+                    <input asp-for="SupplierName" class="form-control" />
+                    <span asp-validation-for="SupplierName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ContactPerson"></label>
+                    <input asp-for="ContactPerson" class="form-control" />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Phone"></label>
+                    <input asp-for="Phone" class="form-control" />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Email"></label>
+                    <input asp-for="Email" class="form-control" />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Country"></label>
+                    <input asp-for="Country" class="form-control" />
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label asp-for="Address"></label>
+                    <textarea asp-for="Address" rows="3" class="form-control"></textarea>
+                </div>
+
+                <div class="col-md-12 mb-3">
+
+                    <div class="form-check form-switch">
+
+                        <input asp-for="IsActive" class="form-check-input" />
+
+                        <label class="form-check-label">
+
+                            Active
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <button class="btn btn-success">
+
+                <i class="bi bi-check-circle"></i>
+
+                Save
+
+            </button>
+
+            <a asp-action="Index"
+               class="btn btn-secondary">
+
+                Back
+
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+}
