@@ -102,51 +102,19 @@
 
         <li>
 
-            <a href="#">
-
-                <i class="bi bi-award"></i>
-
-                <span>Brand</span>
-
-            </a>
-
-        </li>
-
-        <li>
-
-            <a href="#">
-
-                <i class="bi bi-rulers"></i>
-
-                <span>Unit</span>
-
-            </a>
-
-        </li>
-
-        <li>
-
-            <a href="#">
+            <a asp-controller="Shipment"
+               asp-action="Index"
+               class="@(controller=="Shipment" ? "active" : "")">
 
                 <i class="bi bi-truck"></i>
 
-                <span>Supplier</span>
+                <span>Shipment</span>
 
             </a>
 
         </li>
 
-        <li>
-
-            <a href="#">
-
-                <i class="bi bi-people"></i>
-
-                <span>Customer</span>
-
-            </a>
-
-        </li>
+      
 
         <li class="menu-title">
 

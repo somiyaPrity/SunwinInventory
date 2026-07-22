@@ -1,0 +1,161 @@
+﻿@model SunwinInventory.DTOs.Shipment.ShipmentDto
+
+@{
+    ViewData["Title"] = "Edit Shipment";
+}
+
+<div class="card shadow-sm">
+
+    <div class="card-header">
+
+        <h4>
+
+            <i class="bi bi-pencil-square"></i>
+
+            Edit Shipment
+
+        </h4>
+
+    </div>
+
+    <div class="card-body">
+
+        <form asp-action="Edit" method="post">
+
+            <input asp-for="ShipmentId" type="hidden" />
+
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger"></div>
+
+            <div class="row">
+
+                <div class="col-md-3 mb-3">
+
+                    <label asp-for="ShipmentNo" class="form-label"></label>
+
+                    <input asp-for="ShipmentNo"
+                           class="form-control"
+                           readonly />
+
+                </div>
+
+                <div class="col-md-3 mb-3">
+
+                    <label asp-for="ShipmentDate" class="form-label"></label>
+
+                    <input asp-for="ShipmentDate"
+                           type="date"
+                           class="form-control" />
+
+                    <span asp-validation-for="ShipmentDate"
+                          class="text-danger"></span>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label asp-for="ShipmentType" class="form-label"></label>
+
+                    <input asp-for="ShipmentType"
+                           class="form-control" />
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label asp-for="VesselName" class="form-label"></label>
+
+                    <input asp-for="VesselName"
+                           class="form-control" />
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label asp-for="ContainerNo" class="form-label"></label>
+
+                    <input asp-for="ContainerNo"
+                           class="form-control" />
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label asp-for="BLNo" class="form-label"></label>
+
+                    <input asp-for="BLNo"
+                           class="form-control" />
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label asp-for="ArrivalDate" class="form-label"></label>
+
+                    <input asp-for="ArrivalDate"
+                           type="date"
+                           class="form-control" />
+
+                </div>
+
+                <div class="col-md-12 mb-3">
+
+                    <label asp-for="Remarks" class="form-label"></label>
+
+                    <textarea asp-for="Remarks"
+                              rows="3"
+                              class="form-control"></textarea>
+
+                </div>
+
+                <div class="col-md-12 mb-3">
+
+                    <div class="form-check form-switch">
+
+                        <input asp-for="IsActive"
+                               class="form-check-input" />
+
+                        <label asp-for="IsActive"
+                               class="form-check-label">
+
+                            Active
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <hr />
+
+            <button type="submit"
+                    class="btn btn-primary">
+
+                <i class="bi bi-save"></i>
+
+                Update
+
+            </button>
+
+            <a asp-action="Index"
+               class="btn btn-secondary">
+
+                <i class="bi bi-arrow-left"></i>
+
+                Back
+
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+}

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Folder Include="Data\" />
+    <Folder Include="DTOs\NewFolder1\" />
     <Folder Include="DTOs\NewFolder\" />
     <Folder Include="Helpers\" />
   </ItemGroup>
