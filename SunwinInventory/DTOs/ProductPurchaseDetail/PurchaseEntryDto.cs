@@ -7,7 +7,13 @@ namespace SunwinInventory.DTOs.ProductPurchaseDetail
         [Required]
         public int ShipmentId { get; set; }
 
+        [Required]
+        public int SupplierId { get; set; }
+
+        [Required]
+        public int WarehouseId { get; set; }
+
         public List<ProductPurchaseDetailDto> Items { get; set; }
-            = new List<ProductPurchaseDetailDto>();
+            = new();
     }
 }

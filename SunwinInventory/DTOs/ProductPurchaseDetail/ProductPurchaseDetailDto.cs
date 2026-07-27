@@ -41,7 +41,7 @@ namespace SunwinInventory.DTOs.ProductPurchaseDetail
         public decimal? ImportTaxPerKgTk { get; set; }
 
         public decimal? ImportTaxPerKgRmb { get; set; }
-
+        public decimal? CostPricePerPieceTk { get; set; }
         public decimal? CostPriceKgTk { get; set; }
 
         public decimal? CostPriceLbsTk { get; set; }

@@ -29,7 +29,7 @@ namespace SunwinInventory.Controllers
             _productNameService = productNameService;
             _lookupService = lookupService; ;
         }
-
+        [HttpGet]
         public async Task<IActionResult> Create()
         {
             await LoadDropDowns();
@@ -38,9 +38,16 @@ namespace SunwinInventory.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PurchaseEntryDto dto)
         {
-            if (dto.Items == null || !dto.Items.Any())
+            if (!ModelState.IsValid)
+            {
+                await LoadDropDowns();
+                return View(dto);
+            }
+
+            if (dto.Items == null || dto.Items.Count == 0)
             {
                 TempData["Error"] = "Please add at least one product.";
 
@@ -49,12 +56,40 @@ namespace SunwinInventory.Controllers
                 return View(dto);
             }
 
+            foreach (var item in dto.Items)
+            {
+                item.ShipmentId = dto.ShipmentId;
+
+                item.SupplierId = dto.SupplierId;
+
+                item.WarehouseId = dto.WarehouseId;
+            }
+
             await _purchaseService.CreateAsync(dto);
 
             TempData["Success"] = "Purchase saved successfully.";
 
             return RedirectToAction(nameof(Create));
         }
+
+        //[HttpPost]
+        //public async Task<IActionResult> Create(PurchaseEntryDto dto)
+        //{
+        //    if (dto.Items == null || !dto.Items.Any())
+        //    {
+        //        TempData["Error"] = "Please add at least one product.";
+
+        //        await LoadDropDowns();
+
+        //        return View(dto);
+        //    }
+
+        //    await _purchaseService.CreateAsync(dto);
+
+        //    TempData["Success"] = "Purchase saved successfully.";
+
+        //    return RedirectToAction(nameof(Create));
+        //}
 
         private async Task LoadDropDowns()
         {
@@ -73,10 +108,17 @@ namespace SunwinInventory.Controllers
                 "WarehouseId",
                 "WarehouseName");
 
+            var products = await _productNameService.GetAllAsync();
+
+            if (products == null)
+            {
+                throw new Exception("Products is NULL");
+            }
+
             ViewBag.Products = new SelectList(
-                await _productNameService.GetAllAsync(),
+                products,
                 "ProductNameId",
-                "ProductName1");
+                "Name");
 
             ViewBag.Colors = await _lookupService.GetColorListAsync();
         }

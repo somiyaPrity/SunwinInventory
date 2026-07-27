@@ -80,5 +80,20 @@ namespace SunwinInventory.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+        [HttpGet]
+        public async Task<IActionResult> GetShipment(int id)
+        {
+            var shipment = await _shipmentService.GetByIdAsync(id);
+
+            if (shipment == null)
+                return NotFound();
+
+            return Json(new
+            {
+                shipmentId = shipment.ShipmentId,
+                shipmentNo = shipment.ShipmentNo,
+                shipmentDate = shipment.ShipmentDate.ToString("yyyy-MM-dd")
+            });
+        }
     }
 }

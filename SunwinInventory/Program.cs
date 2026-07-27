@@ -43,6 +43,9 @@ builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IShipmentRepository, ShipmentRepository>();
 builder.Services.AddScoped<IShipmentService, ShipmentService>();
 builder.Services.AddScoped<ILookupService, LookupService>();
+builder.Services.AddScoped<IProductPurchaseDetailRepository, ProductPurchaseDetailRepository>();
+builder.Services.AddScoped<IProductPurchaseDetailService, ProductPurchaseDetailService>();
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromHours(8);

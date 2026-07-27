@@ -1,4 +1,5 @@
-﻿using SunwinInventory.Models;
+﻿using SunwinInventory.DTOs.ProductPurchaseDetail;
+using SunwinInventory.Models;
 
 namespace SunwinInventory.Repositories.Interfaces
 {
@@ -9,7 +10,7 @@ namespace SunwinInventory.Repositories.Interfaces
         Task<ProductPurchaseDetail?> GetByIdAsync(int id);
 
         Task AddAsync(ProductPurchaseDetail entity);
-
+        Task CreateAsync(PurchaseEntryDto dto);
         Task UpdateAsync(ProductPurchaseDetail entity);
 
         Task DeleteAsync(int id);
