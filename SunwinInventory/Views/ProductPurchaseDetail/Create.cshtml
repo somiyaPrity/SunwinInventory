@@ -161,10 +161,10 @@
 
     <input asp-for="ShipmentId" type="hidden" id="hdShipmentId"/>
 
-    <div id="hiddenItems"></div>
+    <div id="hiddenItemsExcel"></div>
 
     <button class="btn btn-primary mt-3"
-            id="btnSave"
+                id="btnSaveExcel"
             style="display:none">
 
         Save All
@@ -863,7 +863,7 @@
 
                         renderTable();
 
-                        $("#btnSave").prop("disabled", purchaseItems.length == 0);
+                        $("#btnSaveExcel").prop("disabled", purchaseItems.length == 0);
                     },
                     error: function (xhr) {
 
@@ -886,7 +886,7 @@
 
                 renderTable();
 
-                $("#btnSave").prop("disabled", purchaseItems.length == 0);
+                $("#btnSaveExcel").prop("disabled", purchaseItems.length == 0);
 
             }
         </script>
@@ -1421,20 +1421,45 @@
 
 
             }
+            // $("#ShipmentId").change(function () {
+
+            //     var id = $(this).val();
+
+            //     if (id == "") {
+            //         $("#ShipmentDate").val("");
+            //         return;
+            //     }
+
+            //     $.get("/Shipment/GetShipment", { id: id }, function (data) {
+
+            //         $("#ShipmentDate").val(data.shipmentDate);
+
+            //     });
+
+            // });
             $("#ShipmentId").change(function () {
 
                 var id = $(this).val();
+
+                console.log("Shipment Changed:", id);
 
                 if (id == "") {
                     $("#ShipmentDate").val("");
                     return;
                 }
 
-                $.get("/Shipment/GetShipment", { id: id }, function (data) {
+                $.get("/Shipment/GetShipment",
+                    { id: id },
+                    function (data) {
 
-                    $("#ShipmentDate").val(data.shipmentDate);
+                        console.log(data);
 
-                });
+                        $("#ShipmentDate").val(data.shipmentDate);
+
+                    })
+                    .fail(function (xhr) {
+                        console.log(xhr);
+                    });
 
             });
 
