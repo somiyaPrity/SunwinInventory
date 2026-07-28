@@ -6,102 +6,9 @@
 
 <div class="container-fluid">
     @* excel upload *@
-    <div class="card shadow">
+  
 
-        <div class="card-header bg-primary text-white">
-
-            <h4 class="mb-0">
-                <i class="bi bi-file-earmark-excel"></i>
-                Purchase Entry (Excel Upload)
-            </h4>
-
-        </div>
-
-        <div class="card-body">
-
-            <div class="row">
-
-                <div class="col-md-3 mb-3">
-
-                    <label class="form-label">Shipment</label>
-
-                    <select asp-for="ShipmentId"
-                            asp-items="ViewBag.Shipments"
-                            id="ShipmentId"
-                            class="form-select">
-
-                        <option value="">Select Shipment</option>
-
-                    </select>
-
-                </div>
-
-                <div class="col-md-3 mb-3">
-
-                    <label class="form-label">Supplier</label>
-
-                    <select id="SupplierId"
-                            class="form-select"
-                            asp-items="ViewBag.Suppliers">
-
-                        <option value="">Select Supplier</option>
-
-                    </select>
-
-                </div>
-
-                <div class="col-md-3 mb-3">
-
-                    <label class="form-label">Warehouse</label>
-
-                    <select id="WarehouseId"
-                            class="form-select"
-                            asp-items="ViewBag.Warehouses">
-
-                        <option value="">Select Warehouse</option>
-
-                    </select>
-
-                </div>
-
-                <div class="col-md-3 mb-3">
-
-                    <label class="form-label">Excel File</label>
-
-                    <input type="file"
-                           id="excelFile"
-                           class="form-control"
-                           accept=".xlsx,.xls" />
-
-                </div>
-
-            </div>
-
-            <div class="row">
-
-                <div class="col-md-12 text-end">
-
-                    <button type="button"
-                            id="btnUpload"
-                            class="btn btn-success">
-
-                        <i class="bi bi-upload"></i>
-
-                        Upload Excel
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-<br />
-
-<div id="PreviewArea" style="display:none;">
+@* <div id="PreviewArea" style="display:none;">
 
     <div class="card">
 
@@ -171,10 +78,103 @@
 
     </button>
 
-</form>
+</form> *@
     @* individual entry *@
     <form asp-action="Create" method="post" id="purchaseForm">
+        <div class="card shadow">
 
+            <div class="card-header bg-primary text-white">
+
+                <h4 class="mb-0">
+                    <i class="bi bi-file-earmark-excel"></i>
+                    Purchase Entry (Excel Upload)
+                </h4>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+
+                        <label class="form-label">Shipment</label>
+
+                        <select asp-for="ShipmentId"
+                                asp-items="ViewBag.Shipments"
+                                id="ShipmentId"
+                                class="form-select">
+
+                            <option value="">Select Shipment</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+
+                        <label class="form-label">Supplier</label>
+
+                        <select id="SupplierId"
+                                class="form-select"
+                                asp-items="ViewBag.Suppliers">
+
+                            <option value="">Select Supplier</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+
+                        <label class="form-label">Warehouse</label>
+
+                        <select id="WarehouseId"
+                                class="form-select"
+                                asp-items="ViewBag.Warehouses">
+
+                            <option value="">Select Warehouse</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+
+                        <label class="form-label">Excel File</label>
+
+                        <input type="file"
+                               id="excelFile"
+                               class="form-control"
+                               accept=".xlsx,.xls" />
+
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-12 text-end">
+
+                        <button type="button"
+                                id="btnUpload"
+                                class="btn btn-success">
+
+                            <i class="bi bi-upload"></i>
+
+                            Upload Excel
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <br />
         <div class="card shadow">
 
             <div class="card-header bg-primary text-white">
@@ -748,40 +748,147 @@
         @* excel entry *@
         <script>
 
+            // $("#btnUpload").click(function () {
+
+            //     var shipmentId = $("#ShipmentId").val();
+            //     var supplierId = $("#SupplierId").val();
+            //     var warehouseId = $("#WarehouseId").val();
+
+            //     if (shipmentId == "") {
+            //         alert("Select Shipment");
+            //         return;
+            //     }
+
+            //     if (supplierId == "") {
+            //         alert("Select Supplier");
+            //         return;
+            //     }
+
+            //     if (warehouseId == "") {
+            //         alert("Select Warehouse");
+            //         return;
+            //     }
+
+            //     if ($("#excelFile")[0].files.length == 0) {
+            //         alert("Select Excel File");
+            //         return;
+            //     }
+
+            //     var file = $("#excelFile")[0].files[0];
+
+            //     var data = new FormData();
+
+            //     data.append("file", file);
+            //     data.append("shipmentId", shipmentId);
+            //     data.append("supplierId", supplierId);
+            //     data.append("warehouseId", warehouseId);
+
+            //     $.ajax({
+
+            //         url: "/ProductPurchaseDetail/UploadExcel",
+
+            //         type: "POST",
+
+            //         data: data,
+
+            //         processData: false,
+
+            //         contentType: false,
+
+            //         // success: function (response) {
+
+            //         //     purchaseItems = response;
+
+            //         //     renderTable();
+
+            //         //     $("#PreviewArea").show();
+
+            //         //     $("#btnSave").show();
+            //         //     console.log(response);
+
+            //         //     renderExcel(response);
+
+            //         // },
+            //         success: function (response) {
+
+            //             purchaseItems = response.map(function (x) {
+
+            //                 return {
+
+            //                     ShipmentId: x.shipmentId,
+            //                     SupplierId: x.supplierId,
+            //                     WarehouseId: x.warehouseId,
+
+            //                     ProductNameId: x.productNameId,
+            //                     ProductName: x.productName,
+
+            //                     ColorId: x.colorId,
+            //                     ColorName: x.colorName,
+
+            //                     Thickness: x.thickness,
+            //                     ProductSize: x.productSize,
+
+            //                     InitialQuantity: x.initialQuantity,
+
+            //                     UnitWeightKg: x.unitWeightKg,
+            //                     TotalWeightKg: x.totalWeightKg,
+
+            //                     ExchangeRate: x.exchangeRate,
+
+            //                     UnitPriceRmb: x.unitPriceRmb,
+            //                     UnitPriceTk: x.unitPriceTk,
+
+            //                     ImportTaxPerKgTk: x.importTaxPerKgTk,
+            //                     ImportTaxPerKgRmb: x.importTaxPerKgRmb,
+
+            //                     CostPriceKgTk: x.costPriceKgTk,
+            //                     CostPriceLbsTk: x.costPriceLbsTk,
+            //                     CostPricePcsTk: x.costPricePcsTk,
+            //                     CostPricePcsRmb: x.costPricePcsRmb,
+
+            //                     CostPriceKgRmb: x.costPriceKgRmb,
+            //                     CostPriceLbsRmb: x.costPriceLbsRmb,
+
+            //                     TotalAmountWithoutTaxTk: x.totalAmountWithoutTaxTk,
+            //                     TotalAmountIncludingTaxTk: x.totalAmountIncludingTaxTk,
+
+            //                     TotalAmountWithoutTaxRmb: x.totalAmountWithoutTaxRmb,
+            //                     TotalAmountIncludingTaxRmb: x.totalAmountIncludingTaxRmb,
+
+            //                     Remarks: x.remarks
+
+            //                 };
+
+            //             });
+
+            //             renderTable();
+
+            //             $("#btnSaveExcel").prop("disabled", purchaseItems.length == 0);
+            //         },
+            //         error: function (xhr) {
+
+            //             alert(xhr.responseText);
+
+            //         }
+
+            //     });
+
+            // });
             $("#btnUpload").click(function () {
 
-                var shipmentId = $("#ShipmentId").val();
-                var supplierId = $("#SupplierId").val();
-                var warehouseId = $("#WarehouseId").val();
-
-                if (shipmentId == "") {
-                    alert("Select Shipment");
-                    return;
-                }
-
-                if (supplierId == "") {
-                    alert("Select Supplier");
-                    return;
-                }
-
-                if (warehouseId == "") {
-                    alert("Select Warehouse");
-                    return;
-                }
-
-                if ($("#excelFile")[0].files.length == 0) {
-                    alert("Select Excel File");
-                    return;
-                }
-
                 var file = $("#excelFile")[0].files[0];
+
+                if (!file) {
+                    alert("Select Excel");
+                    return;
+                }
 
                 var data = new FormData();
 
                 data.append("file", file);
-                data.append("shipmentId", shipmentId);
-                data.append("supplierId", supplierId);
-                data.append("warehouseId", warehouseId);
+                data.append("shipmentId", $("#ShipmentId").val());
+                data.append("supplierId", $("#SupplierId").val());
+                data.append("warehouseId", $("#WarehouseId").val());
 
                 $.ajax({
 
@@ -795,76 +902,14 @@
 
                     contentType: false,
 
-                    // success: function (response) {
+                    success: function (rows) {
 
-                    //     purchaseItems = response;
-
-                    //     renderTable();
-
-                    //     $("#PreviewArea").show();
-
-                    //     $("#btnSave").show();
-                    //     console.log(response);
-
-                    //     renderExcel(response);
-
-                    // },
-                    success: function (response) {
-
-                        purchaseItems = response.map(function (x) {
-
-                            return {
-
-                                ShipmentId: x.shipmentId,
-                                SupplierId: x.supplierId,
-                                WarehouseId: x.warehouseId,
-
-                                ProductNameId: x.productNameId,
-                                ProductName: x.productName,
-
-                                ColorId: x.colorId,
-                                ColorName: x.colorName,
-
-                                Thickness: x.thickness,
-                                ProductSize: x.productSize,
-
-                                InitialQuantity: x.initialQuantity,
-
-                                UnitWeightKg: x.unitWeightKg,
-                                TotalWeightKg: x.totalWeightKg,
-
-                                ExchangeRate: x.exchangeRate,
-
-                                UnitPriceRmb: x.unitPriceRmb,
-                                UnitPriceTk: x.unitPriceTk,
-
-                                ImportTaxPerKgTk: x.importTaxPerKgTk,
-                                ImportTaxPerKgRmb: x.importTaxPerKgRmb,
-
-                                CostPriceKgTk: x.costPriceKgTk,
-                                CostPriceLbsTk: x.costPriceLbsTk,
-                                CostPricePcsTk: x.costPricePcsTk,
-                                CostPricePcsRmb: x.costPricePcsRmb,
-
-                                CostPriceKgRmb: x.costPriceKgRmb,
-                                CostPriceLbsRmb: x.costPriceLbsRmb,
-
-                                TotalAmountWithoutTaxTk: x.totalAmountWithoutTaxTk,
-                                TotalAmountIncludingTaxTk: x.totalAmountIncludingTaxTk,
-
-                                TotalAmountWithoutTaxRmb: x.totalAmountWithoutTaxRmb,
-                                TotalAmountIncludingTaxRmb: x.totalAmountIncludingTaxRmb,
-
-                                Remarks: x.remarks
-
-                            };
-
-                        });
+                        purchaseItems = rows;
 
                         renderTable();
 
-                        $("#btnSaveExcel").prop("disabled", purchaseItems.length == 0);
                     },
+
                     error: function (xhr) {
 
                         alert(xhr.responseText);
@@ -874,6 +919,71 @@
                 });
 
             });
+            function addItem() {
+
+                purchaseItems.push({
+
+                    shipmentId: $("#ShipmentId").val(),
+
+                    supplierId: $("#SupplierId").val(),
+
+                    warehouseId: $("#WarehouseId").val(),
+
+                    productNameId: $("#ProductNameId").val(),
+
+                    productName: $("#ProductNameId option:selected").text(),
+
+                    colorId: $("#ColorId").val(),
+
+                    colorName: $("#ColorId option:selected").text(),
+
+                    thickness: $("#Thickness").val(),
+
+                    productSize: $("#ProductSize").val(),
+
+                    initialQuantity: $("#InitialQuantity").val(),
+
+                    unitWeightKg: $("#UnitWeightKg").val(),
+
+                    totalWeightKg: $("#TotalWeightKg").val(),
+
+                    exchangeRate: $("#ExchangeRate").val(),
+
+                    unitPriceRmb: $("#UnitPriceRmb").val(),
+
+                    unitPriceTk: $("#UnitPriceTk").val(),
+
+                    importTaxPerKgTk: $("#ImportTaxPerKgTk").val(),
+
+                    importTaxPerKgRmb: $("#ImportTaxPerKgRmb").val(),
+
+                    costPriceKgTk: $("#CostPriceKgTk").val(),
+
+                    costPriceLbsTk: $("#CostPriceLbsTk").val(),
+
+                    costPricePcsTk: $("#CostPricePcsTk").val(),
+
+                    costPriceKgRmb: $("#CostPriceKgRmb").val(),
+
+                    costPriceLbsRmb: $("#CostPriceLbsRmb").val(),
+
+                    costPricePcsRmb: $("#CostPricePcsRmb").val(),
+
+                    totalAmountWithoutTaxTk: $("#TotalAmountWithoutTaxTk").val(),
+
+                    totalAmountWithoutTaxRmb: $("#TotalAmountWithoutTaxRmb").val(),
+
+                    totalAmountIncludingTaxTk: $("#TotalAmountIncludingTaxTk").val(),
+
+                    totalAmountIncludingTaxRmb: $("#TotalAmountIncludingTaxRmb").val(),
+
+                    remarks: $("#Remarks").val()
+
+                });
+
+                renderTable();
+
+            }
             function renderExcel(items) {
 
                 purchaseItems = [];
@@ -1243,9 +1353,9 @@
 
             <td>${index + 1}</td>
 
-            <td>${item.ProductName}</td>
+                        <td>${item.productName ?? item.ProductName}</td>
 
-            <td>${item.ColorName}</td>
+                        <td>${item.colorName ?? item.ColorName}</td>
 
             <td>${item.Thickness}</td>
 
@@ -1437,29 +1547,30 @@
             //     });
 
             // });
-            $("#ShipmentId").change(function () {
+            $(document).on("change", "#ShipmentId", function () {
 
                 var id = $(this).val();
 
-                console.log("Shipment Changed:", id);
-
-                if (id == "") {
+                if (!id) {
                     $("#ShipmentDate").val("");
                     return;
                 }
 
-                $.get("/Shipment/GetShipment",
-                    { id: id },
-                    function (data) {
+                $.ajax({
 
-                        console.log(data);
+                    url: "/Shipment/GetShipment",
 
-                        $("#ShipmentDate").val(data.shipmentDate);
+                    type: "GET",
 
-                    })
-                    .fail(function (xhr) {
-                        console.log(xhr);
-                    });
+                    data: { id: id },
+
+                    success: function (res) {
+
+                        $("#ShipmentDate").val(res.shipmentDate);
+
+                    }
+
+                });
 
             });
 
