@@ -25,8 +25,8 @@ public partial class ProductPurchaseDetail
     [Column(TypeName = "decimal(10, 2)")]
     public decimal? Thickness { get; set; }
 
-    [Column(TypeName = "decimal(10, 2)")]
-    public decimal? ProductSize { get; set; }
+    [StringLength(100)]
+    public string? ProductSize { get; set; }
 
     public int InitialQuantity { get; set; }
 

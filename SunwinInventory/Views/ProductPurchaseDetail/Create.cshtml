@@ -5,7 +5,174 @@
 }
 
 <div class="container-fluid">
+    @* excel upload *@
+    <div class="card shadow">
 
+        <div class="card-header bg-primary text-white">
+
+            <h4 class="mb-0">
+                <i class="bi bi-file-earmark-excel"></i>
+                Purchase Entry (Excel Upload)
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-3 mb-3">
+
+                    <label class="form-label">Shipment</label>
+
+                    <select asp-for="ShipmentId"
+                            asp-items="ViewBag.Shipments"
+                            id="ShipmentId"
+                            class="form-select">
+
+                        <option value="">Select Shipment</option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-3 mb-3">
+
+                    <label class="form-label">Supplier</label>
+
+                    <select id="SupplierId"
+                            class="form-select"
+                            asp-items="ViewBag.Suppliers">
+
+                        <option value="">Select Supplier</option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-3 mb-3">
+
+                    <label class="form-label">Warehouse</label>
+
+                    <select id="WarehouseId"
+                            class="form-select"
+                            asp-items="ViewBag.Warehouses">
+
+                        <option value="">Select Warehouse</option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-3 mb-3">
+
+                    <label class="form-label">Excel File</label>
+
+                    <input type="file"
+                           id="excelFile"
+                           class="form-control"
+                           accept=".xlsx,.xls" />
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-12 text-end">
+
+                    <button type="button"
+                            id="btnUpload"
+                            class="btn btn-success">
+
+                        <i class="bi bi-upload"></i>
+
+                        Upload Excel
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+<br />
+
+<div id="PreviewArea" style="display:none;">
+
+    <div class="card">
+
+        <div class="card-header bg-success text-white">
+
+            Purchase Preview
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-sm"
+                       id="previewTable">
+
+                    <thead>
+
+                    <tr>
+
+                        <th>#</th>
+
+                        <th>Product</th>
+
+                        <th>Color</th>
+
+                        <th>Thickness</th>
+
+                        <th>Size</th>
+
+                        <th>Qty</th>
+
+                        <th>Total Weight</th>
+
+                        <th>Unit Price RMB</th>
+
+                        <th>Total TK</th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<form asp-action="SaveExcelPurchase"
+      method="post">
+
+    <input asp-for="ShipmentId" type="hidden" id="hdShipmentId"/>
+
+    <div id="hiddenItems"></div>
+
+    <button class="btn btn-primary mt-3"
+            id="btnSave"
+            style="display:none">
+
+        Save All
+
+    </button>
+
+</form>
+    @* individual entry *@
     <form asp-action="Create" method="post" id="purchaseForm">
 
         <div class="card shadow">
@@ -101,13 +268,10 @@
 
                                 </label>
 
-                                <select asp-for="SupplierId"
-                                        id="SupplierId"
-                                        asp-items="ViewBag.Suppliers"
-                                        class="form-select">
-
+                                <select id="SupplierId"
+                                        class="form-select"
+                                        asp-items="ViewBag.Suppliers">
                                     <option value="">Select Supplier</option>
-
                                 </select>
 
                             </div>
@@ -120,13 +284,10 @@
 
                                 </label>
 
-                                <select asp-for="WarehouseId"
-                                        id="WarehouseId"
-                                        asp-items="ViewBag.Warehouses"
-                                        class="form-select">
-
+                                <select id="WarehouseId"
+                                        class="form-select"
+                                        asp-items="ViewBag.Warehouses">
                                     <option value="">Select Warehouse</option>
-
                                 </select>
 
                             </div>
@@ -584,6 +745,153 @@
 
     @section Scripts {
 
+        @* excel entry *@
+        <script>
+
+            $("#btnUpload").click(function () {
+
+                var shipmentId = $("#ShipmentId").val();
+                var supplierId = $("#SupplierId").val();
+                var warehouseId = $("#WarehouseId").val();
+
+                if (shipmentId == "") {
+                    alert("Select Shipment");
+                    return;
+                }
+
+                if (supplierId == "") {
+                    alert("Select Supplier");
+                    return;
+                }
+
+                if (warehouseId == "") {
+                    alert("Select Warehouse");
+                    return;
+                }
+
+                if ($("#excelFile")[0].files.length == 0) {
+                    alert("Select Excel File");
+                    return;
+                }
+
+                var file = $("#excelFile")[0].files[0];
+
+                var data = new FormData();
+
+                data.append("file", file);
+                data.append("shipmentId", shipmentId);
+                data.append("supplierId", supplierId);
+                data.append("warehouseId", warehouseId);
+
+                $.ajax({
+
+                    url: "/ProductPurchaseDetail/UploadExcel",
+
+                    type: "POST",
+
+                    data: data,
+
+                    processData: false,
+
+                    contentType: false,
+
+                    // success: function (response) {
+
+                    //     purchaseItems = response;
+
+                    //     renderTable();
+
+                    //     $("#PreviewArea").show();
+
+                    //     $("#btnSave").show();
+                    //     console.log(response);
+
+                    //     renderExcel(response);
+
+                    // },
+                    success: function (response) {
+
+                        purchaseItems = response.map(function (x) {
+
+                            return {
+
+                                ShipmentId: x.shipmentId,
+                                SupplierId: x.supplierId,
+                                WarehouseId: x.warehouseId,
+
+                                ProductNameId: x.productNameId,
+                                ProductName: x.productName,
+
+                                ColorId: x.colorId,
+                                ColorName: x.colorName,
+
+                                Thickness: x.thickness,
+                                ProductSize: x.productSize,
+
+                                InitialQuantity: x.initialQuantity,
+
+                                UnitWeightKg: x.unitWeightKg,
+                                TotalWeightKg: x.totalWeightKg,
+
+                                ExchangeRate: x.exchangeRate,
+
+                                UnitPriceRmb: x.unitPriceRmb,
+                                UnitPriceTk: x.unitPriceTk,
+
+                                ImportTaxPerKgTk: x.importTaxPerKgTk,
+                                ImportTaxPerKgRmb: x.importTaxPerKgRmb,
+
+                                CostPriceKgTk: x.costPriceKgTk,
+                                CostPriceLbsTk: x.costPriceLbsTk,
+                                CostPricePcsTk: x.costPricePcsTk,
+                                CostPricePcsRmb: x.costPricePcsRmb,
+
+                                CostPriceKgRmb: x.costPriceKgRmb,
+                                CostPriceLbsRmb: x.costPriceLbsRmb,
+
+                                TotalAmountWithoutTaxTk: x.totalAmountWithoutTaxTk,
+                                TotalAmountIncludingTaxTk: x.totalAmountIncludingTaxTk,
+
+                                TotalAmountWithoutTaxRmb: x.totalAmountWithoutTaxRmb,
+                                TotalAmountIncludingTaxRmb: x.totalAmountIncludingTaxRmb,
+
+                                Remarks: x.remarks
+
+                            };
+
+                        });
+
+                        renderTable();
+
+                        $("#btnSave").prop("disabled", purchaseItems.length == 0);
+                    },
+                    error: function (xhr) {
+
+                        alert(xhr.responseText);
+
+                    }
+
+                });
+
+            });
+            function renderExcel(items) {
+
+                purchaseItems = [];
+
+                items.forEach(function (item) {
+
+                    purchaseItems.push(item);
+
+                });
+
+                renderTable();
+
+                $("#btnSave").prop("disabled", purchaseItems.length == 0);
+
+            }
+        </script>
+
+        @* individual entry *@
         <script>
             let editIndex = -1;
             let purchaseItems = [];
@@ -598,109 +906,8 @@
                 CalculatePurchase();
 
             });
-            // $("#btnCalculate").click(function () {
-
-            //     let qty = parseFloat($("#InitialQuantity").val()) || 0;
-
-            //     let totalWeight = parseFloat($("#TotalWeightKg").val()) || 0;
-
-            //     let exchangeRate = parseFloat($("#ExchangeRate").val()) || 0;
-
-            //     let unitPriceRmb = parseFloat($("#UnitPriceRmb").val()) || 0;
-
-            //     let taxPerKgTk = parseFloat($("#ImportTaxPerKgTk").val()) || 0;
-
-            //     //--------------------------------------------------
-            //     // Weight
-            //     //--------------------------------------------------
-
-            //     let unitWeightKg = 0;
-
-            //     if (qty > 0)
-            //         unitWeightKg = totalWeight / qty;
-
-            //     //--------------------------------------------------
-            //     // Price
-            //     //--------------------------------------------------
-
-            //     let unitPriceTk = unitPriceRmb * exchangeRate;
-
-            //     let taxPerKgRmb = 0;
-
-            //     if (exchangeRate > 0)
-            //         taxPerKgRmb = taxPerKgTk / exchangeRate;
-
-            //     //--------------------------------------------------
-            //     // Cost Per KG
-            //     //--------------------------------------------------
-
-            //     let costKgTk = unitPriceTk + taxPerKgTk;
-
-            //     let costKgRmb = unitPriceRmb + taxPerKgRmb;
-
-            //     //--------------------------------------------------
-            //     // Cost Per LBS
-            //     //--------------------------------------------------
-
-            //     let costLbsTk = costKgTk / 2.20462;
-
-            //     let costLbsRmb = costKgRmb / 2.20462;
-
-            //     //--------------------------------------------------
-            //     // Cost Per PCS
-            //     //--------------------------------------------------
-
-            //     let costPerPcsTk = costKgTk * unitWeightKg;
-
-            //     let costPerPcsRmb = costKgRmb * unitWeightKg;
-
-            //     //--------------------------------------------------
-            //     // Total Without Tax
-            //     //--------------------------------------------------
-
-            //     let totalWithoutTaxTk = unitPriceTk * totalWeight;
-
-            //     let totalWithoutTaxRmb = unitPriceRmb * totalWeight;
-
-            //     //--------------------------------------------------
-            //     // Total Including Tax
-            //     //--------------------------------------------------
-
-            //     let totalWithTaxTk = costKgTk * totalWeight;
-
-            //     let totalWithTaxRmb = costKgRmb * totalWeight;
-
-            //     //--------------------------------------------------
-            //     // Fill Controls
-            //     //--------------------------------------------------
-
-            //     $("#UnitWeightKg").val(unitWeightKg.toFixed(4));
-
-            //     $("#UnitPriceTk").val(unitPriceTk.toFixed(2));
-
-            //     $("#ImportTaxPerKgRmb").val(taxPerKgRmb.toFixed(2));
-
-            //     $("#CostPriceKgTk").val(costKgTk.toFixed(2));
-
-            //     $("#CostPriceKgRmb").val(costKgRmb.toFixed(2));
-
-            //     $("#CostPriceLbsTk").val(costLbsTk.toFixed(2));
-
-            //     $("#CostPriceLbsRmb").val(costLbsRmb.toFixed(2));
-
-            //     $("#CostPricePcsTk").val(costPerPcsTk.toFixed(2));
-
-            //     $("#CostPricePcsRmb").val(costPerPcsRmb.toFixed(2));
-
-            //     $("#TotalAmountWithoutTaxTk").val(totalWithoutTaxTk.toFixed(2));
-
-            //     $("#TotalAmountWithoutTaxRmb").val(totalWithoutTaxRmb.toFixed(2));
-
-            //     $("#TotalAmountIncludingTaxTk").val(totalWithTaxTk.toFixed(2));
-
-            //     $("#TotalAmountIncludingTaxRmb").val(totalWithTaxRmb.toFixed(2));
-
-            // });
+            
+          
             $("#InitialQuantity").on("keyup change", calculatePurchase);
 
             $("#TotalWeightKg").on("keyup change", calculatePurchase);

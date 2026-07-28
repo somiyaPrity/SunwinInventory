@@ -4,6 +4,14 @@ namespace SunwinInventory.DTOs.ProductPurchaseDetail
 {
     public class ProductPurchaseDetailDto
     {
+        public string? ProductName { get; set; }
+
+        public string? ColorName { get; set; }
+        public decimal? CostPricePcsTk { get; set; }
+
+        public decimal? CostPricePcsRmb { get; set; }
+
+       
         public int PurchaseDetailId { get; set; }
 
         [Required]
@@ -23,7 +31,7 @@ namespace SunwinInventory.DTOs.ProductPurchaseDetail
 
         public decimal? Thickness { get; set; }
 
-        public decimal? ProductSize { get; set; }
+        public string? ProductSize { get; set; }
 
         [Required]
         public int InitialQuantity { get; set; }
