@@ -7,8 +7,8 @@ namespace SunwinInventory.DTOs.ProductPurchaseDetail
         public string? ProductName { get; set; }
 
         public string? ColorName { get; set; }
-        public decimal? CostPricePcsTk { get; set; }
-
+        public decimal? CostPricePerPieceTk { get; set; }
+        public decimal? CostPricePerPieceRmb { get; set; }
         public decimal? CostPricePcsRmb { get; set; }
 
        
@@ -49,7 +49,7 @@ namespace SunwinInventory.DTOs.ProductPurchaseDetail
         public decimal? ImportTaxPerKgTk { get; set; }
 
         public decimal? ImportTaxPerKgRmb { get; set; }
-        public decimal? CostPricePerPieceTk { get; set; }
+       
         public decimal? CostPriceKgTk { get; set; }
 
         public decimal? CostPriceLbsTk { get; set; }

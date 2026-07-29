@@ -20,6 +20,8 @@ public partial class ProductPurchaseDetail
     public int ProductNameId { get; set; }
     [Column(TypeName = "decimal(18,4)")]
     public decimal? CostPricePerPieceTk { get; set; }
+    [Column(TypeName = "decimal(18,4)")]
+    public decimal? CostPricePerPieceRmb { get; set; }
     public int ColorId { get; set; }
 
     [Column(TypeName = "decimal(10, 2)")]

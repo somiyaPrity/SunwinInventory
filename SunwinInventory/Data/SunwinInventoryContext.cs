@@ -36,10 +36,10 @@ public partial class SunwinInventoryContext : DbContext
 
     public virtual DbSet<Warehouse> Warehouses { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-B2C6QFK;Database=SunwinInventoryDB;Trusted_Connection=True;TrustServerCertificate=True;");
     //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //=> optionsBuilder.UseSqlServer("Server=SOMIYA-IT\\SA;Database=SunwinInventoryDB;Trusted_Connection=True;TrustServerCertificate=True;");
+    //    => optionsBuilder.UseSqlServer("Server=DESKTOP-B2C6QFK;Database=SunwinInventoryDB;Trusted_Connection=True;TrustServerCertificate=True;");
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    => optionsBuilder.UseSqlServer("Server=SOMIYA-IT\\SA;Database=SunwinInventoryDB;Trusted_Connection=True;TrustServerCertificate=True;");
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Color>(entity =>

@@ -5,119 +5,40 @@
 }
 
 <div class="container-fluid">
-    @* excel upload *@
-  
 
-@* <div id="PreviewArea" style="display:none;">
+    <div class="card shadow-sm">
 
-    <div class="card">
-
-        <div class="card-header bg-success text-white">
-
-            Purchase Preview
-
+        <div class="card-header bg-primary text-white">
+            <h4>Purchase Entry</h4>
         </div>
 
         <div class="card-body">
 
-            <div class="table-responsive">
-
-                <table class="table table-bordered table-sm"
-                       id="previewTable">
-
-                    <thead>
-
-                    <tr>
-
-                        <th>#</th>
-
-                        <th>Product</th>
-
-                        <th>Color</th>
-
-                        <th>Thickness</th>
-
-                        <th>Size</th>
-
-                        <th>Qty</th>
-
-                        <th>Total Weight</th>
-
-                        <th>Unit Price RMB</th>
-
-                        <th>Total TK</th>
-
-                    </tr>
-
-                    </thead>
-
-                    <tbody></tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<form asp-action="SaveExcelPurchase"
-      method="post">
-
-    <input asp-for="ShipmentId" type="hidden" id="hdShipmentId"/>
-
-    <div id="hiddenItemsExcel"></div>
-
-    <button class="btn btn-primary mt-3"
-                id="btnSaveExcel"
-            style="display:none">
-
-        Save All
-
-    </button>
-
-</form> *@
-    @* individual entry *@
-    <form asp-action="Create" method="post" id="purchaseForm">
-        <div class="card shadow">
-
-            <div class="card-header bg-primary text-white">
-
-                <h4 class="mb-0">
-                    <i class="bi bi-file-earmark-excel"></i>
-                    Purchase Entry (Excel Upload)
-                </h4>
-
-            </div>
-
-            <div class="card-body">
+            <form asp-action="Create" method="post" enctype="multipart/form-data" id="purchaseForm">
 
                 <div class="row">
 
-                    <div class="col-md-3 mb-3">
+                    <div class="col-md-4 mb-3">
 
-                        <label class="form-label">Shipment</label>
+                        <label>Shipment</label>
 
                         <select asp-for="ShipmentId"
                                 asp-items="ViewBag.Shipments"
-                                id="ShipmentId"
-                                class="form-select">
-
+                                class="form-select"
+                                id="ShipmentId">
                             <option value="">Select Shipment</option>
-
                         </select>
 
                     </div>
 
-                    <div class="col-md-3 mb-3">
+                    <div class="col-md-4 mb-3">
 
-                        <label class="form-label">Supplier</label>
+                        <label>Supplier</label>
 
-                        <select id="SupplierId"
+                        <select asp-for="SupplierId"
+                                asp-items="ViewBag.Suppliers"
                                 class="form-select"
-                                asp-items="ViewBag.Suppliers">
+                                id="SupplierId">
 
                             <option value="">Select Supplier</option>
 
@@ -125,13 +46,14 @@
 
                     </div>
 
-                    <div class="col-md-3 mb-3">
+                    <div class="col-md-4 mb-3">
 
-                        <label class="form-label">Warehouse</label>
+                        <label>Warehouse</label>
 
-                        <select id="WarehouseId"
+                        <select asp-for="WarehouseId"
+                                asp-items="ViewBag.Warehouses"
                                 class="form-select"
-                                asp-items="ViewBag.Warehouses">
+                                id="WarehouseId">
 
                             <option value="">Select Warehouse</option>
 
@@ -139,28 +61,28 @@
 
                     </div>
 
-                    <div class="col-md-3 mb-3">
+                </div>
 
-                        <label class="form-label">Excel File</label>
+                <hr/>
+
+                <div class="row">
+
+                    <div class="col-md-8">
+
+                        <label>Upload Excel</label>
 
                         <input type="file"
                                id="excelFile"
                                class="form-control"
-                               accept=".xlsx,.xls" />
+                               accept=".xlsx,.xls"/>
 
                     </div>
 
-                </div>
-
-                <div class="row">
-
-                    <div class="col-md-12 text-end">
+                    <div class="col-md-4 d-flex align-items-end">
 
                         <button type="button"
-                                id="btnUpload"
-                                class="btn btn-success">
-
-                            <i class="bi bi-upload"></i>
+                                class="btn btn-success w-100"
+                                id="btnUploadExcel">
 
                             Upload Excel
 
@@ -170,1435 +92,598 @@
 
                 </div>
 
-            </div>
+                <hr/>
 
-        </div>
+                <h5 class="text-primary">
 
-        <br />
-        <div class="card shadow">
+                    Individual Purchase Entry
 
-            <div class="card-header bg-primary text-white">
+                </h5><div class="row mt-3">
 
-                <h4 class="mb-0">
-
-                    <i class="bi bi-cart-check-fill"></i>
-
-                    Purchase Entry
-
-                </h4>
-
-            </div>
-
-            <div class="card-body">
-                <div class="card border-primary mb-4">
-
-                    <div class="card-header bg-light">
-
-                        <h5 class="mb-0">
-
-                            Shipment Information
-
-                        </h5>
-
+                    <div class="col-md-3 mb-3">
+                        <label>Product</label>
+                        <select id="ProductNameId" class="form-select">
+                            <option value="">Select Product</option>
+                            @foreach (var item in ViewBag.Products)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
                     </div>
 
-                    <div class="card-body">
+                    <div class="col-md-3 mb-3">
+                        <label>Color</label>
+                        <select id="ColorId" class="form-select">
+                            <option value="">Select Color</option>
+                            @foreach (var item in ViewBag.Colors)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
 
-                        <div class="row">
+                    <div class="col-md-2 mb-3">
+                        <label>Thickness</label>
+                        <input type="number" step="0.01" id="Thickness" class="form-control" />
+                    </div>
 
-                            <div class="col-md-4">
+                    <div class="col-md-2 mb-3">
+                        <label>Size</label>
+                        <input type="text" id="ProductSize" class="form-control" />
+                    </div>
 
-                                <label class="form-label">
-
-                                    Shipment No
-
-                                </label>
-
-                                <select asp-for="ShipmentId"
-                                        id="ShipmentId"
-                                        asp-items="ViewBag.Shipments"
-                                        class="form-select">
-
-                                    <option value="">Select Shipment</option>
-
-                                </select>
-
-                            </div>
-
-                            <div class="col-md-4">
-
-                                <label class="form-label">
-
-                                    Shipment Date
-
-                                </label>
-
-                                <input id="ShipmentDate"
-                                       class="form-control"
-                                       readonly />
-
-                            </div>
-
-                        </div>
-
+                    <div class="col-md-2 mb-3">
+                        <label>Quantity</label>
+                        <input type="number" id="InitialQuantity" class="form-control" />
                     </div>
 
                 </div>
-                <div class="card border-success mb-4">
 
-                    <div class="card-header bg-light">
+                <div class="row">
 
-                        <h5 class="mb-0">
-
-                            Purchase Header
-
-                        </h5>
-
+                    <div class="col-md-2 mb-3">
+                        <label>Unit Weight (KG)</label>
+                        <input type="number" step="0.0001" id="UnitWeightKg" class="form-control" />
                     </div>
 
-                    <div class="card-body">
+                    <div class="col-md-2 mb-3">
+                        <label>Total Weight</label>
+                        <input type="number" step="0.0001" id="TotalWeightKg" class="form-control" />
+                    </div>
 
-                        <div class="row">
+                    <div class="col-md-2 mb-3">
+                        <label>Exchange Rate</label>
+                        <input type="number" step="0.0001" id="ExchangeRate" class="form-control" />
+                    </div>
 
-                            <div class="col-md-6">
+                    <div class="col-md-2 mb-3">
+                        <label>Unit Price TK</label>
+                        <input type="number" step="0.0001" id="UnitPriceTk" class="form-control" />
+                    </div>
 
-                                <label class="form-label">
+                    <div class="col-md-2 mb-3">
+                        <label>Unit Price RMB</label>
+                        <input type="number" step="0.0001" id="UnitPriceRmb" class="form-control" />
+                    </div>
 
-                                    Supplier
-
-                                </label>
-
-                                <select id="SupplierId"
-                                        class="form-select"
-                                        asp-items="ViewBag.Suppliers">
-                                    <option value="">Select Supplier</option>
-                                </select>
-
-                            </div>
-
-                            <div class="col-md-6">
-
-                                <label class="form-label">
-
-                                    Warehouse
-
-                                </label>
-
-                                <select id="WarehouseId"
-                                        class="form-select"
-                                        asp-items="ViewBag.Warehouses">
-                                    <option value="">Select Warehouse</option>
-                                </select>
-
-                            </div>
-
-                        </div>
-
+                    <div class="col-md-2 mb-3">
+                        <label>Import Tax TK</label>
+                        <input type="number" step="0.0001" id="ImportTaxPerKgTk" class="form-control" />
                     </div>
 
                 </div>
-                <div class="card border-info mb-4">
 
-                    <div class="card-header bg-light">
+                <div class="row">
 
-                        <h5 class="mb-0">
-
-                            Product Information
-
-                        </h5>
-
+                    <div class="col-md-2 mb-3">
+                        <label>Import Tax RMB</label>
+                        <input type="number" step="0.0001" id="ImportTaxPerKgRmb" class="form-control" />
                     </div>
 
-                    <div class="card-body">
+                    <div class="col-md-2 mb-3">
+                        <label>Cost/KG TK</label>
+                        <input type="number" step="0.0001" id="CostPriceKgTk" class="form-control" />
+                    </div>
 
-                        <div class="row">
+                    <div class="col-md-2 mb-3">
+                        <label>Cost/LBS TK</label>
+                        <input type="number" step="0.0001" id="CostPriceLbsTk" class="form-control" />
+                    </div>
 
-                            <div class="col-md-3 mb-3">
+                    <div class="col-md-2 mb-3">
+                        <label>Cost/PCS TK</label>
+                        <input type="number" step="0.0001" id="CostPricePerPieceTk" class="form-control" />
+                    </div>
 
-                                <label>Product</label>
+                    <div class="col-md-2 mb-3">
+                        <label>Cost/KG RMB</label>
+                        <input type="number" step="0.0001" id="CostPriceKgRmb" class="form-control" />
+                    </div>
 
-                                <select id="ProductNameId"
-                                        class="form-select"
-                                        asp-items="ViewBag.Products">
-
-                                    <option value="">Select Product</option>
-
-                                </select>
-
-                            </div>
-
-                            <div class="col-md-3 mb-3">
-
-                                <label>Color</label>
-
-                                <select id="ColorId"
-                                        class="form-select"
-                                        asp-items="ViewBag.Colors">
-
-                                    <option value="">Select Color</option>
-
-                                </select>
-
-                            </div>
-
-                            <div class="col-md-2 mb-3">
-
-                                <label>Thickness</label>
-
-                                <input id="Thickness"
-                                       class="form-control" />
-
-                            </div>
-
-                            <div class="col-md-2 mb-3">
-
-                                <label>Size</label>
-
-                                <input id="ProductSize"
-                                       class="form-control" />
-
-                            </div>
-
-                            <div class="col-md-2 mb-3">
-
-                                <label>Quantity</label>
-
-                                <input id="InitialQuantity"
-                                       type="number"
-                                       class="form-control" />
-
-                            </div>
-
-                        </div>
-
-                        <div class="row">
-
-                            <div class="col-md-3 mb-3">
-
-                                <label>Total Weight (KG)</label>
-
-                                <input id="TotalWeightKg"
-                                       class="form-control" />
-
-                            </div>
-
-                            <div class="col-md-3 mb-3">
-
-                                <label>Exchange Rate</label>
-
-                                <input id="ExchangeRate"
-                                       class="form-control" />
-
-                            </div>
-
-                            <div class="col-md-3 mb-3">
-
-                                <label>Unit Price (RMB)</label>
-
-                                <input id="UnitPriceRmb"
-                                       class="form-control" />
-
-                            </div>
-
-                            <div class="col-md-3 mb-3">
-
-                                <label>Import Tax / KG (TK)</label>
-
-                                <input id="ImportTaxPerKgTk"
-                                       class="form-control" />
-
-                            </div>
-
-                        </div>
-
-                        <div class="text-end">
-
-                            <button type="button"
-                                    id="btnCalculate"
-                                    class="btn btn-primary">
-
-                                <i class="bi bi-calculator"></i>
-
-                                Calculate
-
-                            </button>
-
-                        </div>
-
+                    <div class="col-md-2 mb-3">
+                        <label>Cost/LBS RMB</label>
+                        <input type="number" step="0.0001" id="CostPriceLbsRmb" class="form-control" />
                     </div>
 
                 </div>
-                <div class="card border-warning mb-4">
 
-                    <div class="card-header bg-light">
+                <div class="row">
 
-                        <h5 class="mb-0">
+                    <div class="col-md-3 mb-3">
+                        <label>Total Without Tax TK</label>
+                        <input type="number" step="0.01" id="TotalAmountWithoutTaxTk" class="form-control" />
+                    </div>
 
-                            Calculated Information
+                    <div class="col-md-3 mb-3">
+                        <label>Total With Tax TK</label>
+                        <input type="number" step="0.01" id="TotalAmountIncludingTaxTk" class="form-control" />
+                    </div>
 
-                        </h5>
+                    <div class="col-md-3 mb-3">
+                        <label>Total Without Tax RMB</label>
+                        <input type="number" step="0.01" id="TotalAmountWithoutTaxRmb" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Total With Tax RMB</label>
+                        <input type="number" step="0.01" id="TotalAmountIncludingTaxRmb" class="form-control" />
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-10 mb-3">
+                        <label>Remarks</label>
+                        <input type="text" id="Remarks" class="form-control" />
+                    </div>
+
+                    <div class="col-md-1 d-flex align-items-end">
+
+                        <button type="button"
+                                class="btn btn-warning w-100"
+                                id="btnCalculate">
+
+                            Calculate
+
+                        </button>
 
                     </div>
 
-                    <div class="card-body">
+                    <div class="col-md-1 d-flex align-items-end">
 
-                        <div class="row">
+                        <button type="button"
+                                class="btn btn-primary w-100"
+                                id="btnAddItem">
 
-                            <div class="col-md-3 mb-3">
+                            Add To List
 
-                                <label>Unit Weight (KG)</label>
-
-                                <input id="UnitWeightKg"
-                                       class="form-control"
-                                       readonly />
-
-                            </div>
-
-                            <div class="col-md-3 mb-3">
-
-                                <label>Unit Price (TK)</label>
-
-                                <input id="UnitPriceTk"
-                                       class="form-control"
-                                       readonly />
-
-                            </div>
-
-                            <div class="col-md-3 mb-3">
-
-                                <label>Import Tax/KG (RMB)</label>
-
-                                <input id="ImportTaxPerKgRmb"
-                                       class="form-control"
-                                       readonly />
-
-                            </div>
-
-                            
-                            <div class="col-md-3 mb-3">
-                                <label>Cost Price / PCS (TK)</label>
-                                <input id="CostPricePcsTk"
-                                       class="form-control"
-                                       readonly />
-                            </div>
-
-                        </div>
-
-                        <div class="row">
-                           
-                            <div class="col-md-3 mb-3">
-                                <label>Cost Price / PCS (RMB)</label>
-                                <input id="CostPricePcsRmb"
-                                       class="form-control"
-                                       readonly />
-                            </div>
-                            <div class="col-md-3 mb-3">
-
-                                <label>Cost Price/KG (TK)</label>
-
-                                <input id="CostPriceKgTk"
-                                       class="form-control"
-                                       readonly />
-
-                            </div>
-                            <div class="col-md-3 mb-3">
-
-                                <label>Cost Price/LBS (TK)</label>
-
-                                <input id="CostPriceLbsTk"
-                                       class="form-control"
-                                       readonly />
-
-                            </div>
-                         
-                            <div class="col-md-3 mb-3">
-
-                                <label>Cost Price/KG (RMB)</label>
-
-                                <input id="CostPriceKgRmb"
-                                       class="form-control"
-                                       readonly />
-
-                            </div>
-
-                            <div class="col-md-3 mb-3">
-
-                                <label>Cost Price/LBS (RMB)</label>
-
-                                <input id="CostPriceLbsRmb"
-                                       class="form-control"
-                                       readonly />
-
-                            </div>
-                          
-                            <div class="col-md-3 mb-3">
-
-                                <label>Total Without Tax (TK)</label>
-
-                                <input id="TotalAmountWithoutTaxTk"
-                                       class="form-control"
-                                       readonly />
-
-                            </div>
-
-                        </div>
-
-                        <div class="row">
-
-                            <div class="col-md-3 mb-3">
-
-                                <label>Total With Tax (TK)</label>
-
-                                <input id="TotalAmountIncludingTaxTk"
-                                       class="form-control"
-                                       readonly />
-
-                            </div>
-
-                            <div class="col-md-3 mb-3">
-
-                                <label>Total Without Tax (RMB)</label>
-
-                                <input id="TotalAmountWithoutTaxRmb"
-                                       class="form-control"
-                                       readonly />
-
-                            </div>
-
-                            <div class="col-md-3 mb-3">
-
-                                <label>Total With Tax (RMB)</label>
-
-                                <input id="TotalAmountIncludingTaxRmb"
-                                       class="form-control"
-                                       readonly />
-
-                            </div>
-
-                            <div class="col-md-3 mb-3">
-
-                                <label>Remarks</label>
-
-                                <input id="Remarks"
-                                       class="form-control" />
-
-                            </div>
-
-                        </div>
+                        </button>
 
                     </div>
 
                 </div>
 
-                <div class="text-end mb-4">
+                <hr />
 
-                    <button type="button"
-                            id="btnAdd"
-                            class="btn btn-success">
+                <h5 class="text-success">
 
-                        <i class="bi bi-plus-circle"></i>
+                    Purchase Preview
 
-                        Add To List
+                </h5>
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-striped" id="purchaseTable">
+
+                        <thead class="table-dark">
+
+                            <tr>
+
+                                <th>Product</th>
+                                <th>Color</th>
+                                <th>Thickness</th>
+                                <th>Size</th>
+                                <th>Qty</th>
+                                <th>Weight</th>
+                                <th>Price TK</th>
+                                <th>Action</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="text-end mt-3">
+
+                    <button type="submit"
+                            class="btn btn-success btn-lg">
+
+                        Save All Purchase
 
                     </button>
 
                 </div>
+              </form>
+                
+                @section Scripts {
 
-                <div class="card shadow">
+                    <script>
 
-                    <div class="card-header bg-success text-white">
+                        let rowIndex = 0;
 
-                        <h5 class="mb-0">
+                        //===========================================
+                        // ADD INDIVIDUAL ITEM
+                        //===========================================
+                    function n(id) {
 
-                            Purchase Item List
-
-                        </h5>
-
-                    </div>
-
-                    <div class="card-body">
-
-                        <div class="table-responsive">
-
-                            <table class="table table-bordered table-hover align-middle"
-                                   id="purchaseTable">
-
-                                <thead class="table-light">
-
-                                    <tr>
-
-                                        <th width="60">SL</th>
-
-                                        <th>Product</th>
-
-                                        <th>Color</th>
-
-                                        <th>Thickness</th>
-
-                                        <th>Size</th>
-
-                                        <th>Qty</th>
-
-                                        <th>Weight</th>
-
-                                        <th>Price RMB</th>
-
-                                        <th>Total TK</th>
-
-                                        <th width="130">Action</th>
-
-                                    </tr>
-
-                                </thead>
-
-                                <tbody>
-                                </tbody>
-                                <tfoot>
-
-                                    <tr class="table-warning">
-
-                                        <th colspan="2" class="text-end">
-                                            Grand Total
-                                        </th>
-
-                                        <th id="ftQty">0</th>
-
-                                        <th id="ftWeight">0.00</th>
-
-                                        <th></th>
-
-                                        <th id="ftAmount">0.00</th>
-
-                                        <th></th>
-
-                                    </tr>
-
-                                </tfoot>
-
-                            </table>
-
-                        </div>
-
-                        <div class="row mt-3">
-
-                            <div class="col-md-4 offset-md-8">
-
-                                <table class="table table-bordered">
-
-                                    <tr class="table-info">
-
-                                        <th>Total TK</th>
-
-                                        <td id="grandTk"
-                                            class="text-end">
-
-                                            0.00
-
-                                        </td>
-
-                                    </tr>
-
-                                    <tr class="table-warning">
-
-                                        <th>Total RMB</th>
-
-                                        <td id="grandRmb"
-                                            class="text-end">
-
-                                            0.00
-
-                                        </td>
-
-                                    </tr>
-                                    
-                                </table>
-
-                            </div>
-
-                        </div>
-
-                        <div class="text-end">
-
-                            <button type="submit"
-                                    id="btnSave"
-                                    class="btn btn-primary btn-lg">
-
-                                <i class="bi bi-save"></i>
-
-                                Save Purchase
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div id="hiddenItems"></div>
-
-            </div>
-
-        </div>
-
-    </form>
-
-    @section Scripts {
-
-        @* excel entry *@
-        <script>
-
-            // $("#btnUpload").click(function () {
-
-            //     var shipmentId = $("#ShipmentId").val();
-            //     var supplierId = $("#SupplierId").val();
-            //     var warehouseId = $("#WarehouseId").val();
-
-            //     if (shipmentId == "") {
-            //         alert("Select Shipment");
-            //         return;
-            //     }
-
-            //     if (supplierId == "") {
-            //         alert("Select Supplier");
-            //         return;
-            //     }
-
-            //     if (warehouseId == "") {
-            //         alert("Select Warehouse");
-            //         return;
-            //     }
-
-            //     if ($("#excelFile")[0].files.length == 0) {
-            //         alert("Select Excel File");
-            //         return;
-            //     }
-
-            //     var file = $("#excelFile")[0].files[0];
-
-            //     var data = new FormData();
-
-            //     data.append("file", file);
-            //     data.append("shipmentId", shipmentId);
-            //     data.append("supplierId", supplierId);
-            //     data.append("warehouseId", warehouseId);
-
-            //     $.ajax({
-
-            //         url: "/ProductPurchaseDetail/UploadExcel",
-
-            //         type: "POST",
-
-            //         data: data,
-
-            //         processData: false,
-
-            //         contentType: false,
-
-            //         // success: function (response) {
-
-            //         //     purchaseItems = response;
-
-            //         //     renderTable();
-
-            //         //     $("#PreviewArea").show();
-
-            //         //     $("#btnSave").show();
-            //         //     console.log(response);
-
-            //         //     renderExcel(response);
-
-            //         // },
-            //         success: function (response) {
-
-            //             purchaseItems = response.map(function (x) {
-
-            //                 return {
-
-            //                     ShipmentId: x.shipmentId,
-            //                     SupplierId: x.supplierId,
-            //                     WarehouseId: x.warehouseId,
-
-            //                     ProductNameId: x.productNameId,
-            //                     ProductName: x.productName,
-
-            //                     ColorId: x.colorId,
-            //                     ColorName: x.colorName,
-
-            //                     Thickness: x.thickness,
-            //                     ProductSize: x.productSize,
-
-            //                     InitialQuantity: x.initialQuantity,
-
-            //                     UnitWeightKg: x.unitWeightKg,
-            //                     TotalWeightKg: x.totalWeightKg,
-
-            //                     ExchangeRate: x.exchangeRate,
-
-            //                     UnitPriceRmb: x.unitPriceRmb,
-            //                     UnitPriceTk: x.unitPriceTk,
-
-            //                     ImportTaxPerKgTk: x.importTaxPerKgTk,
-            //                     ImportTaxPerKgRmb: x.importTaxPerKgRmb,
-
-            //                     CostPriceKgTk: x.costPriceKgTk,
-            //                     CostPriceLbsTk: x.costPriceLbsTk,
-            //                     CostPricePcsTk: x.costPricePcsTk,
-            //                     CostPricePcsRmb: x.costPricePcsRmb,
-
-            //                     CostPriceKgRmb: x.costPriceKgRmb,
-            //                     CostPriceLbsRmb: x.costPriceLbsRmb,
-
-            //                     TotalAmountWithoutTaxTk: x.totalAmountWithoutTaxTk,
-            //                     TotalAmountIncludingTaxTk: x.totalAmountIncludingTaxTk,
-
-            //                     TotalAmountWithoutTaxRmb: x.totalAmountWithoutTaxRmb,
-            //                     TotalAmountIncludingTaxRmb: x.totalAmountIncludingTaxRmb,
-
-            //                     Remarks: x.remarks
-
-            //                 };
-
-            //             });
-
-            //             renderTable();
-
-            //             $("#btnSaveExcel").prop("disabled", purchaseItems.length == 0);
-            //         },
-            //         error: function (xhr) {
-
-            //             alert(xhr.responseText);
-
-            //         }
-
-            //     });
-
-            // });
-            $("#btnUpload").click(function () {
-
-                var file = $("#excelFile")[0].files[0];
-
-                if (!file) {
-                    alert("Select Excel");
-                    return;
-                }
-
-                var data = new FormData();
-
-                data.append("file", file);
-                data.append("shipmentId", $("#ShipmentId").val());
-                data.append("supplierId", $("#SupplierId").val());
-                data.append("warehouseId", $("#WarehouseId").val());
-
-                $.ajax({
-
-                    url: "/ProductPurchaseDetail/UploadExcel",
-
-                    type: "POST",
-
-                    data: data,
-
-                    processData: false,
-
-                    contentType: false,
-
-                    success: function (rows) {
-
-                        purchaseItems = rows;
-
-                        renderTable();
-
-                    },
-
-                    error: function (xhr) {
-
-                        alert(xhr.responseText);
+                        return parseFloat($(id).val()) || 0;
 
                     }
 
-                });
+                    function CalculatePurchase() {
 
-            });
-            function addItem() {
+                        var qty = n("#InitialQuantity");
 
-                purchaseItems.push({
+                        var unitWeight = n("#UnitWeightKg");
 
-                    shipmentId: $("#ShipmentId").val(),
+                        var exRate = n("#ExchangeRate");
 
-                    supplierId: $("#SupplierId").val(),
+                        var unitPriceTk = n("#UnitPriceTk");
 
-                    warehouseId: $("#WarehouseId").val(),
+                        var unitPriceRmb = n("#UnitPriceRmb");
 
-                    productNameId: $("#ProductNameId").val(),
+                        var taxTk = n("#ImportTaxPerKgTk");
 
-                    productName: $("#ProductNameId option:selected").text(),
+                        //-------------------------------------------------
 
-                    colorId: $("#ColorId").val(),
+                        var totalWeight = qty * unitWeight;
 
-                    colorName: $("#ColorId option:selected").text(),
+                        $("#TotalWeightKg").val(totalWeight.toFixed(4));
 
-                    thickness: $("#Thickness").val(),
+                        //-------------------------------------------------
 
-                    productSize: $("#ProductSize").val(),
+                        if (unitPriceTk == 0 && unitPriceRmb > 0 && exRate > 0) {
 
-                    initialQuantity: $("#InitialQuantity").val(),
+                            unitPriceTk = unitPriceRmb * exRate;
 
-                    unitWeightKg: $("#UnitWeightKg").val(),
+                            $("#UnitPriceTk").val(unitPriceTk.toFixed(4));
 
-                    totalWeightKg: $("#TotalWeightKg").val(),
+                        }
 
-                    exchangeRate: $("#ExchangeRate").val(),
+                        if (unitPriceRmb == 0 && unitPriceTk > 0 && exRate > 0) {
 
-                    unitPriceRmb: $("#UnitPriceRmb").val(),
+                            unitPriceRmb = unitPriceTk / exRate;
 
-                    unitPriceTk: $("#UnitPriceTk").val(),
+                            $("#UnitPriceRmb").val(unitPriceRmb.toFixed(4));
 
-                    importTaxPerKgTk: $("#ImportTaxPerKgTk").val(),
+                        }
 
-                    importTaxPerKgRmb: $("#ImportTaxPerKgRmb").val(),
+                        //-------------------------------------------------
 
-                    costPriceKgTk: $("#CostPriceKgTk").val(),
+                        var costKgTk = unitPriceTk + taxTk;
 
-                    costPriceLbsTk: $("#CostPriceLbsTk").val(),
+                        $("#CostPriceKgTk").val(costKgTk.toFixed(4));
 
-                    costPricePcsTk: $("#CostPricePcsTk").val(),
+                        //-------------------------------------------------
 
-                    costPriceKgRmb: $("#CostPriceKgRmb").val(),
+                        var costLbsTk = costKgTk / 2.20462;
 
-                    costPriceLbsRmb: $("#CostPriceLbsRmb").val(),
+                        $("#CostPriceLbsTk").val(costLbsTk.toFixed(4));
 
-                    costPricePcsRmb: $("#CostPricePcsRmb").val(),
+                        //-------------------------------------------------
 
-                    totalAmountWithoutTaxTk: $("#TotalAmountWithoutTaxTk").val(),
+                        var costPieceTk = qty == 0 ? 0 : (costKgTk * totalWeight) / qty;
 
-                    totalAmountWithoutTaxRmb: $("#TotalAmountWithoutTaxRmb").val(),
+                        $("#CostPricePerPieceTk").val(costPieceTk.toFixed(4));
 
-                    totalAmountIncludingTaxTk: $("#TotalAmountIncludingTaxTk").val(),
+                        //-------------------------------------------------
 
-                    totalAmountIncludingTaxRmb: $("#TotalAmountIncludingTaxRmb").val(),
+                        var costKgRmb = exRate == 0 ? 0 : costKgTk / exRate;
 
-                    remarks: $("#Remarks").val()
+                        $("#CostPriceKgRmb").val(costKgRmb.toFixed(4));
 
-                });
+                        //-------------------------------------------------
 
-                renderTable();
+                        var costLbsRmb = exRate == 0 ? 0 : costLbsTk / exRate;
 
-            }
-            function renderExcel(items) {
+                        $("#CostPriceLbsRmb").val(costLbsRmb.toFixed(4));
 
-                purchaseItems = [];
+                        //-------------------------------------------------
 
-                items.forEach(function (item) {
+                        var costPieceRmb = exRate == 0 ? 0 : costPieceTk / exRate;
 
-                    purchaseItems.push(item);
+                        $("#CostPricePcsRmb").val(costPieceRmb.toFixed(4));
 
-                });
+                        //-------------------------------------------------
 
-                renderTable();
+                        var withoutTaxTk = unitPriceTk * totalWeight;
 
-                $("#btnSaveExcel").prop("disabled", purchaseItems.length == 0);
+                        $("#TotalAmountWithoutTaxTk").val(withoutTaxTk.toFixed(2));
 
-            }
-        </script>
+                        //-------------------------------------------------
 
-        @* individual entry *@
-        <script>
-            let editIndex = -1;
-            let purchaseItems = [];
-            $(document).ready(function () {
+                        var withTaxTk = costKgTk * totalWeight;
 
-                CalculatePurchase();
+                        $("#TotalAmountIncludingTaxTk").val(withTaxTk.toFixed(2));
 
-            });
-            $("#btnSave").prop("disabled", true);
-            $("#btnCalculate").click(function () {
+                        //-------------------------------------------------
 
-                CalculatePurchase();
+                        var withoutTaxRmb = exRate == 0 ? 0 : withoutTaxTk / exRate;
 
-            });
-            
-          
-            $("#InitialQuantity").on("keyup change", calculatePurchase);
+                        $("#TotalAmountWithoutTaxRmb").val(withoutTaxRmb.toFixed(2));
 
-            $("#TotalWeightKg").on("keyup change", calculatePurchase);
+                        //-------------------------------------------------
 
-            $("#ExchangeRate").on("keyup change", calculatePurchase);
+                        var withTaxRmb = exRate == 0 ? 0 : withTaxTk / exRate;
 
-            $("#UnitPriceRmb").on("keyup change", calculatePurchase);
+                        $("#TotalAmountIncludingTaxRmb").val(withTaxRmb.toFixed(2));
 
-            $("#ImportTaxPerKgTk").on("keyup change", calculatePurchase);
-            function calculatePurchase() {
+                    } $("#btnCalculate").click(function () {
 
-                var qty = parseFloat($("#InitialQuantity").val()) || 0;
+                        CalculatePurchase();
 
-                var totalWeight = parseFloat($("#TotalWeightKg").val()) || 0;
+                    }); $("#InitialQuantity,#UnitWeightKg,#ExchangeRate,#UnitPriceTk,#UnitPriceRmb,#ImportTaxPerKgTk")
+                        .on("keyup change", function () {
 
-                var exchangeRate = parseFloat($("#ExchangeRate").val()) || 0;
+                            CalculatePurchase();
 
-                var unitPriceRmb = parseFloat($("#UnitPriceRmb").val()) || 0;
+                        });
+                        $("#btnAddItem").click(function () {
 
-                var taxPerKgTk = parseFloat($("#ImportTaxPerKgTk").val()) || 0;
+                        if ($("#ShipmentId").val() == "") {
+                            alert("Please Select Shipment.");
+                            $("#ShipmentId").focus();
+                            return;
+                        }
 
-                // If RMB tax is editable, read it.
-                // Otherwise keep automatic conversion.
-                // var taxPerKgRmb = parseFloat($("#ImportTaxPerKgRmb").val());
-                var taxPerKgRmb = exchangeRate > 0
-                    ? taxPerKgTk / exchangeRate
-                    : 0;
+                        if ($("#SupplierId").val() == "") {
+                            alert("Please Select Supplier.");
+                            $("#SupplierId").focus();
+                            return;
+                        }
 
-                $("#ImportTaxPerKgRmb").val(taxPerKgRmb.toFixed(2));
-                if (isNaN(taxPerKgRmb))
-                    taxPerKgRmb = exchangeRate > 0 ? taxPerKgTk / exchangeRate : 0;
+                        if ($("#WarehouseId").val() == "") {
+                            alert("Please Select Warehouse.");
+                            $("#WarehouseId").focus();
+                            return;
+                        }
 
-                //----------------------------------------------------
-                // Unit Weight
-                //----------------------------------------------------
+                        if ($("#ProductNameId").val() == "") {
+                            alert("Please Select Product.");
+                            $("#ProductNameId").focus();
+                            return;
+                        }
 
-                var unitWeight = qty > 0 ? totalWeight / qty : 0;
+                       
 
-                $("#UnitWeightKg").val(unitWeight.toFixed(4));
+                        if ($("#InitialQuantity").val() == "" || $("#InitialQuantity").val() == "0") {
+                            alert("Please Enter Quantity.");
+                            $("#InitialQuantity").focus();
+                            return;
+                        }
+                          
 
-                //----------------------------------------------------
-                // Unit Price
-                //----------------------------------------------------
+                            var productText = $("#ProductNameId option:selected").text();
+                            var colorText = $("#ColorId option:selected").text();
 
-                // Keep full precision
-                var unitPriceTk = unitPriceRmb * exchangeRate;
+                            var html = "";
 
-                $("#UnitPriceTk").val(unitPriceTk.toFixed(2));
+                            html += "<tr>";
 
-                //----------------------------------------------------
-                // Import Tax
-                //----------------------------------------------------
+                            html += "<td>" + productText + "</td>";
+                            html += "<td>" + colorText + "</td>";
+                            html += "<td>" + $("#Thickness").val() + "</td>";
+                            html += "<td>" + $("#ProductSize").val() + "</td>";
+                            html += "<td>" + $("#InitialQuantity").val() + "</td>";
+                            html += "<td>" + $("#TotalWeightKg").val() + "</td>";
+                            html += "<td>" + $("#UnitPriceTk").val() + "</td>";
 
-                $("#ImportTaxPerKgRmb").val(taxPerKgRmb.toFixed(2));
+                            html += "<td>";
+                            html += "<button type='button' class='btn btn-danger btn-sm btnRemove'>Remove</button>";
+                            html += "</td>";
 
-                //----------------------------------------------------
-                // Cost Price / KG
-                //----------------------------------------------------
+                            //==========================
+                            // Hidden Inputs
+                            //==========================
 
-                var costKgTk = unitPriceTk + taxPerKgTk;
+                            html += Hidden(rowIndex, "ShipmentId", $("#ShipmentId").val());
+                            html += Hidden(rowIndex, "SupplierId", $("#SupplierId").val());
+                            html += Hidden(rowIndex, "WarehouseId", $("#WarehouseId").val());
 
-                $("#CostPriceKgTk").val(costKgTk.toFixed(2));
+                            html += Hidden(rowIndex, "ProductNameId", $("#ProductNameId").val());
+                            html += Hidden(rowIndex, "ColorId", $("#ColorId").val());
 
-                // Excel formula
-                var costKgRmb = unitPriceRmb + taxPerKgRmb;
+                            html += Hidden(rowIndex, "Thickness", $("#Thickness").val());
+                            html += Hidden(rowIndex, "ProductSize", $("#ProductSize").val());
 
-                $("#CostPriceKgRmb").val(costKgRmb.toFixed(2));
+                            html += Hidden(rowIndex, "InitialQuantity", $("#InitialQuantity").val());
 
-                //----------------------------------------------------
-                // Cost Price / LBS
-                //----------------------------------------------------
+                            html += Hidden(rowIndex, "UnitWeightKg", $("#UnitWeightKg").val());
+                            html += Hidden(rowIndex, "TotalWeightKg", $("#TotalWeightKg").val());
 
-                var costLbsTk = costKgTk / 2.20462;
+                            html += Hidden(rowIndex, "ExchangeRate", $("#ExchangeRate").val());
 
-                $("#CostPriceLbsTk").val(costLbsTk.toFixed(2));
+                            html += Hidden(rowIndex, "UnitPriceTk", $("#UnitPriceTk").val());
+                            html += Hidden(rowIndex, "UnitPriceRmb", $("#UnitPriceRmb").val());
 
-                var costLbsRmb = costKgRmb / 2.20462;
+                            html += Hidden(rowIndex, "ImportTaxPerKgTk", $("#ImportTaxPerKgTk").val());
+                            html += Hidden(rowIndex, "ImportTaxPerKgRmb", $("#ImportTaxPerKgRmb").val());
 
-                $("#CostPriceLbsRmb").val(costLbsRmb.toFixed(2));
+                            html += Hidden(rowIndex, "CostPriceKgTk", $("#CostPriceKgTk").val());
+                            html += Hidden(rowIndex, "CostPriceLbsTk", $("#CostPriceLbsTk").val());
+                            html += Hidden(rowIndex, "CostPricePerPieceTk", $("#CostPricePerPieceTk").val());
 
-                //----------------------------------------------------
-                // Cost Price / PCS
-                //----------------------------------------------------
+                            html += Hidden(rowIndex, "CostPriceKgRmb", $("#CostPriceKgRmb").val());
+                            html += Hidden(rowIndex, "CostPriceLbsRmb", $("#CostPriceLbsRmb").val());
+                            html += Hidden(rowIndex, "CostPricePcsRmb", $("#CostPricePcsRmb").val());
 
-                var costPieceTk = costKgTk * unitWeight;
+                            html += Hidden(rowIndex, "TotalAmountWithoutTaxTk", $("#TotalAmountWithoutTaxTk").val());
+                            html += Hidden(rowIndex, "TotalAmountIncludingTaxTk", $("#TotalAmountIncludingTaxTk").val());
 
-                $("#CostPricePcsTk").val(costPieceTk.toFixed(2));
+                            html += Hidden(rowIndex, "TotalAmountWithoutTaxRmb", $("#TotalAmountWithoutTaxRmb").val());
+                            html += Hidden(rowIndex, "TotalAmountIncludingTaxRmb", $("#TotalAmountIncludingTaxRmb").val());
 
-                var costPieceRmb = costKgRmb * unitWeight;
+                            html += Hidden(rowIndex, "Remarks", $("#Remarks").val());
 
-                $("#CostPricePcsRmb").val(costPieceRmb.toFixed(2));
+                            html += "</tr>";
 
-                //----------------------------------------------------
-                // Total Without Tax
-                //----------------------------------------------------
+                            $("#purchaseTable tbody").append(html);
 
-                var totalWithoutTaxTk = totalWeight * unitPriceTk;
+                            rowIndex++;
 
-                $("#TotalAmountWithoutTaxTk").val(totalWithoutTaxTk.toFixed(2));
+                        });
 
-                var totalWithoutTaxRmb = totalWeight * unitPriceRmb;
 
-                $("#TotalAmountWithoutTaxRmb").val(totalWithoutTaxRmb.toFixed(2));
+                        //===========================================
+                        // REMOVE
+                        //===========================================
 
-                //----------------------------------------------------
-                // Total With Tax
-                //----------------------------------------------------
+                        $(document).on("click", ".btnRemove", function () {
 
-                var totalWithTaxTk = totalWeight * costKgTk;
+                            $(this).closest("tr").remove();
 
-                $("#TotalAmountIncludingTaxTk").val(totalWithTaxTk.toFixed(2));
+                        });
 
-                // Excel appears to use 16.95 rather than the transaction rate
-                var totalWithTaxRmb = totalWithTaxTk / 16.95;
 
-                $("#TotalAmountIncludingTaxRmb").val(totalWithTaxRmb.toFixed(2));
+                        //===========================================
+                        // HIDDEN INPUT
+                        //===========================================
 
-                //----------------------------------------------------
-                // Import Tax Applied
-                //----------------------------------------------------
+                        function Hidden(index, name, value) {
 
-                var importTaxApplied = totalWithTaxTk - totalWithoutTaxTk;
+                            return "<input type='hidden' name='Items[" + index + "]." + name + "' value='" + value + "' />";
 
-                $("#ImportTaxApplied").val(importTaxApplied.toFixed(2));
+                        }
 
-            }
 
-            function editRow(index) {
+                        //===========================================
+                        // EXCEL UPLOAD
+                        //===========================================
 
-                editIndex = index;
+                        $("#btnUploadExcel").click(function () {
 
-                var item = purchaseItems[index];
+                            var file = $("#excelFile")[0].files[0];
 
-                $("#SupplierId").val(item.SupplierId);
+                            if (file == null) {
 
-                $("#WarehouseId").val(item.WarehouseId);
+                                alert("Select Excel File");
 
-                $("#ProductNameId").val(item.ProductNameId);
+                                return;
 
-                $("#ColorId").val(item.ColorId);
+                            }
 
-                $("#Thickness").val(item.Thickness);
+                            var fd = new FormData();
 
-                $("#ProductSize").val(item.ProductSize);
+                            fd.append("file", file);
 
-                $("#InitialQuantity").val(item.InitialQuantity);
+                            fd.append("shipmentId", $("#ShipmentId").val());
 
-                $("#UnitWeightKg").val(item.UnitWeightKg);
+                            fd.append("supplierId", $("#SupplierId").val());
 
-                $("#TotalWeightKg").val(item.TotalWeightKg);
+                            fd.append("warehouseId", $("#WarehouseId").val());
 
-                $("#ExchangeRate").val(item.ExchangeRate);
+                            $.ajax({
 
-                $("#UnitPriceRmb").val(item.UnitPriceRmb);
+                                url: "/ProductPurchaseDetail/UploadExcel",
 
-                $("#UnitPriceTk").val(item.UnitPriceTk);
+                                type: "POST",
 
-                $("#ImportTaxPerKgTk").val(item.ImportTaxPerKgTk);
+                                data: fd,
 
-                $("#ImportTaxPerKgRmb").val(item.ImportTaxPerKgRmb);
+                                processData: false,
 
-                $("#CostPriceKgTk").val(item.CostPriceKgTk);
+                                contentType: false,
 
-                $("#CostPriceKgRmb").val(item.CostPriceKgRmb);
+                                success: function (result) {
 
-                $("#CostPriceLbsTk").val(item.CostPriceLbsTk);
+                                    $.each(result, function (i, item) {
 
-                $("#CostPriceLbsRmb").val(item.CostPriceLbsRmb);
+                                        var html = "";
 
-                $("#CostPricePcsTk").val(item.CostPricePcsTk);
+                                        html += "<tr>";
 
-                $("#CostPricePcsRmb").val(item.CostPricePcsRmb);
+                                        html += "<td>" + item.productName + "</td>";
 
-                $("#TotalAmountWithoutTaxTk").val(item.TotalAmountWithoutTaxTk);
+                                        html += "<td>" + item.colorName + "</td>";
 
-                $("#TotalAmountWithoutTaxRmb").val(item.TotalAmountWithoutTaxRmb);
+                                        html += "<td>" + item.thickness + "</td>";
 
-                $("#TotalAmountIncludingTaxTk").val(item.TotalAmountIncludingTaxTk);
+                                        html += "<td>" + item.productSize + "</td>";
 
-                $("#TotalAmountIncludingTaxRmb").val(item.TotalAmountIncludingTaxRmb);
+                                        html += "<td>" + item.initialQuantity + "</td>";
 
-                $("#Remarks").val(item.Remarks);
+                                        html += "<td>" + item.totalWeightKg + "</td>";
 
-                $("html,body").animate({
-                    scrollTop: $("#SupplierId").offset().top - 100
-                }, 300);
+                                        html += "<td>" + item.unitPriceTk + "</td>";
 
-            }
-           
-            $("#InitialQuantity,#TotalWeightKg,#ExchangeRate,#UnitPriceRmb,#ImportTaxPerKgTk")
-                .on("keyup change", function () {
+                                        html += "<td><button type='button' class='btn btn-danger btn-sm btnRemove'>Remove</button></td>";
 
-                    $("#btnCalculate").click();
+                                        // Header
 
-                });
+                                        html += Hidden(rowIndex, "ShipmentId", item.shipmentId);
+                                        html += Hidden(rowIndex, "SupplierId", item.supplierId);
+                                        html += Hidden(rowIndex, "WarehouseId", item.warehouseId);
 
-            $("#btnAdd").click(function () {
+                                        // Product
 
-                if ($("#ShipmentId").val() == "") {
+                                        html += Hidden(rowIndex, "ProductNameId", item.productNameId);
+                                        html += Hidden(rowIndex, "ColorId", item.colorId);
 
-                    Swal.fire("Warning", "Please select Shipment.", "warning");
-                    return;
-                }
+                                        html += Hidden(rowIndex, "Thickness", item.thickness);
+                                        html += Hidden(rowIndex, "ProductSize", item.productSize);
 
-                if ($("#SupplierId").val() == "") {
+                                        html += Hidden(rowIndex, "InitialQuantity", item.initialQuantity);
 
-                    alert("Select Supplier");
-                    return;
-                }
+                                        html += Hidden(rowIndex, "UnitWeightKg", item.unitWeightKg);
+                                        html += Hidden(rowIndex, "TotalWeightKg", item.totalWeightKg);
 
-                if ($("#WarehouseId").val() == "") {
+                                        html += Hidden(rowIndex, "ExchangeRate", item.exchangeRate);
 
-                    alert("Select Warehouse");
-                    return;
-                }
+                                        html += Hidden(rowIndex, "UnitPriceTk", item.unitPriceTk);
+                                        html += Hidden(rowIndex, "UnitPriceRmb", item.unitPriceRmb);
 
-                if ($("#ProductNameId").val() == "") {
+                                        html += Hidden(rowIndex, "ImportTaxPerKgTk", item.importTaxPerKgTk);
+                                        html += Hidden(rowIndex, "ImportTaxPerKgRmb", item.importTaxPerKgRmb);
 
-                    alert("Select Product");
-                    return;
-                }
+                                        html += Hidden(rowIndex, "CostPriceKgTk", item.costPriceKgTk);
+                                        html += Hidden(rowIndex, "CostPriceLbsTk", item.costPriceLbsTk);
+                                        html += Hidden(rowIndex, "CostPricePerPieceTk", item.costPricePerPieceTk);
 
-                if ($("#ColorId").val() == "") {
+                                        html += Hidden(rowIndex, "CostPriceKgRmb", item.costPriceKgRmb);
+                                        html += Hidden(rowIndex, "CostPriceLbsRmb", item.costPriceLbsRmb);
+                                        html += Hidden(rowIndex, "CostPricePcsRmb", item.costPricePcsRmb);
 
-                    alert("Select Color");
-                    return;
-                }
+                                        html += Hidden(rowIndex, "TotalAmountWithoutTaxTk", item.totalAmountWithoutTaxTk);
+                                        html += Hidden(rowIndex, "TotalAmountIncludingTaxTk", item.totalAmountIncludingTaxTk);
 
-                let item = {
+                                        html += Hidden(rowIndex, "TotalAmountWithoutTaxRmb", item.totalAmountWithoutTaxRmb);
+                                        html += Hidden(rowIndex, "TotalAmountIncludingTaxRmb", item.totalAmountIncludingTaxRmb);
 
-                    ShipmentId: $("#ShipmentId").val(),
+                                        html += Hidden(rowIndex, "Remarks", item.remarks);
 
-                    SupplierId: $("#SupplierId").val(),
-                    SupplierName: $("#SupplierId option:selected").text(),
+                                        html += "</tr>";
 
-                    WarehouseId: $("#WarehouseId").val(),
-                    WarehouseName: $("#WarehouseId option:selected").text(),
+                                        $("#purchaseTable tbody").append(html);
 
-                    ProductNameId: $("#ProductNameId").val(),
-                    ProductName: $("#ProductNameId option:selected").text(),
+                                        rowIndex++;
 
-                    ColorId: $("#ColorId").val(),
-                    ColorName: $("#ColorId option:selected").text(),
+                                    });
 
-                    Thickness: $("#Thickness").val(),
-                    ProductSize: $("#ProductSize").val(),
+                                    alert("Excel Loaded Successfully.");
 
-                    InitialQuantity: $("#InitialQuantity").val(),
+                                }
 
-                    UnitWeightKg: $("#UnitWeightKg").val(),
+                            });
 
-                    TotalWeightKg: $("#TotalWeightKg").val(),
+                        });
 
-                    ExchangeRate: $("#ExchangeRate").val(),
-
-                    UnitPriceRmb: $("#UnitPriceRmb").val(),
-
-                    UnitPriceTk: $("#UnitPriceTk").val(),
-
-                    ImportTaxPerKgTk: $("#ImportTaxPerKgTk").val(),
-
-                    ImportTaxPerKgRmb: $("#ImportTaxPerKgRmb").val(),
-                    CostPricePcsTk: $("#CostPricePcsTk").val(),
-                    CostPricePcsRmb: $("#CostPricePcsRmb").val(),
-                    CostPriceKgTk: $("#CostPriceKgTk").val(),
-
-                    CostPriceLbsTk: $("#CostPriceLbsTk").val(),
-
-                    CostPriceKgRmb: $("#CostPriceKgRmb").val(),
-
-                    CostPriceLbsRmb: $("#CostPriceLbsRmb").val(),
-
-                    TotalAmountWithoutTaxTk: $("#TotalAmountWithoutTaxTk").val(),
-
-                    TotalAmountIncludingTaxTk: $("#TotalAmountIncludingTaxTk").val(),
-
-                    TotalAmountWithoutTaxRmb: $("#TotalAmountWithoutTaxRmb").val(),
-
-                    TotalAmountIncludingTaxRmb: $("#TotalAmountIncludingTaxRmb").val(),
-
-                    Remarks: $("#Remarks").val()
-
-                };
-
-                let exists = purchaseItems.some(x =>
-
-                    x.ProductNameId == item.ProductNameId &&
-                    x.ColorId == item.ColorId &&
-                    x.Thickness == item.Thickness &&
-                    x.ProductSize == item.ProductSize
-
-                );
-
-                if (editIndex == -1) {
-
-                    purchaseItems.push(item);
+                    </script>
 
                 }
-                else {
-
-                    purchaseItems[editIndex] = item;
-
-                    editIndex = -1;
-
-                }
-
-                $("#btnSave").prop("disabled", false);
-
-                renderTable();
-
-                updateFooter();
-
-                $("#ItemsJson").val(JSON.stringify(purchaseItems));
-
-                clearEntry();
-            });
-
-            function renderTable() {
-
-                let tbody = $("#purchaseTable tbody");
-
-                let hidden = $("#hiddenItems");
-
-                tbody.empty();
-
-                hidden.empty();
-
-                purchaseItems.forEach(function (item, index) {
-
-                    tbody.append(`
-
-            <tr>
-
-            <td>${index + 1}</td>
-
-                        <td>${item.productName ?? item.ProductName}</td>
-
-                        <td>${item.colorName ?? item.ColorName}</td>
-
-            <td>${item.Thickness}</td>
-
-            <td>${item.ProductSize}</td>
-
-            <td>${item.InitialQuantity}</td>
-
-            <td>${item.TotalWeightKg}</td>
-
-            <td>${item.UnitPriceRmb}</td>
-
-            <td>${item.TotalAmountIncludingTaxTk}</td>
-
-                        <td>
-                <button type="button"
-                        class="btn btn-warning btn-sm"
-                        onclick="editRow(${index})">
-                    <i class="bi bi-pencil"></i>
-                </button>
-
-                <button type="button"
-                        class="btn btn-danger btn-sm"
-                        onclick="deleteRow(${index})">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </td>
-
-            </tr>
-
-            `);
-
-                    hidden.append(`
-
-            <input type="hidden" name="Items[${index}].ShipmentId" value="${item.ShipmentId}" />
-                        <input type="hidden" name="Items[${index}].SupplierId" value="${item.SupplierId}" />
-
-            <input type="hidden" name="Items[${index}].WarehouseId" value="${item.WarehouseId}" />
-
-            <input type="hidden" name="Items[${index}].ProductNameId" value="${item.ProductNameId}" />
-
-            <input type="hidden" name="Items[${index}].ColorId" value="${item.ColorId}" />
-
-            <input type="hidden" name="Items[${index}].Thickness" value="${item.Thickness}" />
-
-            <input type="hidden" name="Items[${index}].ProductSize" value="${item.ProductSize}" />
-
-            <input type="hidden" name="Items[${index}].InitialQuantity" value="${item.InitialQuantity}" />
-
-            <input type="hidden" name="Items[${index}].UnitWeightKg" value="${item.UnitWeightKg}" />
-
-            <input type="hidden" name="Items[${index}].TotalWeightKg" value="${item.TotalWeightKg}" />
-
-            <input type="hidden" name="Items[${index}].ExchangeRate" value="${item.ExchangeRate}" />
-
-            <input type="hidden" name="Items[${index}].UnitPriceRmb" value="${item.UnitPriceRmb}" />
-
-            <input type="hidden" name="Items[${index}].UnitPriceTk" value="${item.UnitPriceTk}" />
-
-            <input type="hidden" name="Items[${index}].ImportTaxPerKgTk" value="${item.ImportTaxPerKgTk}" />
-
-            <input type="hidden" name="Items[${index}].ImportTaxPerKgRmb" value="${item.ImportTaxPerKgRmb}" />
-
-            <input type="hidden" name="Items[${index}].CostPriceKgTk" value="${item.CostPriceKgTk}" />
-
-            <input type="hidden" name="Items[${index}].CostPriceLbsTk" value="${item.CostPriceLbsTk}" />
-            <input type="hidden" name="Items[${index}].CostPricePcsTk"
-                   value="${item.CostPricePcsTk}" />
-                                     <input type="hidden" name="Items[${index}].CostPricePcsRmb"
-                                           value="${item.CostPricePcsRmb}" />
-
-            <input type="hidden" name="Items[${index}].CostPriceKgRmb" value="${item.CostPriceKgRmb}" />
-
-            <input type="hidden" name="Items[${index}].CostPriceLbsRmb" value="${item.CostPriceLbsRmb}" />
-
-            <input type="hidden" name="Items[${index}].TotalAmountWithoutTaxTk" value="${item.TotalAmountWithoutTaxTk}" />
-
-            <input type="hidden" name="Items[${index}].TotalAmountIncludingTaxTk" value="${item.TotalAmountIncludingTaxTk}" />
-
-            <input type="hidden" name="Items[${index}].TotalAmountWithoutTaxRmb" value="${item.TotalAmountWithoutTaxRmb}" />
-
-            <input type="hidden" name="Items[${index}].TotalAmountIncludingTaxRmb" value="${item.TotalAmountIncludingTaxRmb}" />
-
-            <input type="hidden" name="Items[${index}].Remarks" value="${item.Remarks}" />
-
-            `);
-
-                });
-
-                calculateGrandTotal();
-
-            }
-
-            function calculateGrandTotal() {
-
-                let tk = 0;
-
-                let rmb = 0;
-
-                purchaseItems.forEach(function (item) {
-
-                    tk += parseFloat(item.TotalAmountIncludingTaxTk) || 0;
-
-                    rmb += parseFloat(item.TotalAmountIncludingTaxRmb) || 0;
-
-                });
-
-                $("#grandTk").text(tk.toFixed(2));
-
-                $("#grandRmb").text(rmb.toFixed(2));
-
-            }
-
-          
-            function deleteRow(index) {
-
-                purchaseItems.splice(index, 1);
-
-                renderTable();
-
-            }
-         
-            function clearEntry() {
-
-                $("#SupplierId").val("");
-
-                $("#WarehouseId").val("");
-
-                $("#ProductNameId").val("");
-
-                $("#ColorId").val("");
-
-                $("#Thickness").val("");
-
-                $("#ProductSize").val("");
-
-                $("#InitialQuantity").val("");
-
-                $("#UnitWeightKg").val("");
-
-                $("#TotalWeightKg").val("");
-
-                $("#ExchangeRate").val("");
-
-                $("#UnitPriceRmb").val("");
-
-                $("#UnitPriceTk").val("");
-
-                $("#ImportTaxPerKgTk").val("");
-
-                $("#ImportTaxPerKgRmb").val("");
-
-                $("#CostPriceKgTk").val("");
-
-                $("#CostPriceLbsTk").val("");
-
-                $("#CostPricePerPieceTk").val("");
-
-                $("#CostPriceKgRmb").val("");
-
-                $("#CostPriceLbsRmb").val("");
-
-                $("#TotalAmountWithoutTaxTk").val("");
-
-                $("#TotalAmountWithoutTaxRmb").val("");
-
-                $("#TotalAmountIncludingTaxTk").val("");
-
-                $("#TotalAmountIncludingTaxRmb").val("");
-
-                $("#Remarks").val("");
-
-                $("#SupplierId").focus();
-
-
-            }
-            // $("#ShipmentId").change(function () {
-
-            //     var id = $(this).val();
-
-            //     if (id == "") {
-            //         $("#ShipmentDate").val("");
-            //         return;
-            //     }
-
-            //     $.get("/Shipment/GetShipment", { id: id }, function (data) {
-
-            //         $("#ShipmentDate").val(data.shipmentDate);
-
-            //     });
-
-            // });
-            $(document).on("change", "#ShipmentId", function () {
-
-                var id = $(this).val();
-
-                if (!id) {
-                    $("#ShipmentDate").val("");
-                    return;
-                }
-
-                $.ajax({
-
-                    url: "/Shipment/GetShipment",
-
-                    type: "GET",
-
-                    data: { id: id },
-
-                    success: function (res) {
-
-                        $("#ShipmentDate").val(res.shipmentDate);
-
-                    }
-
-                });
-
-            });
-
-            function updateFooter() {
-
-                let qty = 0;
-
-                let weight = 0;
-
-                let amount = 0;
-
-                purchaseItems.forEach(function (x) {
-
-                    qty += Number(x.InitialQuantity);
-
-                    weight += Number(x.TotalWeightKg);
-
-                    amount += Number(x.TotalAmountIncludingTaxTk);
-
-                });
-
-                $("#ftQty").text(qty);
-
-                $("#ftWeight").text(weight.toFixed(2));
-
-                $("#ftAmount").text(amount.toFixed(2));
-
-            }
-                </script>
-
-    }
