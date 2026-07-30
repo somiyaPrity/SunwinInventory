@@ -1,0 +1,213 @@
+﻿@model IEnumerable<SunwinInventory.DTOs.ProductPurchaseDetail.PurchaseReportDto>
+
+@{
+    ViewData["Title"] = "Purchase Report";
+}
+
+<div class="container-fluid">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-primary text-white">
+
+            <div class="d-flex justify-content-between">
+
+                <h4>Purchase Report</h4>
+
+                <a asp-action="Create" class="btn btn-light">
+                    <i class="fa fa-plus"></i> New Purchase
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-striped table-hover" id="purchaseTable">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th>SL</th>
+
+                            <th>Date</th>
+
+                            <th>Shipment</th>
+
+                            <th>Supplier</th>
+
+                            <th>Warehouse</th>
+
+                            <th>Product</th>
+
+                            <th>Color</th>
+
+                            <th>Thickness</th>
+
+                            <th>Size</th>
+
+                            <th class="text-end">Qty</th>
+
+                            <th class="text-end">Weight</th>
+
+                            <th class="text-end">Unit Price</th>
+
+                            <th class="text-end">Total TK</th>
+
+                            <th width="180">Action</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @{
+                            int sl = 1;
+
+                            decimal totalQty = 0;
+                            decimal totalWeight = 0;
+                            decimal totalTk = 0;
+                        }
+
+                        @foreach (var item in Model)
+                        {
+                            totalQty += item.InitialQuantity;
+                            totalWeight += item.TotalWeightKg;
+                            totalTk += item.TotalAmountIncludingTaxTk;
+
+                            <tr>
+
+                                <td>@sl</td>
+
+                                <td>@item.CreatedDate.ToString("dd-MMM-yyyy")</td>
+
+                                <td>@item.ShipmentNo</td>
+
+                                <td>@item.SupplierName</td>
+
+                                <td>@item.WarehouseName</td>
+
+                                <td>@item.ProductName</td>
+
+                                <td>@item.ColorName</td>
+
+                                <td>@item.Thickness</td>
+
+                                <td>@item.ProductSize</td>
+
+                                <td class="text-end">@item.InitialQuantity</td>
+
+                                <td class="text-end">@item.TotalWeightKg.ToString("N2")</td>
+
+                                <td class="text-end">@item.UnitPriceTk.ToString("N2")</td>
+
+                                <td class="text-end">@item.TotalAmountIncludingTaxTk.ToString("N2")</td>
+
+                                <td>
+
+                                    <a asp-action="Edit"
+                                       asp-route-id="@item.ProductPurchaseDetailId"
+                                       class="btn btn-warning btn-sm">
+                                        Edit
+                                    </a>
+
+                                    <button class="btn btn-danger btn-sm btnDelete"
+                                            data-id="@item.ProductPurchaseDetailId">
+                                        Delete
+                                    </button>
+
+                                </td>
+
+                            </tr>
+
+                            sl++;
+                        }
+
+                    </tbody>
+
+                    <tfoot class="table-secondary">
+
+                        <tr>
+
+                            <th colspan="9" class="text-end">
+                                Grand Total
+                            </th>
+
+                            <th class="text-end">
+                                @totalQty
+                            </th>
+
+                            <th class="text-end">
+                                @totalWeight.ToString("N2")
+                            </th>
+
+                            <th></th>
+
+                            <th class="text-end">
+                                @totalTk.ToString("N2")
+                            </th>
+
+                            <th></th>
+
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <script>
+
+        $(function () {
+
+            $("#purchaseTable").DataTable({
+
+                pageLength: 25,
+
+                responsive: true,
+
+                dom: 'Bfrtip',
+
+                buttons: [
+                    'copy',
+                    'excel',
+                    'pdf',
+                    'print'
+                ]
+
+            });
+
+            $(".btnDelete").click(function () {
+
+                if (!confirm("Delete this purchase?"))
+                    return;
+
+                var id = $(this).data("id");
+
+                $.post("/ProductPurchaseDetail/Delete/" + id, function () {
+
+                    location.reload();
+
+                });
+
+            });
+
+        });
+
+    </script>
+
+}

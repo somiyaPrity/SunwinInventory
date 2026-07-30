@@ -39,7 +39,8 @@ namespace SunwinInventory.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var list = await _purchaseService.GetAllAsync();
+            var list = await _purchaseService.GetPurchaseReportAsync();
+
             return View(list);
         }
 
@@ -320,19 +321,87 @@ namespace SunwinInventory.Controllers
         // EDIT
         //=====================================================
 
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Edit(ProductPurchaseDetail model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        await LoadDropDowns();
+        //        return View(model);
+        //    }
+
+        //    await _purchaseService.UpdateAsync(model);
+
+        //    TempData["Success"] = "Purchase Updated Successfully.";
+
+        //    return RedirectToAction(nameof(Index));
+        //}
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var item = await _purchaseService.GetByIdAsync(id);
+            var purchase = await _purchaseService.GetByIdAsync(id);
 
-            if (item == null)
+            if (purchase == null)
                 return NotFound();
 
             await LoadDropDowns();
 
-            return View(item);
-        }
+            var model = new PurchaseEntryDto
+            {
+                PurchaseDetailId = purchase.PurchaseDetailId,
 
+                ShipmentId = purchase.ShipmentId,
+                SupplierId = purchase.SupplierId,
+                WarehouseId = purchase.WarehouseId
+            };
+
+            var item = new PurchaseItemDto
+            {
+                ShipmentId = purchase.ShipmentId,
+                SupplierId = purchase.SupplierId,
+                WarehouseId = purchase.WarehouseId,
+
+                ProductNameId = purchase.ProductNameId,
+                ColorId = purchase.ColorId,
+
+                Thickness = purchase.Thickness ?? 0,
+                ProductSize = purchase.ProductSize,
+
+                InitialQuantity = purchase.InitialQuantity,
+
+                UnitWeightKg = purchase.UnitWeightKg ?? 0,
+                TotalWeightKg = purchase.TotalWeightKg ?? 0,
+
+                ExchangeRate = purchase.ExchangeRate ?? 0,
+
+                UnitPriceTk = purchase.UnitPriceTk ?? 0,
+                UnitPriceRmb = purchase.UnitPriceRmb ?? 0,
+
+                ImportTaxPerKgTk = purchase.ImportTaxPerKgTk ?? 0,
+                ImportTaxPerKgRmb = purchase.ImportTaxPerKgRmb ?? 0,
+
+                CostPriceKgTk = purchase.CostPriceKgTk ?? 0,
+                CostPriceLbsTk = purchase.CostPriceLbsTk ?? 0,
+                CostPricePerPieceTk = purchase.CostPricePerPieceTk ?? 0,
+
+                CostPriceKgRmb = purchase.CostPriceKgRmb ?? 0,
+                CostPriceLbsRmb = purchase.CostPriceLbsRmb ?? 0,
+                CostPricePcsRmb = purchase.CostPricePcsRmb ?? 0,
+
+                TotalAmountWithoutTaxTk = purchase.TotalAmountWithoutTaxTk ?? 0,
+                TotalAmountIncludingTaxTk = purchase.TotalAmountIncludingTaxTk ?? 0,
+
+                TotalAmountWithoutTaxRmb = purchase.TotalAmountWithoutTaxRmb ?? 0,
+                TotalAmountIncludingTaxRmb = purchase.TotalAmountIncludingTaxRmb ?? 0,
+
+                Remarks = purchase.Remarks
+            };
+
+            model.Items.Add(item);
+
+            return View("Create", model);
+        }
         //=====================================================
         // DELETE
         //=====================================================

@@ -131,20 +131,28 @@ namespace SunwinInventory.Services
             await _repository.CreateAsync(entity);
         }
 
-        public async Task UpdateAsync(ProductPurchaseDetail entity)
-        {
-            entity.UpdatedBy =
-                _httpContextAccessor.HttpContext?
-                .Session.GetString("UserName") ?? "System";
+        //public async Task UpdateAsync(ProductPurchaseDetail entity)
+        //{
+        //    entity.UpdatedBy =
+        //        _httpContextAccessor.HttpContext?
+        //        .Session.GetString("UserName") ?? "System";
 
-            entity.UpdatedDate = DateTime.Now;
+        //    entity.UpdatedDate = DateTime.Now;
 
-            await _repository.UpdateAsync(entity);
-        }
+        //    await _repository.UpdateAsync(entity);
+        //}
 
         public async Task DeleteAsync(int id)
         {
             await _repository.DeleteAsync(id);
+        }
+        public async Task<List<PurchaseReportDto>> GetPurchaseReportAsync()
+        {
+            return await _repository.GetPurchaseReportAsync();
+        }
+        public async Task UpdateAsync(ProductPurchaseDetail entity)
+        {
+            await _repository.UpdateAsync(entity);
         }
     }
 }

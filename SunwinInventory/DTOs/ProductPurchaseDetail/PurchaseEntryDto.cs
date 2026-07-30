@@ -3,9 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SunwinInventory.DTOs.ProductPurchaseDetail
 {
-  
+
     public class PurchaseEntryDto
     {
+        public int PurchaseDetailId { get; set; }
+
         public int ShipmentId { get; set; }
 
         public int SupplierId { get; set; }
@@ -16,7 +18,6 @@ namespace SunwinInventory.DTOs.ProductPurchaseDetail
 
         public List<PurchaseItemDto> Items { get; set; } = new();
     }
-
     public class PurchaseItemDto
     {
         public int ShipmentId { get; set; }

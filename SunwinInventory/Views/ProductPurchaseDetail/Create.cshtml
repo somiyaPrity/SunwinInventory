@@ -16,6 +16,7 @@
 
             <form asp-action="Create" method="post" enctype="multipart/form-data" id="purchaseForm">
                 @Html.AntiForgeryToken()
+              
                 <div class="row">
 
                     <div class="col-md-4 mb-3">
@@ -368,7 +369,9 @@
                     <script>
 
                         let rowIndex = 0;
+                 
 
+                 
                         //===========================================
                         // ADD INDIVIDUAL ITEM
                         //===========================================
@@ -1098,6 +1101,7 @@
                         });
 
                     });
+                 
                     </script>
 
                 }

@@ -1,0 +1,122 @@
+﻿@model SunwinInventory.Models.ProductPurchaseDetail
+
+@{
+    ViewData["Title"] = "Edit Purchase";
+}
+
+<div class="container-fluid">
+
+    <div class="card">
+
+        <div class="card-header bg-warning text-dark">
+            <h4>Edit Purchase</h4>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Edit" method="post">
+
+                <input type="hidden" asp-for="PurchaseDetailId" />
+
+                <div class="row">
+
+                    <div class="col-md-4 mb-3">
+                        <label>Shipment</label>
+                        <select asp-for="ShipmentId"
+                                asp-items="ViewBag.Shipments"
+                                class="form-select">
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label>Supplier</label>
+                        <select asp-for="SupplierId"
+                                asp-items="ViewBag.Suppliers"
+                                class="form-select">
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label>Warehouse</label>
+                        <select asp-for="WarehouseId"
+                                asp-items="ViewBag.Warehouses"
+                                class="form-select">
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+                        <label>Product</label>
+                        <select asp-for="ProductNameId"
+                                asp-items="ViewBag.Products"
+                                class="form-select">
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Color</label>
+                        <select asp-for="ColorId"
+                                asp-items="ViewBag.Colors"
+                                class="form-select">
+                        </select>
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label>Thickness</label>
+                        <input asp-for="Thickness" class="form-control" />
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label>Size</label>
+                        <input asp-for="ProductSize" class="form-control" />
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label>Quantity</label>
+                        <input asp-for="InitialQuantity" class="form-control" />
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+                        <label>Total Weight</label>
+                        <input asp-for="TotalWeightKg" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Unit Price TK</label>
+                        <input asp-for="UnitPriceTk" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Total Amount TK</label>
+                        <input asp-for="TotalAmountIncludingTaxTk" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Remarks</label>
+                        <input asp-for="Remarks" class="form-control" />
+                    </div>
+
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    Update Purchase
+                </button>
+
+                <a asp-action="Index" class="btn btn-secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

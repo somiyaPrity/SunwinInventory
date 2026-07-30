@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SunwinInventory.Data;
+using SunwinInventory.DTOs.ProductPurchaseDetail;
 using SunwinInventory.Models;
 using SunwinInventory.Repositories.Interfaces;
 
@@ -48,6 +49,59 @@ namespace SunwinInventory.Repositories
                 _context.ProductPurchaseDetails.Remove(entity);
                 await _context.SaveChangesAsync();
             }
+        }
+        public async Task<List<PurchaseReportDto>> GetPurchaseReportAsync()
+        {
+            var result = await
+                (from p in _context.ProductPurchaseDetails
+
+                 join s in _context.Shipments
+                     on p.ShipmentId equals s.ShipmentId
+
+                 join sup in _context.Suppliers
+                     on p.SupplierId equals sup.SupplierId
+
+                 join w in _context.Warehouses
+                     on p.WarehouseId equals w.WarehouseId
+
+                 join pn in _context.ProductNames
+                     on p.ProductNameId equals pn.ProductNameId
+
+                 join c in _context.Colors
+                     on p.ColorId equals c.ColorId
+
+                 orderby p.PurchaseDetailId descending
+
+                 select new PurchaseReportDto
+                 {
+                     ProductPurchaseDetailId = p.PurchaseDetailId,
+
+                     CreatedDate = p.CreatedDate,
+
+                     ShipmentNo = s.ShipmentNo,
+
+                     SupplierName = sup.SupplierName,
+
+                     WarehouseName = w.WarehouseName,
+
+                     ProductName = pn.Name,
+
+                     ColorName = c.ColorName,
+
+                     Thickness = p.Thickness ?? 0,
+
+                     ProductSize = p.ProductSize,
+
+                     InitialQuantity = p.InitialQuantity,
+
+                     TotalWeightKg = p.TotalWeightKg ?? 0,
+
+                     UnitPriceTk = p.UnitPriceTk ?? 0,
+
+                     TotalAmountIncludingTaxTk = p.TotalAmountIncludingTaxTk ?? 0
+                 }).ToListAsync();
+
+            return result;
         }
     }
 }
