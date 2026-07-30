@@ -7,6 +7,7 @@ using SunwinInventory.Services.Interfaces;
 using SunwinInventory.Repositories.Implementations;
 using SunwinInventory.Services.Implementations;
 using SunwinInventory.Filters;
+using Microsoft.AspNetCore.Http.Features;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -56,6 +57,11 @@ builder.Services.AddSession(options =>
 });
 
 builder.Services.AddHttpContextAccessor();
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.ValueCountLimit = 10000;
+    options.MultipartBodyLengthLimit = 1024 * 1024 * 100; // 100 MB
+});
 
 var app = builder.Build();
 

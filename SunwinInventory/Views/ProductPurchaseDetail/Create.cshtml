@@ -15,7 +15,7 @@
         <div class="card-body">
 
             <form asp-action="Create" method="post" enctype="multipart/form-data" id="purchaseForm">
-
+                @Html.AntiForgeryToken()
                 <div class="row">
 
                     <div class="col-md-4 mb-3">
@@ -272,7 +272,7 @@
 
                 </h5>
 
-                <div class="table-responsive">
+                @* <div class="table-responsive">
 
                     <table class="table table-bordered table-striped" id="purchaseTable">
 
@@ -295,6 +295,57 @@
 
                         <tbody>
                         </tbody>
+
+                    </table>
+
+                </div> *@
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-striped" id="purchaseTable">
+
+                        <thead class="table-dark">
+
+                            <tr>
+
+                                <th style="width:60px">SL</th>
+                                <th>Product</th>
+                                <th>Color</th>
+                                <th>Thickness</th>
+                                <th>Size</th>
+                                <th>Qty</th>
+                                <th>Weight (KG)</th>
+                                <th>Price TK</th>
+                                <th>Total TK</th>
+                                <th>Action</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+                        </tbody>
+
+                        <tfoot class="table-warning fw-bold">
+
+                            <tr>
+
+                                <td colspan="5" class="text-end">
+                                    Grand Total :
+                                </td>
+
+                                <td id="lblTotalQty">0</td>
+
+                                <td id="lblTotalWeight">0.000</td>
+
+                                <td></td>
+
+                                <td id="lblTotalTk">0.00</td>
+
+                                <td></td>
+
+                            </tr>
+
+                        </tfoot>
 
                     </table>
 
@@ -435,7 +486,137 @@
                             CalculatePurchase();
 
                         });
-                        $("#btnAddItem").click(function () {
+                        // $("#btnAddItem").click(function () {
+
+                        // if ($("#ShipmentId").val() == "") {
+                        //     alert("Please Select Shipment.");
+                        //     $("#ShipmentId").focus();
+                        //     return;
+                        // }
+
+                        // if ($("#SupplierId").val() == "") {
+                        //     alert("Please Select Supplier.");
+                        //     $("#SupplierId").focus();
+                        //     return;
+                        // }
+
+                        // if ($("#WarehouseId").val() == "") {
+                        //     alert("Please Select Warehouse.");
+                        //     $("#WarehouseId").focus();
+                        //     return;
+                        // }
+
+                        // if ($("#ProductNameId").val() == "") {
+                        //     alert("Please Select Product.");
+                        //     $("#ProductNameId").focus();
+                        //     return;
+                        // }
+
+                       
+
+                        // if ($("#InitialQuantity").val() == "" || $("#InitialQuantity").val() == "0") {
+                        //     alert("Please Enter Quantity.");
+                        //     $("#InitialQuantity").focus();
+                        //     return;
+                        // }
+                          
+
+                        //     var productText = $("#ProductNameId option:selected").text();
+                        //     var colorText = $("#ColorId option:selected").text();
+
+                        //     var html = "";
+
+                        //     html += "<tr>";
+
+                        //     html += "<td>" + productText + "</td>";
+                        //     html += "<td>" + colorText + "</td>";
+                        //     html += "<td>" + $("#Thickness").val() + "</td>";
+                        //     html += "<td>" + $("#ProductSize").val() + "</td>";
+                        //     html += "<td>" + $("#InitialQuantity").val() + "</td>";
+                        //     html += "<td>" + $("#TotalWeightKg").val() + "</td>";
+                        //     html += "<td>" + $("#UnitPriceTk").val() + "</td>";
+
+                        //     html += "<td>";
+                        //     html += "<button type='button' class='btn btn-danger btn-sm btnRemove'>Remove</button>";
+                        //     html += "</td>";
+
+                        //     //==========================
+                        //     // Hidden Inputs
+                        //     //==========================
+
+                        //     html += Hidden(rowIndex, "ShipmentId", $("#ShipmentId").val());
+                        //     html += Hidden(rowIndex, "SupplierId", $("#SupplierId").val());
+                        //     html += Hidden(rowIndex, "WarehouseId", $("#WarehouseId").val());
+
+                        //     html += Hidden(rowIndex, "ProductNameId", $("#ProductNameId").val());
+                        //     html += Hidden(rowIndex, "ColorId", $("#ColorId").val());
+
+                        //     html += Hidden(rowIndex, "Thickness", $("#Thickness").val());
+                        //     html += Hidden(rowIndex, "ProductSize", $("#ProductSize").val());
+
+                        //     html += Hidden(rowIndex, "InitialQuantity", $("#InitialQuantity").val());
+
+                        //     html += Hidden(rowIndex, "UnitWeightKg", $("#UnitWeightKg").val());
+                        //     html += Hidden(rowIndex, "TotalWeightKg", $("#TotalWeightKg").val());
+
+                        //     html += Hidden(rowIndex, "ExchangeRate", $("#ExchangeRate").val());
+
+                        //     html += Hidden(rowIndex, "UnitPriceTk", $("#UnitPriceTk").val());
+                        //     html += Hidden(rowIndex, "UnitPriceRmb", $("#UnitPriceRmb").val());
+
+                        //     html += Hidden(rowIndex, "ImportTaxPerKgTk", $("#ImportTaxPerKgTk").val());
+                        //     html += Hidden(rowIndex, "ImportTaxPerKgRmb", $("#ImportTaxPerKgRmb").val());
+
+                        //     html += Hidden(rowIndex, "CostPriceKgTk", $("#CostPriceKgTk").val());
+                        //     html += Hidden(rowIndex, "CostPriceLbsTk", $("#CostPriceLbsTk").val());
+                        //     html += Hidden(rowIndex, "CostPricePerPieceTk", $("#CostPricePerPieceTk").val());
+
+                        //     html += Hidden(rowIndex, "CostPriceKgRmb", $("#CostPriceKgRmb").val());
+                        //     html += Hidden(rowIndex, "CostPriceLbsRmb", $("#CostPriceLbsRmb").val());
+                        //     html += Hidden(rowIndex, "CostPricePcsRmb", $("#CostPricePcsRmb").val());
+
+                        //     html += Hidden(rowIndex, "TotalAmountWithoutTaxTk", $("#TotalAmountWithoutTaxTk").val());
+                        //     html += Hidden(rowIndex, "TotalAmountIncludingTaxTk", $("#TotalAmountIncludingTaxTk").val());
+
+                        //     html += Hidden(rowIndex, "TotalAmountWithoutTaxRmb", $("#TotalAmountWithoutTaxRmb").val());
+                        //     html += Hidden(rowIndex, "TotalAmountIncludingTaxRmb", $("#TotalAmountIncludingTaxRmb").val());
+
+                        //     html += Hidden(rowIndex, "Remarks", $("#Remarks").val());
+
+                        //     html += "</tr>";
+
+                        //     $("#purchaseTable tbody").append(html);
+
+                        //     rowIndex++;
+
+                        // });
+                    function RefreshTableSummary() {
+
+                        var sl = 1;
+
+                        var totalQty = 0;
+                        var totalWeight = 0;
+                        var totalTk = 0;
+
+                        $("#purchaseTable tbody tr").each(function () {
+
+                            $(this).find(".sl").text(sl++);
+
+                            totalQty += parseFloat($(this).find(".qty").text()) || 0;
+
+                            totalWeight += parseFloat($(this).find(".weight").text()) || 0;
+
+                            totalTk += parseFloat($(this).find(".totalTk").text()) || 0;
+
+                        });
+
+                        $("#lblTotalQty").text(totalQty);
+
+                        $("#lblTotalWeight").text(totalWeight.toFixed(3));
+
+                        $("#lblTotalTk").text(totalTk.toFixed(2));
+                    }
+                    $("#btnAddItem").click(function () {
 
                         if ($("#ShipmentId").val() == "") {
                             alert("Please Select Shipment.");
@@ -461,96 +642,174 @@
                             return;
                         }
 
-                       
+                        if ($("#ColorId").val() == "") {
+                            alert("Please Select Color.");
+                            $("#ColorId").focus();
+                            return;
+                        }
 
                         if ($("#InitialQuantity").val() == "" || $("#InitialQuantity").val() == "0") {
                             alert("Please Enter Quantity.");
                             $("#InitialQuantity").focus();
                             return;
                         }
-                          
 
-                            var productText = $("#ProductNameId option:selected").text();
-                            var colorText = $("#ColorId option:selected").text();
+                        //==============================
+                        // Duplicate Check
+                        //==============================
 
-                            var html = "";
+                        var duplicate = false;
 
-                            html += "<tr>";
+                        $("#purchaseTable tbody tr").each(function () {
 
-                            html += "<td>" + productText + "</td>";
-                            html += "<td>" + colorText + "</td>";
-                            html += "<td>" + $("#Thickness").val() + "</td>";
-                            html += "<td>" + $("#ProductSize").val() + "</td>";
-                            html += "<td>" + $("#InitialQuantity").val() + "</td>";
-                            html += "<td>" + $("#TotalWeightKg").val() + "</td>";
-                            html += "<td>" + $("#UnitPriceTk").val() + "</td>";
+                            var p = $(this).find("input[name$='.ProductNameId']").val();
+                            var c = $(this).find("input[name$='.ColorId']").val();
+                            var t = $(this).find("input[name$='.Thickness']").val();
+                            var s = $(this).find("input[name$='.ProductSize']").val();
 
-                            html += "<td>";
-                            html += "<button type='button' class='btn btn-danger btn-sm btnRemove'>Remove</button>";
-                            html += "</td>";
-
-                            //==========================
-                            // Hidden Inputs
-                            //==========================
-
-                            html += Hidden(rowIndex, "ShipmentId", $("#ShipmentId").val());
-                            html += Hidden(rowIndex, "SupplierId", $("#SupplierId").val());
-                            html += Hidden(rowIndex, "WarehouseId", $("#WarehouseId").val());
-
-                            html += Hidden(rowIndex, "ProductNameId", $("#ProductNameId").val());
-                            html += Hidden(rowIndex, "ColorId", $("#ColorId").val());
-
-                            html += Hidden(rowIndex, "Thickness", $("#Thickness").val());
-                            html += Hidden(rowIndex, "ProductSize", $("#ProductSize").val());
-
-                            html += Hidden(rowIndex, "InitialQuantity", $("#InitialQuantity").val());
-
-                            html += Hidden(rowIndex, "UnitWeightKg", $("#UnitWeightKg").val());
-                            html += Hidden(rowIndex, "TotalWeightKg", $("#TotalWeightKg").val());
-
-                            html += Hidden(rowIndex, "ExchangeRate", $("#ExchangeRate").val());
-
-                            html += Hidden(rowIndex, "UnitPriceTk", $("#UnitPriceTk").val());
-                            html += Hidden(rowIndex, "UnitPriceRmb", $("#UnitPriceRmb").val());
-
-                            html += Hidden(rowIndex, "ImportTaxPerKgTk", $("#ImportTaxPerKgTk").val());
-                            html += Hidden(rowIndex, "ImportTaxPerKgRmb", $("#ImportTaxPerKgRmb").val());
-
-                            html += Hidden(rowIndex, "CostPriceKgTk", $("#CostPriceKgTk").val());
-                            html += Hidden(rowIndex, "CostPriceLbsTk", $("#CostPriceLbsTk").val());
-                            html += Hidden(rowIndex, "CostPricePerPieceTk", $("#CostPricePerPieceTk").val());
-
-                            html += Hidden(rowIndex, "CostPriceKgRmb", $("#CostPriceKgRmb").val());
-                            html += Hidden(rowIndex, "CostPriceLbsRmb", $("#CostPriceLbsRmb").val());
-                            html += Hidden(rowIndex, "CostPricePcsRmb", $("#CostPricePcsRmb").val());
-
-                            html += Hidden(rowIndex, "TotalAmountWithoutTaxTk", $("#TotalAmountWithoutTaxTk").val());
-                            html += Hidden(rowIndex, "TotalAmountIncludingTaxTk", $("#TotalAmountIncludingTaxTk").val());
-
-                            html += Hidden(rowIndex, "TotalAmountWithoutTaxRmb", $("#TotalAmountWithoutTaxRmb").val());
-                            html += Hidden(rowIndex, "TotalAmountIncludingTaxRmb", $("#TotalAmountIncludingTaxRmb").val());
-
-                            html += Hidden(rowIndex, "Remarks", $("#Remarks").val());
-
-                            html += "</tr>";
-
-                            $("#purchaseTable tbody").append(html);
-
-                            rowIndex++;
+                            if (
+                                p == $("#ProductNameId").val() &&
+                                c == $("#ColorId").val() &&
+                                t == $("#Thickness").val() &&
+                                s == $("#ProductSize").val()
+                            ) {
+                                duplicate = true;
+                                return false;
+                            }
 
                         });
 
+                        if (duplicate) {
+                            alert("This product already exists in the list.");
+                            return;
+                        }
+
+                        var productText = $("#ProductNameId option:selected").text();
+                        var colorText = $("#ColorId option:selected").text();
+
+                        var totalTk = parseFloat($("#TotalAmountIncludingTaxTk").val() || 0);
+
+                        var html = "";
+
+                        html += "<tr>";
+
+                        html += "<td class='sl'></td>";
+                        html += "<td>" + productText + "</td>";
+                        html += "<td>" + colorText + "</td>";
+                        html += "<td>" + $("#Thickness").val() + "</td>";
+                        html += "<td>" + $("#ProductSize").val() + "</td>";
+                        html += "<td class='qty'>" + $("#InitialQuantity").val() + "</td>";
+                        html += "<td class='weight'>" + $("#TotalWeightKg").val() + "</td>";
+                        html += "<td>" + $("#UnitPriceTk").val() + "</td>";
+                        html += "<td class='totalTk'>" + totalTk.toFixed(2) + "</td>";
+
+                        html += "<td>";
+                        html += "<button type='button' class='btn btn-danger btn-sm btnRemove'>Remove</button>";
+                        html += "</td>";
+
+                        //==============================
+                        // Hidden Inputs
+                        //==============================
+
+                        html += Hidden(rowIndex, "ShipmentId", $("#ShipmentId").val());
+                        html += Hidden(rowIndex, "SupplierId", $("#SupplierId").val());
+                        html += Hidden(rowIndex, "WarehouseId", $("#WarehouseId").val());
+
+                        html += Hidden(rowIndex, "ProductNameId", $("#ProductNameId").val());
+                        html += Hidden(rowIndex, "ColorId", $("#ColorId").val());
+
+                        html += Hidden(rowIndex, "Thickness", $("#Thickness").val());
+                        html += Hidden(rowIndex, "ProductSize", $("#ProductSize").val());
+
+                        html += Hidden(rowIndex, "InitialQuantity", $("#InitialQuantity").val());
+
+                        html += Hidden(rowIndex, "UnitWeightKg", $("#UnitWeightKg").val());
+                        html += Hidden(rowIndex, "TotalWeightKg", $("#TotalWeightKg").val());
+
+                        html += Hidden(rowIndex, "ExchangeRate", $("#ExchangeRate").val());
+
+                        html += Hidden(rowIndex, "UnitPriceTk", $("#UnitPriceTk").val());
+                        html += Hidden(rowIndex, "UnitPriceRmb", $("#UnitPriceRmb").val());
+
+                        html += Hidden(rowIndex, "ImportTaxPerKgTk", $("#ImportTaxPerKgTk").val());
+                        html += Hidden(rowIndex, "ImportTaxPerKgRmb", $("#ImportTaxPerKgRmb").val());
+
+                        html += Hidden(rowIndex, "CostPriceKgTk", $("#CostPriceKgTk").val());
+                        html += Hidden(rowIndex, "CostPriceLbsTk", $("#CostPriceLbsTk").val());
+                        html += Hidden(rowIndex, "CostPricePerPieceTk", $("#CostPricePerPieceTk").val());
+
+                        html += Hidden(rowIndex, "CostPriceKgRmb", $("#CostPriceKgRmb").val());
+                        html += Hidden(rowIndex, "CostPriceLbsRmb", $("#CostPriceLbsRmb").val());
+                        html += Hidden(rowIndex, "CostPricePcsRmb", $("#CostPricePcsRmb").val());
+
+                        html += Hidden(rowIndex, "TotalAmountWithoutTaxTk", $("#TotalAmountWithoutTaxTk").val());
+                        html += Hidden(rowIndex, "TotalAmountIncludingTaxTk", $("#TotalAmountIncludingTaxTk").val());
+
+                        html += Hidden(rowIndex, "TotalAmountWithoutTaxRmb", $("#TotalAmountWithoutTaxRmb").val());
+                        html += Hidden(rowIndex, "TotalAmountIncludingTaxRmb", $("#TotalAmountIncludingTaxRmb").val());
+
+                        html += Hidden(rowIndex, "Remarks", $("#Remarks").val());
+
+                        html += "</tr>";
+
+                        $("#purchaseTable tbody").append(html);
+
+                        rowIndex++;
+
+                        RefreshTableSummary();
+                        //==============================
+                        // Clear Entry Form
+                        //==============================
+
+                        $("#ProductNameId").val("");
+                        $("#ColorId").val("");
+
+                        $("#Thickness").val("");
+                        $("#ProductSize").val("");
+                        $("#InitialQuantity").val("");
+
+                        $("#UnitWeightKg").val("");
+                        $("#TotalWeightKg").val("");
+
+                        $("#ExchangeRate").val("");
+
+                        $("#UnitPriceTk").val("");
+                        $("#UnitPriceRmb").val("");
+
+                        $("#ImportTaxPerKgTk").val("");
+                        $("#ImportTaxPerKgRmb").val("");
+
+                        $("#CostPriceKgTk").val("");
+                        $("#CostPriceLbsTk").val("");
+                        $("#CostPricePerPieceTk").val("");
+
+                        $("#CostPriceKgRmb").val("");
+                        $("#CostPriceLbsRmb").val("");
+                        $("#CostPricePcsRmb").val("");
+
+                        $("#TotalAmountWithoutTaxTk").val("");
+                        $("#TotalAmountIncludingTaxTk").val("");
+
+                        $("#TotalAmountWithoutTaxRmb").val("");
+                        $("#TotalAmountIncludingTaxRmb").val("");
+
+                        $("#Remarks").val("");
+
+                        $("#ProductNameId").focus();
+
+                    });
 
                         //===========================================
                         // REMOVE
                         //===========================================
 
-                        $(document).on("click", ".btnRemove", function () {
+                    $(document).on("click", ".btnRemove", function () {
 
-                            $(this).closest("tr").remove();
+                        $(this).closest("tr").remove();
 
-                        });
+                        RefreshTableSummary();
 
+                    });
 
                         //===========================================
                         // HIDDEN INPUT
@@ -567,123 +826,278 @@
                         // EXCEL UPLOAD
                         //===========================================
 
-                        $("#btnUploadExcel").click(function () {
+                        // $("#btnUploadExcel").click(function () {
 
-                            var file = $("#excelFile")[0].files[0];
+                        //     var file = $("#excelFile")[0].files[0];
 
-                            if (file == null) {
+                        //     if (file == null) {
 
-                                alert("Select Excel File");
+                        //         alert("Select Excel File");
 
-                                return;
+                        //         return;
 
-                            }
+                        //     }
 
-                            var fd = new FormData();
+                        //     var fd = new FormData();
 
-                            fd.append("file", file);
+                        //     fd.append("file", file);
 
-                            fd.append("shipmentId", $("#ShipmentId").val());
+                        //     fd.append("shipmentId", $("#ShipmentId").val());
 
-                            fd.append("supplierId", $("#SupplierId").val());
+                        //     fd.append("supplierId", $("#SupplierId").val());
 
-                            fd.append("warehouseId", $("#WarehouseId").val());
+                        //     fd.append("warehouseId", $("#WarehouseId").val());
 
-                            $.ajax({
+                        //     $.ajax({
 
-                                url: "/ProductPurchaseDetail/UploadExcel",
+                        //         url: "/ProductPurchaseDetail/UploadExcel",
 
-                                type: "POST",
+                        //         type: "POST",
 
-                                data: fd,
+                        //         data: fd,
 
-                                processData: false,
+                        //         processData: false,
 
-                                contentType: false,
+                        //         contentType: false,
 
-                                success: function (result) {
+                        //         success: function (result) {
 
-                                    $.each(result, function (i, item) {
+                        //             $.each(result, function (i, item) {
 
-                                        var html = "";
+                        //                 var html = "";
 
-                                        html += "<tr>";
+                        //                 html += "<tr>";
 
-                                        html += "<td>" + item.productName + "</td>";
+                        //                 html += "<td>" + item.productName + "</td>";
 
-                                        html += "<td>" + item.colorName + "</td>";
+                        //                 html += "<td>" + item.colorName + "</td>";
 
-                                        html += "<td>" + item.thickness + "</td>";
+                        //                 html += "<td>" + item.thickness + "</td>";
 
-                                        html += "<td>" + item.productSize + "</td>";
+                        //                 html += "<td>" + item.productSize + "</td>";
 
-                                        html += "<td>" + item.initialQuantity + "</td>";
+                        //                 html += "<td>" + item.initialQuantity + "</td>";
 
-                                        html += "<td>" + item.totalWeightKg + "</td>";
+                        //                 html += "<td>" + item.totalWeightKg + "</td>";
 
-                                        html += "<td>" + item.unitPriceTk + "</td>";
+                        //                 html += "<td>" + item.unitPriceTk + "</td>";
 
-                                        html += "<td><button type='button' class='btn btn-danger btn-sm btnRemove'>Remove</button></td>";
+                        //                 html += "<td><button type='button' class='btn btn-danger btn-sm btnRemove'>Remove</button></td>";
 
-                                        // Header
+                        //                 // Header
 
-                                        html += Hidden(rowIndex, "ShipmentId", item.shipmentId);
-                                        html += Hidden(rowIndex, "SupplierId", item.supplierId);
-                                        html += Hidden(rowIndex, "WarehouseId", item.warehouseId);
+                        //                 html += Hidden(rowIndex, "ShipmentId", item.shipmentId);
+                        //                 html += Hidden(rowIndex, "SupplierId", item.supplierId);
+                        //                 html += Hidden(rowIndex, "WarehouseId", item.warehouseId);
 
-                                        // Product
+                        //                 // Product
 
-                                        html += Hidden(rowIndex, "ProductNameId", item.productNameId);
-                                        html += Hidden(rowIndex, "ColorId", item.colorId);
+                        //                 html += Hidden(rowIndex, "ProductNameId", item.productNameId);
+                        //                 html += Hidden(rowIndex, "ColorId", item.colorId);
 
-                                        html += Hidden(rowIndex, "Thickness", item.thickness);
-                                        html += Hidden(rowIndex, "ProductSize", item.productSize);
+                        //                 html += Hidden(rowIndex, "Thickness", item.thickness);
+                        //                 html += Hidden(rowIndex, "ProductSize", item.productSize);
 
-                                        html += Hidden(rowIndex, "InitialQuantity", item.initialQuantity);
+                        //                 html += Hidden(rowIndex, "InitialQuantity", item.initialQuantity);
 
-                                        html += Hidden(rowIndex, "UnitWeightKg", item.unitWeightKg);
-                                        html += Hidden(rowIndex, "TotalWeightKg", item.totalWeightKg);
+                        //                 html += Hidden(rowIndex, "UnitWeightKg", item.unitWeightKg);
+                        //                 html += Hidden(rowIndex, "TotalWeightKg", item.totalWeightKg);
 
-                                        html += Hidden(rowIndex, "ExchangeRate", item.exchangeRate);
+                        //                 html += Hidden(rowIndex, "ExchangeRate", item.exchangeRate);
 
-                                        html += Hidden(rowIndex, "UnitPriceTk", item.unitPriceTk);
-                                        html += Hidden(rowIndex, "UnitPriceRmb", item.unitPriceRmb);
+                        //                 html += Hidden(rowIndex, "UnitPriceTk", item.unitPriceTk);
+                        //                 html += Hidden(rowIndex, "UnitPriceRmb", item.unitPriceRmb);
 
-                                        html += Hidden(rowIndex, "ImportTaxPerKgTk", item.importTaxPerKgTk);
-                                        html += Hidden(rowIndex, "ImportTaxPerKgRmb", item.importTaxPerKgRmb);
+                        //                 html += Hidden(rowIndex, "ImportTaxPerKgTk", item.importTaxPerKgTk);
+                        //                 html += Hidden(rowIndex, "ImportTaxPerKgRmb", item.importTaxPerKgRmb);
 
-                                        html += Hidden(rowIndex, "CostPriceKgTk", item.costPriceKgTk);
-                                        html += Hidden(rowIndex, "CostPriceLbsTk", item.costPriceLbsTk);
-                                        html += Hidden(rowIndex, "CostPricePerPieceTk", item.costPricePerPieceTk);
+                        //                 html += Hidden(rowIndex, "CostPriceKgTk", item.costPriceKgTk);
+                        //                 html += Hidden(rowIndex, "CostPriceLbsTk", item.costPriceLbsTk);
+                        //                 html += Hidden(rowIndex, "CostPricePerPieceTk", item.costPricePerPieceTk);
 
-                                        html += Hidden(rowIndex, "CostPriceKgRmb", item.costPriceKgRmb);
-                                        html += Hidden(rowIndex, "CostPriceLbsRmb", item.costPriceLbsRmb);
-                                        html += Hidden(rowIndex, "CostPricePcsRmb", item.costPricePcsRmb);
+                        //                 html += Hidden(rowIndex, "CostPriceKgRmb", item.costPriceKgRmb);
+                        //                 html += Hidden(rowIndex, "CostPriceLbsRmb", item.costPriceLbsRmb);
+                        //                 html += Hidden(rowIndex, "CostPricePcsRmb", item.costPricePcsRmb);
 
-                                        html += Hidden(rowIndex, "TotalAmountWithoutTaxTk", item.totalAmountWithoutTaxTk);
-                                        html += Hidden(rowIndex, "TotalAmountIncludingTaxTk", item.totalAmountIncludingTaxTk);
+                        //                 html += Hidden(rowIndex, "TotalAmountWithoutTaxTk", item.totalAmountWithoutTaxTk);
+                        //                 html += Hidden(rowIndex, "TotalAmountIncludingTaxTk", item.totalAmountIncludingTaxTk);
 
-                                        html += Hidden(rowIndex, "TotalAmountWithoutTaxRmb", item.totalAmountWithoutTaxRmb);
-                                        html += Hidden(rowIndex, "TotalAmountIncludingTaxRmb", item.totalAmountIncludingTaxRmb);
+                        //                 html += Hidden(rowIndex, "TotalAmountWithoutTaxRmb", item.totalAmountWithoutTaxRmb);
+                        //                 html += Hidden(rowIndex, "TotalAmountIncludingTaxRmb", item.totalAmountIncludingTaxRmb);
 
-                                        html += Hidden(rowIndex, "Remarks", item.remarks);
+                        //                 html += Hidden(rowIndex, "Remarks", item.remarks);
 
-                                        html += "</tr>";
+                        //                 html += "</tr>";
 
-                                        $("#purchaseTable tbody").append(html);
+                        //                 $("#purchaseTable tbody").append(html);
 
-                                        rowIndex++;
+                        //                 rowIndex++;
+
+                        //             });
+
+                        //             alert("Excel Loaded Successfully.");
+
+                        //         }
+
+                        //     });
+
+                        // });
+                    $("#btnUploadExcel").click(function () {
+
+                        if ($("#ShipmentId").val() == "") {
+                            alert("Please Select Shipment.");
+                            $("#ShipmentId").focus();
+                            return;
+                        }
+
+                        if ($("#SupplierId").val() == "") {
+                            alert("Please Select Supplier.");
+                            $("#SupplierId").focus();
+                            return;
+                        }
+
+                        if ($("#WarehouseId").val() == "") {
+                            alert("Please Select Warehouse.");
+                            $("#WarehouseId").focus();
+                            return;
+                        }
+
+                        var file = $("#excelFile")[0].files[0];
+
+                        if (!file) {
+                            alert("Select Excel File");
+                            return;
+                        }
+
+                        var fd = new FormData();
+
+                        fd.append("file", file);
+                        fd.append("shipmentId", $("#ShipmentId").val());
+                        fd.append("supplierId", $("#SupplierId").val());
+                        fd.append("warehouseId", $("#WarehouseId").val());
+
+                        $.ajax({
+
+                            url: "/ProductPurchaseDetail/UploadExcel",
+                            type: "POST",
+                            data: fd,
+                            processData: false,
+                            contentType: false,
+
+                            success: function (result) {
+
+                                $.each(result, function (i, item) {
+
+                                    //==========================
+                                    // Duplicate Check
+                                    //==========================
+
+                                    var duplicate = false;
+
+                                    $("#purchaseTable tbody tr").each(function () {
+
+                                        var p = $(this).find("input[name$='.ProductNameId']").val();
+                                        var c = $(this).find("input[name$='.ColorId']").val();
+                                        var t = $(this).find("input[name$='.Thickness']").val();
+                                        var s = $(this).find("input[name$='.ProductSize']").val();
+
+                                        if (
+                                            p == item.productNameId &&
+                                            c == item.colorId &&
+                                            t == item.thickness &&
+                                            s == item.productSize
+                                        ) {
+                                            duplicate = true;
+                                            return false;
+                                        }
 
                                     });
 
-                                    alert("Excel Loaded Successfully.");
+                                    if (duplicate)
+                                        return;
 
-                                }
+                                    var html = "";
 
-                            });
+                                    html += "<tr>";
+
+                                    html += "<td class='sl'></td>";
+                                    html += "<td>" + item.productName + "</td>";
+                                    html += "<td>" + item.colorName + "</td>";
+                                    html += "<td>" + item.thickness + "</td>";
+                                    html += "<td>" + item.productSize + "</td>";
+                                    html += "<td class='qty'>" + item.initialQuantity + "</td>";
+                                    html += "<td class='weight'>" + item.totalWeightKg + "</td>";
+                                    html += "<td>" + item.unitPriceTk + "</td>";
+                                    html += "<td class='totalTk'>" + item.totalAmountIncludingTaxTk + "</td>";
+
+                                    html += "<td>";
+                                    html += "<button type='button' class='btn btn-danger btn-sm btnRemove'>Remove</button>";
+                                    html += "</td>";
+
+                                    //==========================
+                                    // Hidden Inputs
+                                    //==========================
+
+                                    html += Hidden(rowIndex, "ShipmentId", item.shipmentId);
+                                    html += Hidden(rowIndex, "SupplierId", item.supplierId);
+                                    html += Hidden(rowIndex, "WarehouseId", item.warehouseId);
+
+                                    html += Hidden(rowIndex, "ProductNameId", item.productNameId);
+                                    html += Hidden(rowIndex, "ColorId", item.colorId);
+
+                                    html += Hidden(rowIndex, "Thickness", item.thickness);
+                                    html += Hidden(rowIndex, "ProductSize", item.productSize);
+
+                                    html += Hidden(rowIndex, "InitialQuantity", item.initialQuantity);
+
+                                    html += Hidden(rowIndex, "UnitWeightKg", item.unitWeightKg);
+                                    html += Hidden(rowIndex, "TotalWeightKg", item.totalWeightKg);
+
+                                    html += Hidden(rowIndex, "ExchangeRate", item.exchangeRate);
+
+                                    html += Hidden(rowIndex, "UnitPriceTk", item.unitPriceTk);
+                                    html += Hidden(rowIndex, "UnitPriceRmb", item.unitPriceRmb);
+
+                                    html += Hidden(rowIndex, "ImportTaxPerKgTk", item.importTaxPerKgTk);
+                                    html += Hidden(rowIndex, "ImportTaxPerKgRmb", item.importTaxPerKgRmb);
+
+                                    html += Hidden(rowIndex, "CostPriceKgTk", item.costPriceKgTk);
+                                    html += Hidden(rowIndex, "CostPriceLbsTk", item.costPriceLbsTk);
+                                    html += Hidden(rowIndex, "CostPricePerPieceTk", item.costPricePerPieceTk);
+
+                                    html += Hidden(rowIndex, "CostPriceKgRmb", item.costPriceKgRmb);
+                                    html += Hidden(rowIndex, "CostPriceLbsRmb", item.costPriceLbsRmb);
+                                    html += Hidden(rowIndex, "CostPricePcsRmb", item.costPricePcsRmb);
+
+                                    html += Hidden(rowIndex, "TotalAmountWithoutTaxTk", item.totalAmountWithoutTaxTk);
+                                    html += Hidden(rowIndex, "TotalAmountIncludingTaxTk", item.totalAmountIncludingTaxTk);
+
+                                    html += Hidden(rowIndex, "TotalAmountWithoutTaxRmb", item.totalAmountWithoutTaxRmb);
+                                    html += Hidden(rowIndex, "TotalAmountIncludingTaxRmb", item.totalAmountIncludingTaxRmb);
+
+                                    html += Hidden(rowIndex, "Remarks", item.remarks);
+
+                                    html += "</tr>";
+
+                                    $("#purchaseTable tbody").append(html);
+
+                                    rowIndex++;
+
+                                });
+
+                                RefreshTableSummary();
+
+                                alert("Excel Loaded Successfully.");
+
+                            },
+
+                            error: function () {
+                                alert("Excel Upload Failed.");
+                            }
 
                         });
 
+                    });
                     </script>
 
                 }
