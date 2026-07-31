@@ -65,10 +65,12 @@ namespace SunwinInventory.Repositories
                      on p.WarehouseId equals w.WarehouseId
 
                  join pn in _context.ProductNames
-                     on p.ProductNameId equals pn.ProductNameId
+                     on p.ProductNameId equals pn.ProductNameId into ProductNamesGroup
+                 from pn in ProductNamesGroup.DefaultIfEmpty()
 
-                 join c in _context.Colors
-                     on p.ColorId equals c.ColorId
+                join c in _context.Colors
+                     on p.ColorId equals c.ColorId into colorGroup
+                 from c in colorGroup.DefaultIfEmpty()
 
                  orderby p.PurchaseDetailId descending
 

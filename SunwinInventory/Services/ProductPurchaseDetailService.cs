@@ -154,5 +154,9 @@ namespace SunwinInventory.Services
         {
             await _repository.UpdateAsync(entity);
         }
+        public async Task<ProductPurchaseDetail?> GetEntityByIdAsync(int id)
+        {
+            return await _repository.GetByIdAsync(id);
+        }
     }
 }

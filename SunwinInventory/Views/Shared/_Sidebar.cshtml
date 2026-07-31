@@ -1,5 +1,6 @@
 ﻿@{
     var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["Action"]?.ToString();
 }
 
 <aside class="sidebar" id="sidebar">
@@ -117,7 +118,7 @@
         <li>
             <a asp-controller="ProductPurchaseDetail"
                asp-action="Create"
-               class="@(controller=="ProductPurchaseDetail" ? "active" : "")">
+               class="@((controller=="ProductPurchaseDetail" && action=="Create") ? "active" : "")">
 
                 <i class="bi bi-cart-plus"></i>
 
@@ -175,15 +176,16 @@
         </li>
 
         <li>
+            <a asp-controller="ProductPurchaseDetail"
+               asp-action="Index"
+               class="@((controller=="ProductPurchaseDetail" && action=="Index") ? "active" : "")">
 
-            <a href="#">
-
-                <i class="bi bi-file-earmark-bar-graph"></i>
+                @* <i class="bi bi-cart-plus"></i> *@
+                <i class="bi bi-receipt"></i>
 
                 <span>Purchase Report</span>
 
             </a>
-
         </li>
 
         <li>

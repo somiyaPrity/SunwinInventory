@@ -5,7 +5,7 @@
 }
 
 <div class="container-fluid">
-
+   
     <div class="card shadow">
 
         <div class="card-header bg-primary text-white">
@@ -13,13 +13,53 @@
             <div class="d-flex justify-content-between">
 
                 <h4>Purchase Report</h4>
-
+               
                 <a asp-action="Create" class="btn btn-light">
                     <i class="fa fa-plus"></i> New Purchase
                 </a>
 
             </div>
+            <div class="row mb-3">
 
+                <div class="col-md-2">
+                    <label>From Date</label>
+                    <input type="date" id="fromDate" class="form-control" />
+                </div>
+
+                <div class="col-md-2">
+                    <label>To Date</label>
+                    <input type="date" id="toDate" class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label>Supplier</label>
+                    <select id="supplierFilter" class="form-select">
+                        <option value="">All Suppliers</option>
+                        @*   @foreach (var item in ViewBag.Suppliers)
+                        {
+                        <option value="@item.Text">@item.Text</option>
+                        } *@
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label>Warehouse</label>
+                    <select id="warehouseFilter" class="form-select">
+                        <option value="">All Warehouses</option>
+                        @*     @foreach (var item in ViewBag.Warehouses)
+                        {
+                        <option value="@item.Text">@item.Text</option>
+                        } *@
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end">
+                    <button class="btn btn-primary w-100" id="btnFilter">
+                        Search
+                    </button>
+                </div>
+
+            </div>
         </div>
 
         <div class="card-body">
@@ -65,7 +105,7 @@
                     </thead>
 
                     <tbody>
-
+                        @* <h3>Total Rows = @Model.Count()</h3> *@
                         @{
                             int sl = 1;
 

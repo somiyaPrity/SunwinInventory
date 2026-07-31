@@ -1,10 +1,12 @@
 ﻿using ClosedXML.Excel;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SunwinInventory.DTOs.ProductPurchaseDetail;
 using SunwinInventory.Models;
 using SunwinInventory.Services.Interfaces;
+using System;
 
 namespace SunwinInventory.Controllers
 {
@@ -340,67 +342,80 @@ namespace SunwinInventory.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var purchase = await _purchaseService.GetByIdAsync(id);
+            var model = await _purchaseService.GetByIdAsync(id);
 
-            if (purchase == null)
+            if (model == null)
                 return NotFound();
 
             await LoadDropDowns();
 
-            var model = new PurchaseEntryDto
+            return View(model);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(ProductPurchaseDetailDto model)
+        {
+            if (!ModelState.IsValid)
             {
-                PurchaseDetailId = purchase.PurchaseDetailId,
+                await LoadDropDowns();
+                return View(model);
+            }
 
-                ShipmentId = purchase.ShipmentId,
-                SupplierId = purchase.SupplierId,
-                WarehouseId = purchase.WarehouseId
-            };
+            // Load existing record first
+            var entity = await _purchaseService.GetEntityByIdAsync(model.PurchaseDetailId);
 
-            var item = new PurchaseItemDto
-            {
-                ShipmentId = purchase.ShipmentId,
-                SupplierId = purchase.SupplierId,
-                WarehouseId = purchase.WarehouseId,
+            if (entity == null)
+                return NotFound();
 
-                ProductNameId = purchase.ProductNameId,
-                ColorId = purchase.ColorId,
+            // Update editable fields only
+            entity.ShipmentId = model.ShipmentId;
+            entity.SupplierId = model.SupplierId;
+            entity.WarehouseId = model.WarehouseId;
 
-                Thickness = purchase.Thickness ?? 0,
-                ProductSize = purchase.ProductSize,
+            entity.ProductNameId = model.ProductNameId;
+            entity.ColorId = model.ColorId;
 
-                InitialQuantity = purchase.InitialQuantity,
+            entity.Thickness = model.Thickness;
+            entity.ProductSize = model.ProductSize;
 
-                UnitWeightKg = purchase.UnitWeightKg ?? 0,
-                TotalWeightKg = purchase.TotalWeightKg ?? 0,
+            entity.InitialQuantity = model.InitialQuantity;
 
-                ExchangeRate = purchase.ExchangeRate ?? 0,
+            entity.UnitWeightKg = model.UnitWeightKg;
+            entity.TotalWeightKg = model.TotalWeightKg;
 
-                UnitPriceTk = purchase.UnitPriceTk ?? 0,
-                UnitPriceRmb = purchase.UnitPriceRmb ?? 0,
+            entity.ExchangeRate = model.ExchangeRate;
 
-                ImportTaxPerKgTk = purchase.ImportTaxPerKgTk ?? 0,
-                ImportTaxPerKgRmb = purchase.ImportTaxPerKgRmb ?? 0,
+            entity.UnitPriceTk = model.UnitPriceTk;
+            entity.UnitPriceRmb = model.UnitPriceRmb;
 
-                CostPriceKgTk = purchase.CostPriceKgTk ?? 0,
-                CostPriceLbsTk = purchase.CostPriceLbsTk ?? 0,
-                CostPricePerPieceTk = purchase.CostPricePerPieceTk ?? 0,
+            entity.ImportTaxPerKgTk = model.ImportTaxPerKgTk;
+            entity.ImportTaxPerKgRmb = model.ImportTaxPerKgRmb;
 
-                CostPriceKgRmb = purchase.CostPriceKgRmb ?? 0,
-                CostPriceLbsRmb = purchase.CostPriceLbsRmb ?? 0,
-                CostPricePcsRmb = purchase.CostPricePcsRmb ?? 0,
+            entity.CostPriceKgTk = model.CostPriceKgTk;
+            entity.CostPriceLbsTk = model.CostPriceLbsTk;
+            entity.CostPricePerPieceTk = model.CostPricePerPieceTk;
 
-                TotalAmountWithoutTaxTk = purchase.TotalAmountWithoutTaxTk ?? 0,
-                TotalAmountIncludingTaxTk = purchase.TotalAmountIncludingTaxTk ?? 0,
+            entity.CostPriceKgRmb = model.CostPriceKgRmb;
+            entity.CostPriceLbsRmb = model.CostPriceLbsRmb;
+            entity.CostPricePerPieceRmb = model.CostPricePerPieceRmb;
 
-                TotalAmountWithoutTaxRmb = purchase.TotalAmountWithoutTaxRmb ?? 0,
-                TotalAmountIncludingTaxRmb = purchase.TotalAmountIncludingTaxRmb ?? 0,
+            entity.TotalAmountWithoutTaxTk = model.TotalAmountWithoutTaxTk;
+            entity.TotalAmountIncludingTaxTk = model.TotalAmountIncludingTaxTk;
 
-                Remarks = purchase.Remarks
-            };
+            entity.TotalAmountWithoutTaxRmb = model.TotalAmountWithoutTaxRmb;
+            entity.TotalAmountIncludingTaxRmb = model.TotalAmountIncludingTaxRmb;
 
-            model.Items.Add(item);
+            entity.Remarks = model.Remarks;
 
-            return View("Create", model);
+            // Preserve CreatedDate and CreatedBy
+            entity.UpdatedDate = DateTime.Now;
+            entity.UpdatedBy = "Admin"; // Replace with logged-in username
+
+            await _purchaseService.UpdateAsync(entity);
+
+            TempData["Success"] = "Purchase updated successfully.";
+
+            return RedirectToAction(nameof(Index));
         }
         //=====================================================
         // DELETE

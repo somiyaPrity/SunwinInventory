@@ -15,6 +15,6 @@ namespace SunwinInventory.Services.Interfaces
 
         Task DeleteAsync(int id);
         Task<List<PurchaseReportDto>> GetPurchaseReportAsync();
-        
+        Task<ProductPurchaseDetail?> GetEntityByIdAsync(int id);
     }
 }
