@@ -39,13 +39,131 @@ namespace SunwinInventory.Controllers
         // INDEX
         //=====================================================
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(PurchaseReportFilterDto filter)
         {
-            var list = await _purchaseService.GetPurchaseReportAsync();
+            await LoadDropDowns();
+
+            var list = await _purchaseService.GetPurchaseReportAsync(filter);
+
+            ViewBag.Filter = filter;
 
             return View(list);
         }
+        [HttpGet]
+        public async Task<IActionResult> ExportExcel()
+        {
+            var list = await _purchaseService.GetPurchaseReportAsync();
 
+            using var workbook = new XLWorkbook();
+
+            var ws = workbook.Worksheets.Add("Purchase Report");
+
+            int row = 1;
+
+            //==============================
+            // Header
+            //==============================
+
+            ws.Cell(row, 1).Value = "Date";
+            ws.Cell(row, 2).Value = "Shipment";
+            ws.Cell(row, 3).Value = "Supplier";
+            ws.Cell(row, 4).Value = "Warehouse";
+            ws.Cell(row, 5).Value = "Product";
+            ws.Cell(row, 6).Value = "Color";
+            ws.Cell(row, 7).Value = "Thickness";
+            ws.Cell(row, 8).Value = "Size";
+            ws.Cell(row, 9).Value = "Quantity";
+            ws.Cell(row, 10).Value = "Unit Weight";
+            ws.Cell(row, 11).Value = "Total Weight";
+            ws.Cell(row, 12).Value = "Exchange Rate";
+            ws.Cell(row, 13).Value = "Unit Price TK";
+            ws.Cell(row, 14).Value = "Unit Price RMB";
+            ws.Cell(row, 15).Value = "Import Tax TK";
+            ws.Cell(row, 16).Value = "Import Tax RMB";
+            ws.Cell(row, 17).Value = "Cost/KG TK";
+            ws.Cell(row, 18).Value = "Cost/LBS TK";
+            ws.Cell(row, 19).Value = "Cost/PCS TK";
+            ws.Cell(row, 20).Value = "Cost/KG RMB";
+            ws.Cell(row, 21).Value = "Cost/LBS RMB";
+            ws.Cell(row, 22).Value = "Cost/PCS RMB";
+            ws.Cell(row, 23).Value = "Total Without Tax TK";
+            ws.Cell(row, 24).Value = "Total With Tax TK";
+            ws.Cell(row, 25).Value = "Total Without Tax RMB";
+            ws.Cell(row, 26).Value = "Total With Tax RMB";
+            ws.Cell(row, 27).Value = "Remarks";
+
+            //============================================
+            // STEP 4.2 (ADD HERE)
+            //============================================
+
+            ws.Range("A1:AA1").Style.Font.Bold = true;
+            ws.Range("A1:AA1").Style.Fill.BackgroundColor = XLColor.DarkBlue;
+            ws.Range("A1:AA1").Style.Font.FontColor = XLColor.White;
+            ws.Range("A1:AA1").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+            //============================================
+            // STEP 4.4 (ADD HERE)
+            //============================================
+
+            ws.SheetView.FreezeRows(1);
+
+            row++;
+
+            foreach (var item in list)
+            {
+                ws.Cell(row, 1).Value = item.CreatedDate;
+                ws.Cell(row, 2).Value = item.ShipmentNo;
+                ws.Cell(row, 3).Value = item.SupplierName;
+                ws.Cell(row, 4).Value = item.WarehouseName;
+                ws.Cell(row, 5).Value = item.ProductName;
+                ws.Cell(row, 6).Value = item.ColorName;
+                ws.Cell(row, 7).Value = item.Thickness;
+                ws.Cell(row, 8).Value = item.ProductSize;
+                ws.Cell(row, 9).Value = item.InitialQuantity;
+                ws.Cell(row, 10).Value = item.UnitWeightKg;
+                ws.Cell(row, 11).Value = item.TotalWeightKg;
+                ws.Cell(row, 12).Value = item.ExchangeRate;
+                ws.Cell(row, 13).Value = item.UnitPriceTk;
+                ws.Cell(row, 14).Value = item.UnitPriceRmb;
+                ws.Cell(row, 15).Value = item.ImportTaxPerKgTk;
+                ws.Cell(row, 16).Value = item.ImportTaxPerKgRmb;
+                ws.Cell(row, 17).Value = item.CostPriceKgTk;
+                ws.Cell(row, 18).Value = item.CostPriceLbsTk;
+                ws.Cell(row, 19).Value = item.CostPricePerPieceTk;
+                ws.Cell(row, 20).Value = item.CostPriceKgRmb;
+                ws.Cell(row, 21).Value = item.CostPriceLbsRmb;
+                ws.Cell(row, 22).Value = item.CostPricePcsRmb;
+                ws.Cell(row, 23).Value = item.TotalAmountWithoutTaxTk;
+                ws.Cell(row, 24).Value = item.TotalAmountIncludingTaxTk;
+                ws.Cell(row, 25).Value = item.TotalAmountWithoutTaxRmb;
+                ws.Cell(row, 26).Value = item.TotalAmountIncludingTaxRmb;
+                ws.Cell(row, 27).Value = item.Remarks;
+
+                row++;
+            }
+
+            //============================================
+            // STEP 4.3 (ADD HERE)
+            //============================================
+
+            var range = ws.Range(1, 1, row - 1, 27);
+
+            range.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            range.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+
+            ws.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+
+            workbook.SaveAs(stream);
+
+            stream.Position = 0;
+
+            return File(
+                stream.ToArray(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"PurchaseReport_{DateTime.Now:yyyyMMddHHmmss}.xlsx");
+        }
         //=====================================================
         // CREATE (GET)
         //=====================================================
@@ -317,6 +435,9 @@ namespace SunwinInventory.Controllers
                 await _shipmentService.GetAllAsync(),
                 "ShipmentId",
                 "ShipmentNo");
+            ViewBag.Shipments = new SelectList(await _shipmentService.GetAllAsync(), "ShipmentId", "ShipmentNo");
+
+            ViewBag.Products = new SelectList(await _productNameService.GetAllAsync(), "ProductNameId", "Name");
         }
 
         //=====================================================

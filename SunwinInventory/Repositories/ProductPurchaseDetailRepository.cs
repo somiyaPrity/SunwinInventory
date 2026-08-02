@@ -52,58 +52,182 @@ namespace SunwinInventory.Repositories
         }
         public async Task<List<PurchaseReportDto>> GetPurchaseReportAsync()
         {
-            var result = await
-                (from p in _context.ProductPurchaseDetails
+            return await
+            (
+                from p in _context.ProductPurchaseDetails
 
-                 join s in _context.Shipments
-                     on p.ShipmentId equals s.ShipmentId
+                join s in _context.Shipments
+                    on p.ShipmentId equals s.ShipmentId
 
-                 join sup in _context.Suppliers
-                     on p.SupplierId equals sup.SupplierId
+                join sup in _context.Suppliers
+                    on p.SupplierId equals sup.SupplierId
 
-                 join w in _context.Warehouses
-                     on p.WarehouseId equals w.WarehouseId
+                join w in _context.Warehouses
+                    on p.WarehouseId equals w.WarehouseId
 
-                 join pn in _context.ProductNames
-                     on p.ProductNameId equals pn.ProductNameId into ProductNamesGroup
-                 from pn in ProductNamesGroup.DefaultIfEmpty()
+                join pn in _context.ProductNames
+                    on p.ProductNameId equals pn.ProductNameId into productGroup
+                from pn in productGroup.DefaultIfEmpty()
 
                 join c in _context.Colors
-                     on p.ColorId equals c.ColorId into colorGroup
-                 from c in colorGroup.DefaultIfEmpty()
+                    on p.ColorId equals c.ColorId into colorGroup
+                from c in colorGroup.DefaultIfEmpty()
 
-                 orderby p.PurchaseDetailId descending
+                orderby p.PurchaseDetailId descending
 
-                 select new PurchaseReportDto
-                 {
-                     ProductPurchaseDetailId = p.PurchaseDetailId,
+                select new PurchaseReportDto
+                {
+                    ProductPurchaseDetailId = p.PurchaseDetailId,
 
-                     CreatedDate = p.CreatedDate,
+                    CreatedDate = p.CreatedDate,
 
-                     ShipmentNo = s.ShipmentNo,
+                    ShipmentNo = s.ShipmentNo,
 
-                     SupplierName = sup.SupplierName,
+                    SupplierName = sup.SupplierName,
 
-                     WarehouseName = w.WarehouseName,
+                    WarehouseName = w.WarehouseName,
 
-                     ProductName = pn.Name,
+                    ProductName = pn != null ? pn.Name : "",
 
-                     ColorName = c.ColorName,
+                    ColorName = c != null ? c.ColorName : "",
 
-                     Thickness = p.Thickness ?? 0,
+                    Thickness = p.Thickness ?? 0,
 
-                     ProductSize = p.ProductSize,
+                    ProductSize = p.ProductSize,
 
-                     InitialQuantity = p.InitialQuantity,
+                    InitialQuantity = p.InitialQuantity,
 
-                     TotalWeightKg = p.TotalWeightKg ?? 0,
+                    UnitWeightKg = p.UnitWeightKg ?? 0,
 
-                     UnitPriceTk = p.UnitPriceTk ?? 0,
+                    TotalWeightKg = p.TotalWeightKg ?? 0,
 
-                     TotalAmountIncludingTaxTk = p.TotalAmountIncludingTaxTk ?? 0
-                 }).ToListAsync();
+                    ExchangeRate = p.ExchangeRate ?? 0,
 
-            return result;
+                    UnitPriceTk = p.UnitPriceTk ?? 0,
+
+                    UnitPriceRmb = p.UnitPriceRmb ?? 0,
+
+                    ImportTaxPerKgTk = p.ImportTaxPerKgTk ?? 0,
+
+                    ImportTaxPerKgRmb = p.ImportTaxPerKgRmb ?? 0,
+
+                    CostPriceKgTk = p.CostPriceKgTk ?? 0,
+
+                    CostPriceLbsTk = p.CostPriceLbsTk ?? 0,
+
+                    CostPricePerPieceTk = p.CostPricePerPieceTk ?? 0,
+
+                    CostPriceKgRmb = p.CostPriceKgRmb ?? 0,
+
+                    CostPriceLbsRmb = p.CostPriceLbsRmb ?? 0,
+
+                    CostPricePcsRmb = p.CostPricePerPieceRmb ?? 0,
+
+                    TotalAmountWithoutTaxTk = p.TotalAmountWithoutTaxTk ?? 0,
+
+                    TotalAmountIncludingTaxTk = p.TotalAmountIncludingTaxTk ?? 0,
+
+                    TotalAmountWithoutTaxRmb = p.TotalAmountWithoutTaxRmb ?? 0,
+
+                    TotalAmountIncludingTaxRmb = p.TotalAmountIncludingTaxRmb ?? 0,
+
+                    Remarks = p.Remarks
+                }
+            ).ToListAsync();
+        }
+        public async Task<List<PurchaseReportDto>> GetPurchaseReportAsync(PurchaseReportFilterDto filter)
+        {
+            var query =
+                from p in _context.ProductPurchaseDetails
+
+                join s in _context.Shipments
+                    on p.ShipmentId equals s.ShipmentId
+
+                join sup in _context.Suppliers
+                    on p.SupplierId equals sup.SupplierId
+
+                join w in _context.Warehouses
+                    on p.WarehouseId equals w.WarehouseId
+
+                join pn in _context.ProductNames
+                    on p.ProductNameId equals pn.ProductNameId
+
+                join c1 in _context.Colors
+                    on p.ColorId equals c1.ColorId into colorGroup
+
+                from c in colorGroup.DefaultIfEmpty()
+
+                select new
+                {
+                    p,
+                    s,
+                    sup,
+                    w,
+                    pn,
+                    c
+                };
+
+            if (filter.FromDate.HasValue)
+            {
+                query = query.Where(x => x.p.CreatedDate.Date >= filter.FromDate.Value.Date);
+            }
+
+            if (filter.ToDate.HasValue)
+            {
+                query = query.Where(x => x.p.CreatedDate.Date <= filter.ToDate.Value.Date);
+            }
+
+            if (filter.SupplierId.HasValue)
+            {
+                query = query.Where(x => x.p.SupplierId == filter.SupplierId);
+            }
+
+            if (filter.WarehouseId.HasValue)
+            {
+                query = query.Where(x => x.p.WarehouseId == filter.WarehouseId);
+            }
+
+            if (filter.ShipmentId.HasValue)
+            {
+                query = query.Where(x => x.p.ShipmentId == filter.ShipmentId);
+            }
+
+            if (filter.ProductNameId.HasValue)
+            {
+                query = query.Where(x => x.p.ProductNameId == filter.ProductNameId);
+            }
+
+            return await query
+                .OrderByDescending(x => x.p.PurchaseDetailId)
+                .Select(x => new PurchaseReportDto
+                {
+                    ProductPurchaseDetailId = x.p.PurchaseDetailId,
+
+                    CreatedDate = x.p.CreatedDate,
+
+                    ShipmentNo = x.s.ShipmentNo,
+
+                    SupplierName = x.sup.SupplierName,
+
+                    WarehouseName = x.w.WarehouseName,
+
+                    ProductName = x.pn.Name,
+
+                    ColorName = x.c == null ? "" : x.c.ColorName,
+
+                    Thickness = x.p.Thickness ?? 0,
+
+                    ProductSize = x.p.ProductSize,
+
+                    InitialQuantity = x.p.InitialQuantity,
+
+                    TotalWeightKg = x.p.TotalWeightKg ?? 0,
+
+                    UnitPriceTk = x.p.UnitPriceTk ?? 0,
+
+                    TotalAmountIncludingTaxTk = x.p.TotalAmountIncludingTaxTk ?? 0
+                })
+                .ToListAsync();
         }
     }
 }

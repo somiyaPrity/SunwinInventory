@@ -15,6 +15,7 @@ namespace SunwinInventory.Repositories.Interfaces
 
         Task DeleteAsync(int id);
         Task<List<PurchaseReportDto>> GetPurchaseReportAsync();
-     
+        Task<List<PurchaseReportDto>> GetPurchaseReportAsync(PurchaseReportFilterDto filter);
+
     }
 }

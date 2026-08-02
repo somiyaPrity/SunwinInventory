@@ -5,64 +5,260 @@
 }
 
 <div class="container-fluid">
-   
-    <div class="card shadow">
+    <div class="d-flex justify-content-between">
 
-        <div class="card-header bg-primary text-white">
+        <h4>Purchase Report</h4>
 
-            <div class="d-flex justify-content-between">
+        <div>
 
-                <h4>Purchase Report</h4>
-               
-                <a asp-action="Create" class="btn btn-light">
-                    <i class="fa fa-plus"></i> New Purchase
-                </a>
+            <a asp-action="Create" class="btn btn-light">
+                <i class="bi bi-plus-circle"></i>
+                New Purchase
+            </a>
 
-            </div>
-            <div class="row mb-3">
+            <a asp-action="ExportExcel"
+               class="btn btn-success">
 
-                <div class="col-md-2">
-                    <label>From Date</label>
-                    <input type="date" id="fromDate" class="form-control" />
-                </div>
+                <i class="bi bi-file-earmark-excel"></i>
 
-                <div class="col-md-2">
-                    <label>To Date</label>
-                    <input type="date" id="toDate" class="form-control" />
-                </div>
+                Export Excel
 
-                <div class="col-md-3">
-                    <label>Supplier</label>
-                    <select id="supplierFilter" class="form-select">
-                        <option value="">All Suppliers</option>
-                        @*   @foreach (var item in ViewBag.Suppliers)
-                        {
-                        <option value="@item.Text">@item.Text</option>
-                        } *@
-                    </select>
-                </div>
+            </a>
 
-                <div class="col-md-3">
-                    <label>Warehouse</label>
-                    <select id="warehouseFilter" class="form-select">
-                        <option value="">All Warehouses</option>
-                        @*     @foreach (var item in ViewBag.Warehouses)
-                        {
-                        <option value="@item.Text">@item.Text</option>
-                        } *@
-                    </select>
-                </div>
-
-                <div class="col-md-2 d-flex align-items-end">
-                    <button class="btn btn-primary w-100" id="btnFilter">
-                        Search
-                    </button>
-                </div>
-
-            </div>
         </div>
 
-        <div class="card-body">
+    </div>
+    <div class="card shadow mt-3">
+       
+        <div class="card-header text-white border-bottom-0">
+
+            <form asp-action="Index" method="get">
+
+                <div class="row mb-3 mt-4">
+
+                    <div class="col-md-2">
+                        <label>From Date</label>
+
+                        <input type="date"
+                               name="FromDate"
+                               class="form-control"
+                               value="@ViewBag.Filter?.FromDate?.ToString("yyyy-MM-dd")" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label>To Date</label>
+
+                        <input type="date"
+                               name="ToDate"
+                               class="form-control"
+                               value="@ViewBag.Filter?.ToDate?.ToString("yyyy-MM-dd")" />
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <label>Supplier</label>
+
+                        <select name="SupplierId" class="form-select">
+
+                            <option value="">All Suppliers</option>
+
+                            @foreach (var item in ViewBag.Suppliers)
+                            {
+                                if (ViewBag.Filter?.SupplierId?.ToString() == item.Value)
+                                {
+                                    <option value="@item.Value" selected>@item.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <label>Warehouse</label>
+
+                        <select name="WarehouseId" class="form-select">
+
+                            <option value="">All Warehouses</option>
+
+                            @foreach (var item in ViewBag.Warehouses)
+                            {
+                                if (ViewBag.Filter?.WarehouseId?.ToString() == item.Value)
+                                {
+                                    <option value="@item.Value" selected>@item.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <label>Shipment</label>
+
+                        <select name="ShipmentId" class="form-select">
+
+                            <option value="">All Shipments</option>
+
+                            @foreach (var item in ViewBag.Shipments)
+                            {
+                                if (ViewBag.Filter?.ShipmentId?.ToString() == item.Value)
+                                {
+                                    <option value="@item.Value" selected>@item.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end">
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-md-3 d-flex align-items-end">
+
+                        <a asp-action="Index"
+                           class="btn btn-secondary w-100">
+
+                            Clear
+
+                        </a>
+
+                    </div>
+                </div>
+            </form>
+      
+            </div>
+        </div>
+    <div class="row mt-4">
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card border-0 shadow-sm bg-primary text-white">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <h6 class="mb-1">Total Purchase</h6>
+
+                            <h2 class="fw-bold mb-0">
+                                @Model.Count()
+                            </h2>
+                        </div>
+
+                        <i class="bi bi-cart-check fs-1"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card border-0 shadow-sm bg-success text-white">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <h6 class="mb-1">Total Quantity</h6>
+
+                            <h2 class="fw-bold mb-0">
+                                @Model.Sum(x => x.InitialQuantity).ToString("N0")
+                            </h2>
+                        </div>
+
+                        <i class="bi bi-box-seam fs-1"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card border-0 shadow-sm bg-warning text-dark">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <h6 class="mb-1">Total Weight</h6>
+
+                            <h2 class="fw-bold mb-0">
+                                @Model.Sum(x => x.TotalWeightKg).ToString("N2") KG
+                            </h2>
+                        </div>
+
+                        <i class="bi bi-speedometer2 fs-1"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card border-0 shadow-sm bg-danger text-white">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <h6 class="mb-1">Total Purchase (TK)</h6>
+
+                            <h2 class="fw-bold mb-0">
+                                ৳ @Model.Sum(x => x.TotalAmountIncludingTaxTk).ToString("N2")
+                            </h2>
+                        </div>
+
+                        <i class="bi bi-cash-stack fs-1"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+        <div class="card-body mt-3">
 
             <div class="table-responsive">
 
@@ -152,11 +348,11 @@
 
                                     <a asp-action="Edit"
                                        asp-route-id="@item.ProductPurchaseDetailId"
-                                       class="btn btn-warning btn-sm">
+                                   class="btn btn-warning  btn-sm">
                                         Edit
                                     </a>
 
-                                    <button class="btn btn-danger btn-sm btnDelete"
+                                    <button class="btn btn-danger btn-sm w-75 btnDelete"
                                             data-id="@item.ProductPurchaseDetailId">
                                         Delete
                                     </button>
@@ -206,7 +402,6 @@
 
     </div>
 
-</div>
 
 @section Scripts {
 
