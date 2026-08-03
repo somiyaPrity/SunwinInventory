@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SunwinInventory.Models;
 
-[Index("CategoryName", Name = "IX_ProductCategories_CategoryName", IsUnique = true)]
 public partial class ProductCategory
 {
     [Key]

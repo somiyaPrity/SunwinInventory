@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SunwinInventory.Models;
 
-[Index("RoleName", Name = "IX_Roles_RoleName", IsUnique = true)]
 public partial class Role
 {
     [Key]
