@@ -1,10 +1,12 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Bibliography;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SunwinInventory.DTOs.ProductPurchaseDetail;
 using SunwinInventory.Models;
+using SunwinInventory.Services;
 using SunwinInventory.Services.Interfaces;
 using System;
 
@@ -18,14 +20,14 @@ namespace SunwinInventory.Controllers
         private readonly IWarehouseService _warehouseService;
         private readonly IProductNameService _productNameService;
         private readonly ILookupService _lookupService;
-
+        private readonly IStockLedgerService _stockLedgerService;
         public ProductPurchaseDetailController(
             IProductPurchaseDetailService purchaseService,
             IShipmentService shipmentService,
             ISupplierService supplierService,
             IWarehouseService warehouseService,
             IProductNameService productNameService,
-            ILookupService lookupService)
+            ILookupService lookupService, IStockLedgerService stockLedgerService)
         {
             _purchaseService = purchaseService;
             _shipmentService = shipmentService;
@@ -33,6 +35,7 @@ namespace SunwinInventory.Controllers
             _warehouseService = warehouseService;
             _productNameService = productNameService;
             _lookupService = lookupService;
+            _stockLedgerService = stockLedgerService;
         }
 
         //=====================================================
@@ -238,6 +241,23 @@ namespace SunwinInventory.Controllers
                 };
 
                 await _purchaseService.CreateAsync(entity);
+                await _stockLedgerService.CreateAsync(new StockLedger
+                {
+                    PurchaseDetailId = entity.PurchaseDetailId,
+
+                    WarehouseId = entity.WarehouseId,
+
+                    ProductNameId = entity.ProductNameId,
+
+                    ColorId = entity.ColorId,
+
+                    AvailableQty = entity.InitialQuantity,
+
+                    AvailableWeight = entity.TotalWeightKg ?? 0,
+                    UnitCost = entity.CostPriceKgTk ?? 0,
+
+                    PurchaseDate = entity.CreatedDate
+                });
             }
 
             TempData["Success"] = "Purchase saved successfully.";

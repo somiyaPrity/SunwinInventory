@@ -30,4 +30,7 @@ public partial class StockLedger
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedDate { get; set; }
+
+    [Column(TypeName = "decimal(18, 4)")]
+    public decimal? UnitCost { get; set; }
 }

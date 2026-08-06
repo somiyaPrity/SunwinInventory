@@ -46,6 +46,11 @@ builder.Services.AddScoped<IShipmentService, ShipmentService>();
 builder.Services.AddScoped<ILookupService, LookupService>();
 builder.Services.AddScoped<IProductPurchaseDetailRepository, ProductPurchaseDetailRepository>();
 builder.Services.AddScoped<IProductPurchaseDetailService, ProductPurchaseDetailService>();
+builder.Services.AddScoped<IStockLedgerRepository, StockLedgerRepository>();
+builder.Services.AddScoped<IStockLedgerService, StockLedgerService>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+
 
 builder.Services.AddSession(options =>
 {
