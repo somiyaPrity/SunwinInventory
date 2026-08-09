@@ -50,7 +50,8 @@ builder.Services.AddScoped<IStockLedgerRepository, StockLedgerRepository>();
 builder.Services.AddScoped<IStockLedgerService, StockLedgerService>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
-
+builder.Services.AddScoped<ISalesRepository, SalesRepository>();
+builder.Services.AddScoped<ISalesService, SalesService>();
 
 builder.Services.AddSession(options =>
 {
