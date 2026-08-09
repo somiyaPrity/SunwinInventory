@@ -129,22 +129,21 @@
 
         <li class="menu-title">
 
-            <span>TRANSACTIONS</span>
+            <span>Sale</span>
 
         </li>
 
         <li>
+            <a asp-controller="Customer"
+               asp-action="Index"
+               class="@(controller == "Customer" ? "active" : "")">
 
-            <a href="#">
+                <i class="bi bi-people"></i>
 
-                <i class="bi bi-cart-plus"></i>
-
-                <span>Purchase</span>
+                <span>Customers</span>
 
             </a>
-
         </li>
-
         <li>
 
             <a href="#">

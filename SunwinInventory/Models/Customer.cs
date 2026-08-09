@@ -13,7 +13,7 @@ public partial class Customer
     public int CustomerId { get; set; }
 
     [StringLength(50)]
-    public string CustomerCode { get; set; } = null!;
+    public string? CustomerCode { get; set; }
 
     [StringLength(200)]
     public string CustomerName { get; set; } = null!;

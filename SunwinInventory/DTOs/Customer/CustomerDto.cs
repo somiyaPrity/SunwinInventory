@@ -6,8 +6,8 @@ namespace SunwinInventory.DTOs.Customer
     {
         public int CustomerId { get; set; }
 
-        [Required]
-        public string CustomerCode { get; set; }
+       
+        public string? CustomerCode { get; set; }
 
         [Required]
         public string CustomerName { get; set; }

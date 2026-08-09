@@ -48,5 +48,11 @@ namespace SunwinInventory.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<Customer?> GetLastCustomerAsync()
+        {
+            return await _context.Customers
+                .OrderByDescending(x => x.CustomerId)
+                .FirstOrDefaultAsync();
+        }
     }
 }
