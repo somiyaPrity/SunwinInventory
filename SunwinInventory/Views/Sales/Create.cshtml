@@ -352,7 +352,24 @@
                                    value="1" />
 
                         </div>
+                        <div class="col-md-2">
 
+                            <label class="form-label">
+                                Unit
+                            </label>
+
+                            <select id="saleUnit"
+                                    class="form-select">
+
+                                <option value="">Select Unit</option>
+                                <option value="Pcs">Pcs</option>
+                                <option value="KG">KG</option>
+                                <option value="LBS">LBS</option>
+                                <option value="SFT">SFT</option>
+
+                            </select>
+
+                        </div>
 
                         <div class="col-md-3">
 
@@ -441,7 +458,7 @@
                                 <th>Size</th>
 
                                 <th>Quantity</th>
-
+                                <th>Unit</th>
                                 <th>Unit Price</th>
 
                                 <th>Total</th>
@@ -929,12 +946,18 @@
             const quantity =
                 parseInt($("#saleQuantity").val())
                 || 0;
-
+            const unit =
+                $("#saleUnit").val();
             const unitPrice =
                 parseFloat($("#unitPrice").val())
                 || 0;
 
+            if (!unit) {
 
+                alert("Please select unit.");
+                return;
+
+            }
             if (!productId) {
 
                 alert("Please select product.");
@@ -1006,7 +1029,8 @@
 
                 quantity:
                     quantity,
-
+                unit:
+                    unit,
                 unitPrice:
                     unitPrice,
 
@@ -1072,7 +1096,9 @@
                             <td>
                                 ${item.quantity}
                             </td>
-
+                                    <td>
+            ${item.unit}
+        </td>
                             <td>
                                 ${item.unitPrice.toFixed(2)}
                             </td>
@@ -1223,7 +1249,10 @@
                     `Items[${index}].Quantity`,
                     item.quantity
                 );
-
+                addHidden(
+                    `Items[${index}].Unit`,
+                    item.unit
+                );
                 addHidden(
                     `Items[${index}].UnitPrice`,
                     item.unitPrice

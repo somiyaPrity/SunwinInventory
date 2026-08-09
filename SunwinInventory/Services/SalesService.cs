@@ -303,7 +303,7 @@ namespace SunwinInventory.Services
 
                             Quantity =
                                 issueQty,
-
+                            Unit = item.Unit,
                             WeightKg =
                                 issueWeight,
 

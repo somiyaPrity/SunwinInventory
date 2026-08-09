@@ -26,5 +26,6 @@
         public string? ProductName { get; set; }
 
         public string? ColorName { get; set; }
+        public string? Unit { get; set; }
     }
 }

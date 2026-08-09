@@ -37,4 +37,7 @@ public partial class SalesDetail
 
     [Column(TypeName = "decimal(18, 2)")]
     public decimal? LineTotal { get; set; }
+
+    [StringLength(20)]
+    public string? Unit { get; set; }
 }
