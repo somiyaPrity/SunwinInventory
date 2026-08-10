@@ -23,7 +23,7 @@ namespace SunwinInventory.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<bool> CreateSaleAsync(SalesEntryDto model)
+        public async Task<int?> CreateSaleAsync(SalesEntryDto model)
         {
             await using var transaction =
                 await _context.Database.BeginTransactionAsync();
@@ -343,12 +343,12 @@ namespace SunwinInventory.Services
 
                 await transaction.CommitAsync();
 
-                return true;
+                return invoice.SalesInvoiceId;
             }
             catch
             {
                 await transaction.RollbackAsync();
-                throw;
+                return null;
             }
         }
 

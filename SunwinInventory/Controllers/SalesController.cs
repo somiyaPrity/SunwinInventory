@@ -5,6 +5,7 @@ using SunwinInventory.Data;
 using SunwinInventory.DTOs.Sales;
 using SunwinInventory.Repositories.Interfaces;
 using SunwinInventory.Services.Interfaces;
+using SunwinInventory.Services.Pdf;
 
 namespace SunwinInventory.Controllers
 {
@@ -13,15 +14,18 @@ namespace SunwinInventory.Controllers
         private readonly SunwinInventoryContext _context;
         private readonly ISalesRepository _salesRepository;
         private readonly ISalesService _salesService;
-
+        private readonly IInvoicePdfService _invoicePdfService;
         public SalesController(
             SunwinInventoryContext context,
             ISalesRepository salesRepository,
+            IInvoicePdfService invoicePdfService,
             ISalesService salesService)
         {
             _context = context;
             _salesRepository = salesRepository;
+           
             _salesService = salesService;
+            _invoicePdfService = invoicePdfService;
         }
 
 
@@ -184,7 +188,6 @@ namespace SunwinInventory.Controllers
         // =========================================================
         // SAVE SALE
         // =========================================================
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SalesEntryDto model)
@@ -197,18 +200,29 @@ namespace SunwinInventory.Controllers
 
             try
             {
-                var success = await _salesService.CreateSaleAsync(model);
+                var salesInvoiceId =
+                    await _salesService.CreateSaleAsync(model);
 
-                if (!success)
+                if (!salesInvoiceId.HasValue)
                 {
-                    TempData["Error"] = "Sale could not be completed.";
+                    TempData["Error"] =
+                        "Sale could not be completed.";
+
                     await LoadDropdowns();
                     return View(model);
                 }
 
-                TempData["Success"] = "Sale completed successfully.";
+                // Generate PDF
+                var pdf =
+                    await _invoicePdfService
+                        .GenerateInvoiceAsync(
+                            salesInvoiceId.Value);
 
-                return RedirectToAction(nameof(Create));
+                // Return PDF directly to browser
+                return File(
+                    pdf,
+                    "application/pdf",
+                    $"Invoice-{salesInvoiceId.Value}.pdf");
             }
             catch (Exception ex)
             {
@@ -219,6 +233,40 @@ namespace SunwinInventory.Controllers
                 return View(model);
             }
         }
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Create(SalesEntryDto model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        await LoadDropdowns();
+        //        return View(model);
+        //    }
+
+        //    try
+        //    {
+        //        var success = await _salesService.CreateSaleAsync(model);
+
+        //        if (!success)
+        //        {
+        //            TempData["Error"] = "Sale could not be completed.";
+        //            await LoadDropdowns();
+        //            return View(model);
+        //        }
+
+        //        TempData["Success"] = "Sale completed successfully.";
+
+        //        return RedirectToAction(nameof(Create));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TempData["Error"] = ex.Message;
+
+        //        await LoadDropdowns();
+
+        //        return View(model);
+        //    }
+        //}
 
 
         // =========================================================

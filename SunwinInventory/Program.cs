@@ -8,7 +8,12 @@ using SunwinInventory.Repositories.Implementations;
 using SunwinInventory.Services.Implementations;
 using SunwinInventory.Filters;
 using Microsoft.AspNetCore.Http.Features;
+using QuestPDF.Infrastructure;
+using SunwinInventory.Services.Pdf;
+
 var builder = WebApplication.CreateBuilder(args);
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 // Add services to the container.
 builder.Services.AddControllersWithViews(options =>
@@ -52,6 +57,7 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ISalesRepository, SalesRepository>();
 builder.Services.AddScoped<ISalesService, SalesService>();
+builder.Services.AddScoped<IInvoicePdfService, InvoicePdfService>();
 
 builder.Services.AddSession(options =>
 {

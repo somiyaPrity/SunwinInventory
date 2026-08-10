@@ -4,6 +4,6 @@ namespace SunwinInventory.Services.Interfaces
 {
     public interface ISalesService
     {
-        Task<bool> CreateSaleAsync(SalesEntryDto model);
+        Task<int?> CreateSaleAsync(SalesEntryDto model);
     }
 }
