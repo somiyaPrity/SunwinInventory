@@ -260,7 +260,7 @@
     </div>
         <div class="card-body mt-3">
 
-            <div class="table-responsive">
+        @* <div class="purchase-report-table"> *@
 
                 <table class="table table-bordered table-striped table-hover" id="purchaseTable">
 
@@ -400,9 +400,58 @@
 
         </div>
 
-    </div>
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+
+            $("#purchaseTable").DataTable({
+
+                pageLength: 25,
+
+                lengthMenu: [10, 25, 50, 100],
+
+                scrollX: true,
+
+                scrollCollapse: true,
+
+                autoWidth: false,
+
+                ordering: true,
+
+                searching: true,
+
+                columnDefs: [
+                    {
+                        targets: "_all",
+                        className: "text-nowrap"
+                    }
+                ]
+
+            });
 
 
+            $(".btnDelete").click(function () {
+
+                if (!confirm("Delete this purchase?"))
+                    return;
+
+                var id = $(this).data("id");
+
+                $.post(
+                    "/ProductPurchaseDetail/Delete/" + id,
+                    function () {
+                        location.reload();
+                    }
+                );
+
+            });
+
+        });
+    </script>
+
+}
+@* 
 @section Scripts {
 
     <script>
@@ -412,10 +461,22 @@
             $("#purchaseTable").DataTable({
 
                 pageLength: 25,
+                lengthMenu: [10, 25, 50, 100],
 
-                responsive: true,
+                scrollX: true,
+                scrollCollapse: true,
 
-                dom: 'Bfrtip',
+                autoWidth: false,
+
+                ordering: true,
+                searching: true,
+
+                columnDefs: [
+                    {
+                        targets: '_all',
+                        className: 'text-nowrap'
+                    }
+                ]
 
                 buttons: [
                     'copy',
@@ -445,4 +506,4 @@
 
     </script>
 
-}
+} *@
