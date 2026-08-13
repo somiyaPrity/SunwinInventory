@@ -48,7 +48,7 @@ public partial class SunwinInventoryContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 
-        => optionsBuilder.UseSqlServer("Server=SOMIYA-IT\\SA;Database=SunwinInventoryDB;Trusted_Connection=True;TrustServerCertificate=True;");
+        => optionsBuilder.UseSqlServer("Server=db63319.databaseasp.net,1433;Database=db63319;User Id=db63319;Password=Lp9+g%Q53n!Y;Encrypt=False;MultipleActiveResultSets=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

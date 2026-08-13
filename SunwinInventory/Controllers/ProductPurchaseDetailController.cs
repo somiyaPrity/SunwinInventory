@@ -266,16 +266,15 @@ namespace SunwinInventory.Controllers
         }        //=====================================================
         // UPLOAD EXCEL
         //=====================================================
-
         [HttpPost]
         public async Task<IActionResult> UploadExcel(
-            IFormFile file,
-            int shipmentId,
-            int supplierId,
-            int warehouseId)
+    IFormFile file,
+    int shipmentId,
+    int supplierId,
+    int warehouseId)
         {
             if (file == null || file.Length == 0)
-                return BadRequest("Please select an Excel file.");
+                return BadRequest("No file selected.");
 
             var items = new List<ProductPurchaseDetailDto>();
 
@@ -288,60 +287,309 @@ namespace SunwinInventory.Controllers
 
             for (int row = 3; row <= lastRow; row++)
             {
+                // Skip blank product rows
                 if (string.IsNullOrWhiteSpace(ws.Cell(row, 3).GetString()))
                     continue;
 
                 var dto = new ProductPurchaseDetailDto();
 
+                // =========================================
+                // HEADER VALUES
+                // =========================================
+
                 dto.ShipmentId = shipmentId;
                 dto.SupplierId = supplierId;
                 dto.WarehouseId = warehouseId;
 
-                dto.ProductName = ws.Cell(row, 3).GetString().Trim();
-                dto.ColorName = ws.Cell(row, 4).GetString().Trim();
 
-                dto.Thickness = GetDecimal(ws, row, 5);
-                dto.ProductSize = ws.Cell(row, 6).GetString();
+                // =========================================
+                // BASIC PRODUCT INFORMATION
+                // =========================================
 
-                dto.InitialQuantity = (int)GetDecimal(ws, row, 7);
+                // C - Product Name
+                dto.ProductName =
+                    ws.Cell(row, 3)
+                      .GetString()
+                      .Trim();
 
-                dto.UnitWeightKg = GetDecimal(ws, row, 8);
-                dto.TotalWeightKg = GetDecimal(ws, row, 9);
+                // D - Color
+                dto.ColorName =
+                    ws.Cell(row, 4)
+                      .GetString()
+                      .Trim();
 
-                dto.UnitPriceTk = GetDecimal(ws, row, 10);
-                dto.ExchangeRate = GetDecimal(ws, row, 11);
-                dto.UnitPriceRmb = GetDecimal(ws, row, 12);
+                // E - Thickness
+                dto.Thickness =
+                    GetDecimal(ws, row, 5);
 
-                dto.ImportTaxPerKgTk = GetDecimal(ws, row, 13);
-                dto.ImportTaxPerKgRmb = GetDecimal(ws, row, 14);
+                // F - Product Size
+                dto.ProductSize =
+                    ws.Cell(row, 6)
+                      .GetString()
+                      .Trim();
 
-                dto.CostPriceKgTk = GetDecimal(ws, row, 15);
-                dto.CostPriceLbsTk = GetDecimal(ws, row, 16);
-                dto.CostPricePerPieceTk = GetDecimal(ws, row, 17);
 
-                dto.CostPriceKgRmb = GetDecimal(ws, row, 18);
-                dto.CostPriceLbsRmb = GetDecimal(ws, row, 19);
-                dto.CostPricePcsRmb = GetDecimal(ws, row, 20);
+                // =========================================
+                // QUANTITY / WEIGHT
+                // =========================================
 
-                dto.TotalAmountWithoutTaxTk = GetDecimal(ws, row, 21);
-                dto.TotalAmountIncludingTaxTk = GetDecimal(ws, row, 22);
+                // G - Initial Quantity
+                dto.InitialQuantity =
+                    (int)GetDecimal(ws, row, 7);
 
-                dto.TotalAmountWithoutTaxRmb = GetDecimal(ws, row, 23);
-                dto.TotalAmountIncludingTaxRmb = GetDecimal(ws, row, 24);
+                // H - Weight KG / PCS
+                dto.UnitWeightKg =
+                    GetDecimal(ws, row, 8);
 
-                dto.Remarks = ws.Cell(row, 25).GetString();
+                // I - Total Weight KG
+                dto.TotalWeightKg =
+                    GetDecimal(ws, row, 9);
+
+
+                // =========================================
+                // PRICE INFORMATION
+                // =========================================
+
+                // J - Unit Price TK
+                dto.UnitPriceTk =
+                    GetDecimal(ws, row, 10);
+
+                // K - Unit Price RMB
+                dto.UnitPriceRmb =
+                    GetDecimal(ws, row, 11);
+
+
+                // =========================================
+                // EXCHANGE RATE
+                // =========================================
+                // Excel does not have a separate Exchange Rate
+                // column.
+                //
+                // J = K * ExchangeRate
+                //
+                // Therefore:
+                // ExchangeRate = UnitPriceTk / UnitPriceRmb
+
+                dto.ExchangeRate =
+                    dto.UnitPriceRmb != 0
+                        ? dto.UnitPriceTk / dto.UnitPriceRmb
+                        : 0;
+
+
+                // =========================================
+                // TAX / COST
+                // =========================================
+
+                // L - Tax / KG
+                dto.ImportTaxPerKgTk =
+                    GetDecimal(ws, row, 12);
+
+                // M - Price / KG including TAX
+                dto.CostPriceKgTk =
+                    GetDecimal(ws, row, 13);
+
+                // N - Price / LBS including TAX
+                dto.CostPriceLbsTk =
+                    GetDecimal(ws, row, 14);
+
+
+                // =========================================
+                // COST PER PIECE
+                // =========================================
+                // Excel Y contains Cost Price per PCS (TK)
+                //
+                // Y = column 25
+
+                dto.CostPricePerPieceTk =
+                    GetDecimal(ws, row, 25);
+
+
+                // =========================================
+                // RMB COST VALUES
+                // =========================================
+
+                // Cost KG RMB
+                dto.CostPriceKgRmb =
+                    dto.ExchangeRate != 0
+                        ? dto.CostPriceKgTk / dto.ExchangeRate
+                        : 0;
+
+                // Cost LBS RMB
+                dto.CostPriceLbsRmb =
+                    dto.ExchangeRate != 0
+                        ? dto.CostPriceLbsTk / dto.ExchangeRate
+                        : 0;
+
+                // Cost PCS RMB
+                dto.CostPricePcsRmb =
+                    dto.ExchangeRate != 0
+                        ? dto.CostPricePerPieceTk / dto.ExchangeRate
+                        : 0;
+
+
+                // =========================================
+                // TOTAL AMOUNTS
+                // =========================================
+
+                // O - Total Amount Without TAX (TK)
+                dto.TotalAmountWithoutTaxTk =
+                    GetDecimal(ws, row, 15);
+
+                // P - Total Amount (RMB)
+                dto.TotalAmountWithoutTaxRmb =
+                    GetDecimal(ws, row, 16);
+
+                // Q - TOTAL INCLUDING TAX (TK)
+                // THIS IS THE IMPORTANT ONE
+                dto.TotalAmountIncludingTaxTk =
+                    GetDecimal(ws, row, 17);
+
+                // R - Total Including TAX (RMB)
+                dto.TotalAmountIncludingTaxRmb =
+                    GetDecimal(ws, row, 18);
+
+
+                // =========================================
+                // LOOKUP PRODUCT / COLOR IDS
+                // =========================================
 
                 dto.ProductNameId =
-                    await _lookupService.GetProductIdAsync(dto.ProductName) ?? 0;
+                    await _lookupService
+                        .GetProductIdAsync(dto.ProductName)
+                    ?? 0;
 
                 dto.ColorId =
-                    await _lookupService.GetColorIdAsync(dto.ColorName) ?? 0;
+                    await _lookupService
+                        .GetColorIdAsync(dto.ColorName)
+                    ?? 0;
+
+
+                // =========================================
+                // DEBUG
+                // =========================================
+
+                Console.WriteLine(
+                    $"Row: {row} | " +
+                    $"Product: {dto.ProductName} | " +
+                    $"Weight: {dto.TotalWeightKg} | " +
+                    $"UnitPriceTK: {dto.UnitPriceTk} | " +
+                    $"TaxTK: {dto.ImportTaxPerKgTk} | " +
+                    $"TotalWithoutTax: {dto.TotalAmountWithoutTaxTk} | " +
+                    $"TotalWithTax(Q): {dto.TotalAmountIncludingTaxTk}"
+                );
+
 
                 items.Add(dto);
             }
 
             return Json(items);
         }
+
+
+        private decimal GetDecimal(
+            IXLWorksheet ws,
+            int row,
+            int column)
+        {
+            var cell = ws.Cell(row, column);
+
+            // Get calculated value from Excel
+            if (cell.DataType == XLDataType.Number)
+            {
+                return cell.GetValue<decimal>();
+            }
+
+            var value =
+                cell.GetString()
+                    .Replace(",", "")
+                    .Trim();
+
+            if (decimal.TryParse(
+                value,
+                System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out decimal result))
+            {
+                return result;
+            }
+
+            return 0;
+        }
+        //[HttpPost]
+        //public async Task<IActionResult> UploadExcel(
+        //    IFormFile file,
+        //    int shipmentId,
+        //    int supplierId,
+        //    int warehouseId)
+        //{
+        //    if (file == null || file.Length == 0)
+        //        return BadRequest("Please select an Excel file.");
+
+        //    var items = new List<ProductPurchaseDetailDto>();
+
+        //    using var stream = file.OpenReadStream();
+        //    using var workbook = new XLWorkbook(stream);
+
+        //    var ws = workbook.Worksheet(1);
+
+        //    int lastRow = ws.LastRowUsed().RowNumber();
+
+        //    for (int row = 3; row <= lastRow; row++)
+        //    {
+        //        if (string.IsNullOrWhiteSpace(ws.Cell(row, 3).GetString()))
+        //            continue;
+
+        //        var dto = new ProductPurchaseDetailDto();
+
+        //        dto.ShipmentId = shipmentId;
+        //        dto.SupplierId = supplierId;
+        //        dto.WarehouseId = warehouseId;
+
+        //        dto.ProductName = ws.Cell(row, 3).GetString().Trim();
+        //        dto.ColorName = ws.Cell(row, 4).GetString().Trim();
+
+        //        dto.Thickness = GetDecimal(ws, row, 5);
+        //        dto.ProductSize = ws.Cell(row, 6).GetString();
+
+        //        dto.InitialQuantity = (int)GetDecimal(ws, row, 7);
+
+        //        dto.UnitWeightKg = GetDecimal(ws, row, 8);
+        //        dto.TotalWeightKg = GetDecimal(ws, row, 9);
+
+        //        dto.UnitPriceTk = GetDecimal(ws, row, 10);
+        //        dto.ExchangeRate = GetDecimal(ws, row, 11);
+        //        dto.UnitPriceRmb = GetDecimal(ws, row, 12);
+
+        //        dto.ImportTaxPerKgTk = GetDecimal(ws, row, 13);
+        //        dto.ImportTaxPerKgRmb = GetDecimal(ws, row, 14);
+
+        //        dto.CostPriceKgTk = GetDecimal(ws, row, 15);
+        //        dto.CostPriceLbsTk = GetDecimal(ws, row, 16);
+        //        dto.CostPricePerPieceTk = GetDecimal(ws, row, 17);
+
+        //        dto.CostPriceKgRmb = GetDecimal(ws, row, 18);
+        //        dto.CostPriceLbsRmb = GetDecimal(ws, row, 19);
+        //        dto.CostPricePcsRmb = GetDecimal(ws, row, 20);
+
+        //        dto.TotalAmountWithoutTaxTk = GetDecimal(ws, row, 21);
+        //        dto.TotalAmountIncludingTaxTk = GetDecimal(ws, row, 22);
+
+        //        dto.TotalAmountWithoutTaxRmb = GetDecimal(ws, row, 23);
+        //        dto.TotalAmountIncludingTaxRmb = GetDecimal(ws, row, 24);
+
+        //        dto.Remarks = ws.Cell(row, 25).GetString();
+
+        //        dto.ProductNameId =
+        //            await _lookupService.GetProductIdAsync(dto.ProductName) ?? 0;
+
+        //        dto.ColorId =
+        //            await _lookupService.GetColorIdAsync(dto.ColorName) ?? 0;
+
+        //        items.Add(dto);
+        //    }
+
+        //    return Json(items);
+        //}
 
         //=====================================================
         // SAVE EXCEL PURCHASE
@@ -412,21 +660,21 @@ namespace SunwinInventory.Controllers
         // HELPER
         //=====================================================
 
-        private decimal GetDecimal(IXLWorksheet ws, int row, int column)
-        {
-            var value = ws.Cell(row, column)
-                          .GetString()
-                          .Replace(",", "")
-                          .Trim();
+        //private decimal GetDecimal(IXLWorksheet ws, int row, int column)
+        //{
+        //    var value = ws.Cell(row, column)
+        //                  .GetString()
+        //                  .Replace(",", "")
+        //                  .Trim();
 
-            if (decimal.TryParse(value, out decimal result))
-                return result;
+        //    if (decimal.TryParse(value, out decimal result))
+        //        return result;
 
-            return 0;
-        }        //=====================================================
-                 // LOAD DROPDOWNS
-                 //=====================================================
-
+        //    return 0;
+        //}       
+        //=====================================================
+        // LOAD DROPDOWNS
+        //=====================================================
         private async Task LoadDropDowns()
         {
             var products = await _productNameService.GetAllAsync();

@@ -156,16 +156,16 @@
                         <label>Exchange Rate</label>
                         <input type="number" step="0.0001" id="ExchangeRate" class="form-control" />
                     </div>
-
+                    <div class="col-md-2 mb-3">
+                        <label>Unit Price RMB</label>
+                        <input type="number" step="0.0001" id="UnitPriceRmb" class="form-control" />
+                    </div>
                     <div class="col-md-2 mb-3">
                         <label>Unit Price TK</label>
                         <input type="number" step="0.0001" id="UnitPriceTk" class="form-control" />
                     </div>
 
-                    <div class="col-md-2 mb-3">
-                        <label>Unit Price RMB</label>
-                        <input type="number" step="0.0001" id="UnitPriceRmb" class="form-control" />
-                    </div>
+                   
 
                     <div class="col-md-2 mb-3">
                         <label>Import Tax TK</label>
@@ -394,12 +394,12 @@
                         var unitPriceRmb = n("#UnitPriceRmb");
 
                         var taxTk = n("#ImportTaxPerKgTk");
-
+                        var ImportTaxPerKgRmb = n("#ImportTaxPerKgRmb");
                         //-------------------------------------------------
 
                         var totalWeight = qty * unitWeight;
 
-                        $("#TotalWeightKg").val(totalWeight.toFixed(4));
+                        $("#TotalWeightKg").val(totalWeight.toFixed(2));
 
                         //-------------------------------------------------
 
@@ -407,7 +407,7 @@
 
                             unitPriceTk = unitPriceRmb * exRate;
 
-                            $("#UnitPriceTk").val(unitPriceTk.toFixed(4));
+                            $("#UnitPriceTk").val(unitPriceTk.toFixed(2));
 
                         }
 
@@ -415,27 +415,30 @@
 
                             unitPriceRmb = unitPriceTk / exRate;
 
-                            $("#UnitPriceRmb").val(unitPriceRmb.toFixed(4));
+                            $("#UnitPriceRmb").val(unitPriceRmb.toFixed(2));
 
                         }
-
+                        if (exRate > 0) {
+                            ImportTaxPerKgRmb = taxTk / exRate;
+                            $("#ImportTaxPerKgRmb").val(ImportTaxPerKgRmb.toFixed(2));
+                        }
                         //-------------------------------------------------
 
                         var costKgTk = unitPriceTk + taxTk;
 
-                        $("#CostPriceKgTk").val(costKgTk.toFixed(4));
+                        $("#CostPriceKgTk").val(costKgTk.toFixed(2));
 
                         //-------------------------------------------------
 
                         var costLbsTk = costKgTk / 2.20462;
 
-                        $("#CostPriceLbsTk").val(costLbsTk.toFixed(4));
+                        $("#CostPriceLbsTk").val(costLbsTk.toFixed(2));
 
                         //-------------------------------------------------
 
                         var costPieceTk = qty == 0 ? 0 : (costKgTk * totalWeight) / qty;
 
-                        $("#CostPricePerPieceTk").val(costPieceTk.toFixed(4));
+                        $("#CostPricePerPieceTk").val(costPieceTk.toFixed(2));
 
                         //-------------------------------------------------
 
@@ -447,13 +450,13 @@
 
                         var costLbsRmb = exRate == 0 ? 0 : costLbsTk / exRate;
 
-                        $("#CostPriceLbsRmb").val(costLbsRmb.toFixed(4));
+                        $("#CostPriceLbsRmb").val(costLbsRmb.toFixed(2));
 
                         //-------------------------------------------------
 
                         var costPieceRmb = exRate == 0 ? 0 : costPieceTk / exRate;
 
-                        $("#CostPricePcsRmb").val(costPieceRmb.toFixed(4));
+                        $("#CostPricePcsRmb").val(costPieceRmb.toFixed(2));
 
                         //-------------------------------------------------
 
@@ -479,120 +482,107 @@
 
                         $("#TotalAmountIncludingTaxRmb").val(withTaxRmb.toFixed(2));
 
-                    } $("#btnCalculate").click(function () {
+                    }
 
-                        CalculatePurchase();
 
-                    }); $("#InitialQuantity,#UnitWeightKg,#ExchangeRate,#UnitPriceTk,#UnitPriceRmb,#ImportTaxPerKgTk")
-                        .on("keyup change", function () {
+                    // Normal calculation fields
+                    $("#InitialQuantity,#UnitWeightKg,#ExchangeRate")
+                        .on("input change", function () {
 
                             CalculatePurchase();
 
                         });
-                        // $("#btnAddItem").click(function () {
 
-                        // if ($("#ShipmentId").val() == "") {
-                        //     alert("Please Select Shipment.");
-                        //     $("#ShipmentId").focus();
-                        //     return;
-                        // }
 
-                        // if ($("#SupplierId").val() == "") {
-                        //     alert("Please Select Supplier.");
-                        //     $("#SupplierId").focus();
-                        //     return;
-                        // }
+                    // ==========================================
+                    // UNIT PRICE RMB → TK
+                    // ==========================================
 
-                        // if ($("#WarehouseId").val() == "") {
-                        //     alert("Please Select Warehouse.");
-                        //     $("#WarehouseId").focus();
-                        //     return;
-                        // }
+                    $("#UnitPriceRmb").on("change", function () {
 
-                        // if ($("#ProductNameId").val() == "") {
-                        //     alert("Please Select Product.");
-                        //     $("#ProductNameId").focus();
-                        //     return;
-                        // }
+                        var unitPriceRmb = n("#UnitPriceRmb");
+                        var exRate = n("#ExchangeRate");
 
-                       
+                        if (unitPriceRmb > 0 && exRate > 0) {
 
-                        // if ($("#InitialQuantity").val() == "" || $("#InitialQuantity").val() == "0") {
-                        //     alert("Please Enter Quantity.");
-                        //     $("#InitialQuantity").focus();
-                        //     return;
-                        // }
-                          
+                            var unitPriceTk = unitPriceRmb * exRate;
 
-                        //     var productText = $("#ProductNameId option:selected").text();
-                        //     var colorText = $("#ColorId option:selected").text();
+                            $("#UnitPriceTk").val(unitPriceTk.toFixed(2));
+                        }
 
-                        //     var html = "";
+                        CalculatePurchase();
+                    });
 
-                        //     html += "<tr>";
 
-                        //     html += "<td>" + productText + "</td>";
-                        //     html += "<td>" + colorText + "</td>";
-                        //     html += "<td>" + $("#Thickness").val() + "</td>";
-                        //     html += "<td>" + $("#ProductSize").val() + "</td>";
-                        //     html += "<td>" + $("#InitialQuantity").val() + "</td>";
-                        //     html += "<td>" + $("#TotalWeightKg").val() + "</td>";
-                        //     html += "<td>" + $("#UnitPriceTk").val() + "</td>";
+                    // ==========================================
+                    // UNIT PRICE TK → RMB
+                    // ==========================================
 
-                        //     html += "<td>";
-                        //     html += "<button type='button' class='btn btn-danger btn-sm btnRemove'>Remove</button>";
-                        //     html += "</td>";
+                    $("#UnitPriceTk").on("change", function () {
 
-                        //     //==========================
-                        //     // Hidden Inputs
-                        //     //==========================
+                        var unitPriceTk = n("#UnitPriceTk");
+                        var exRate = n("#ExchangeRate");
 
-                        //     html += Hidden(rowIndex, "ShipmentId", $("#ShipmentId").val());
-                        //     html += Hidden(rowIndex, "SupplierId", $("#SupplierId").val());
-                        //     html += Hidden(rowIndex, "WarehouseId", $("#WarehouseId").val());
+                        if (unitPriceTk > 0 && exRate > 0) {
 
-                        //     html += Hidden(rowIndex, "ProductNameId", $("#ProductNameId").val());
-                        //     html += Hidden(rowIndex, "ColorId", $("#ColorId").val());
+                            var unitPriceRmb = unitPriceTk / exRate;
 
-                        //     html += Hidden(rowIndex, "Thickness", $("#Thickness").val());
-                        //     html += Hidden(rowIndex, "ProductSize", $("#ProductSize").val());
+                            $("#UnitPriceRmb").val(unitPriceRmb.toFixed(2));
+                        }
 
-                        //     html += Hidden(rowIndex, "InitialQuantity", $("#InitialQuantity").val());
+                        CalculatePurchase();
+                    });
 
-                        //     html += Hidden(rowIndex, "UnitWeightKg", $("#UnitWeightKg").val());
-                        //     html += Hidden(rowIndex, "TotalWeightKg", $("#TotalWeightKg").val());
 
-                        //     html += Hidden(rowIndex, "ExchangeRate", $("#ExchangeRate").val());
+                    // ==========================================
+                    // TAX TK → RMB
+                    // ==========================================
 
-                        //     html += Hidden(rowIndex, "UnitPriceTk", $("#UnitPriceTk").val());
-                        //     html += Hidden(rowIndex, "UnitPriceRmb", $("#UnitPriceRmb").val());
+                    $("#ImportTaxPerKgTk").on("change", function () {
 
-                        //     html += Hidden(rowIndex, "ImportTaxPerKgTk", $("#ImportTaxPerKgTk").val());
-                        //     html += Hidden(rowIndex, "ImportTaxPerKgRmb", $("#ImportTaxPerKgRmb").val());
+                        var taxTk = n("#ImportTaxPerKgTk");
+                        var exRate = n("#ExchangeRate");
 
-                        //     html += Hidden(rowIndex, "CostPriceKgTk", $("#CostPriceKgTk").val());
-                        //     html += Hidden(rowIndex, "CostPriceLbsTk", $("#CostPriceLbsTk").val());
-                        //     html += Hidden(rowIndex, "CostPricePerPieceTk", $("#CostPricePerPieceTk").val());
+                        if (taxTk > 0 && exRate > 0) {
 
-                        //     html += Hidden(rowIndex, "CostPriceKgRmb", $("#CostPriceKgRmb").val());
-                        //     html += Hidden(rowIndex, "CostPriceLbsRmb", $("#CostPriceLbsRmb").val());
-                        //     html += Hidden(rowIndex, "CostPricePcsRmb", $("#CostPricePcsRmb").val());
+                            var taxRmb = taxTk / exRate;
 
-                        //     html += Hidden(rowIndex, "TotalAmountWithoutTaxTk", $("#TotalAmountWithoutTaxTk").val());
-                        //     html += Hidden(rowIndex, "TotalAmountIncludingTaxTk", $("#TotalAmountIncludingTaxTk").val());
+                            $("#ImportTaxPerKgRmb").val(taxRmb.toFixed(2));
+                        }
 
-                        //     html += Hidden(rowIndex, "TotalAmountWithoutTaxRmb", $("#TotalAmountWithoutTaxRmb").val());
-                        //     html += Hidden(rowIndex, "TotalAmountIncludingTaxRmb", $("#TotalAmountIncludingTaxRmb").val());
+                        CalculatePurchase();
+                    });
 
-                        //     html += Hidden(rowIndex, "Remarks", $("#Remarks").val());
 
-                        //     html += "</tr>";
+                    // ==========================================
+                    // TAX RMB → TK
+                    // ==========================================
 
-                        //     $("#purchaseTable tbody").append(html);
+                    $("#ImportTaxPerKgRmb").on("change", function () {
 
-                        //     rowIndex++;
+                        var taxRmb = n("#ImportTaxPerKgRmb");
+                        var exRate = n("#ExchangeRate");
 
-                        // });
+                        if (taxRmb > 0 && exRate > 0) {
+
+                            var taxTk = taxRmb * exRate;
+
+                            $("#ImportTaxPerKgTk").val(taxTk.toFixed(2));
+                        }
+
+                        CalculatePurchase();
+                    });
+
+
+                    // ==========================================
+                    // CALCULATE BUTTON
+                    // ==========================================
+
+                    $("#btnCalculate").click(function () {
+
+                        CalculatePurchase();
+
+                    });
                     function RefreshTableSummary() {
 
                         var sl = 1;
