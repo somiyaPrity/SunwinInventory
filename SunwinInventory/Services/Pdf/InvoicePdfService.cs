@@ -49,12 +49,12 @@ namespace SunwinInventory.Services.Pdf
             // Warehouse
             // -----------------------------
 
-            var warehouse = await _context.Warehouses
-                .FirstOrDefaultAsync(x =>
-                    x.WarehouseId == invoice.WarehouseId);
+            //var warehouse = await _context.Warehouses
+            //    .FirstOrDefaultAsync(x =>
+            //        x.WarehouseId == invoice.WarehouseId);
 
-            if (warehouse == null)
-                throw new Exception("Warehouse not found.");
+            //if (warehouse == null)
+            //    throw new Exception("Warehouse not found.");
 
 
             // -----------------------------
@@ -157,9 +157,9 @@ namespace SunwinInventory.Services.Pdf
                                                     .Text(
                                                         $"Invoice Date: {invoice.InvoiceDate:dd-MMM-yyyy}");
 
-                                                left.Item()
-                                                    .Text(
-                                                        $"Warehouse: {warehouse.WarehouseName}");
+                                                //left.Item()
+                                                //    .Text(
+                                                //        $"Warehouse: {warehouse.WarehouseName}");
                                             });
 
 
@@ -368,7 +368,26 @@ namespace SunwinInventory.Services.Pdf
                                             .Element(TotalValueCell)
                                             .Text(
                                                 $"{(invoice.TotalAmount ?? 0):N2}");
+                                        // Cutting Charge
+                                        table.Cell()
+                                            .Element(TotalLabelCell)
+                                            .Text("Cutting Charge");
 
+                                        table.Cell()
+                                            .Element(TotalValueCell)
+                                            .Text(
+                                                $"{(invoice.CuttingCharge):N2}");
+
+
+                                        // Delivery Charge
+                                        table.Cell()
+                                            .Element(TotalLabelCell)
+                                            .Text("Delivery Charge");
+
+                                        table.Cell()
+                                            .Element(TotalValueCell)
+                                            .Text(
+                                                $"{(invoice.DeliveryCharge):N2}");
 
                                         // Discount
                                         table.Cell()

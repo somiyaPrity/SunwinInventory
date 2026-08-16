@@ -212,61 +212,62 @@ namespace SunwinInventory.Controllers
                     return View(model);
                 }
 
-                // Generate PDF
-                var pdf =
-                    await _invoicePdfService
-                        .GenerateInvoiceAsync(
-                            salesInvoiceId.Value);
+                TempData["Success"] =
+                    $"Sale completed successfully. Invoice No: INV-{salesInvoiceId.Value:D5}";
 
-                // Return PDF directly to browser
-                return File(
-                    pdf,
-                    "application/pdf",
-                    $"Invoice-{salesInvoiceId.Value}.pdf");
+                TempData["SalesInvoiceId"] =
+                    salesInvoiceId.Value;
+
+                return RedirectToAction("Create");
             }
             catch (Exception ex)
             {
                 TempData["Error"] = ex.Message;
 
                 await LoadDropdowns();
-
                 return View(model);
             }
         }
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create(SalesEntryDto model)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        await LoadDropdowns();
-        //        return View(model);
-        //    }
+        //   [HttpPost]
+        //   [ValidateAntiForgeryToken]
+        //   public async Task<IActionResult> Create(SalesEntryDto model)
+        //   {
+        //       if (!ModelState.IsValid)
+        //       {
+        //           await LoadDropdowns();
+        //           return View(model);
+        //       }
 
-        //    try
-        //    {
-        //        var success = await _salesService.CreateSaleAsync(model);
+        //       try
+        //       {
+        //           var salesInvoiceId =
+        //               await _salesService.CreateSaleAsync(model);
 
-        //        if (!success)
-        //        {
-        //            TempData["Error"] = "Sale could not be completed.";
-        //            await LoadDropdowns();
-        //            return View(model);
-        //        }
+        //           if (!salesInvoiceId.HasValue)
+        //           {
+        //               TempData["Error"] =
+        //                   "Sale could not be completed.";
 
-        //        TempData["Success"] = "Sale completed successfully.";
+        //               await LoadDropdowns();
+        //               return View(model);
+        //           }
 
-        //        return RedirectToAction(nameof(Create));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        TempData["Error"] = ex.Message;
+        //           TempData["Success"] =
+        //$"Sale completed successfully. Invoice No: INV-{salesInvoiceId.Value:D5}";
 
-        //        await LoadDropdowns();
+        //           TempData["SalesInvoiceId"] = salesInvoiceId.Value;
 
-        //        return View(model);
-        //    }
-        //}
+        //           // Redirect to fresh Create page
+        //           return RedirectToAction("Create");
+        //       }
+        //       catch (Exception ex)
+        //       {
+        //           TempData["Error"] = ex.Message;
+
+        //           await LoadDropdowns();
+        //           return View(model);
+        //       }
+        //   }
 
 
         // =========================================================
@@ -381,34 +382,22 @@ namespace SunwinInventory.Controllers
         [HttpGet]
         public async Task<IActionResult> DownloadInvoicePdf(int id)
         {
-            /*
-             * PDF generation will be implemented next.
-             *
-             * Flow:
-             *
-             * Sales saved
-             *      ↓
-             * Invoice generated
-             *      ↓
-             * DownloadInvoicePdf()
-             *      ↓
-             * PDF file
-             */
-
             var invoice =
                 await _context.SalesInvoices
                     .FirstOrDefaultAsync(x =>
                         x.SalesInvoiceId == id);
 
-
             if (invoice == null)
                 return NotFound();
 
+            var pdf =
+                await _invoicePdfService
+                    .GenerateInvoiceAsync(id);
 
-            // PDF implementation comes next.
-
-            return Content(
-                "PDF invoice generation will be implemented next.");
+            return File(
+                pdf,
+                "application/pdf",
+                $"Invoice-{invoice.InvoiceNo}.pdf");
         }
     }
 }

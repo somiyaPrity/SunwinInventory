@@ -52,10 +52,126 @@ namespace SunwinInventory.Controllers
 
             return View(list);
         }
+        //[HttpGet]
+        //public async Task<IActionResult> ExportExcel()
+        //{
+        //    var list = await _purchaseService.GetPurchaseReportAsync();
+
+        //    using var workbook = new XLWorkbook();
+
+        //    var ws = workbook.Worksheets.Add("Purchase Report");
+
+        //    int row = 1;
+
+        //    //==============================
+        //    // Header
+        //    //==============================
+
+        //    ws.Cell(row, 1).Value = "Date";
+        //    ws.Cell(row, 2).Value = "Shipment";
+        //    ws.Cell(row, 3).Value = "Supplier";
+        //    ws.Cell(row, 4).Value = "Warehouse";
+        //    ws.Cell(row, 5).Value = "Product";
+        //    ws.Cell(row, 6).Value = "Color";
+        //    ws.Cell(row, 7).Value = "Thickness";
+        //    ws.Cell(row, 8).Value = "Size";
+        //    ws.Cell(row, 9).Value = "Quantity";
+        //    ws.Cell(row, 10).Value = "Unit Weight";
+        //    ws.Cell(row, 11).Value = "Total Weight";
+        //    ws.Cell(row, 12).Value = "Exchange Rate";
+        //    ws.Cell(row, 13).Value = "Unit Price TK";
+        //    ws.Cell(row, 14).Value = "Unit Price RMB";
+        //    ws.Cell(row, 15).Value = "Import Tax TK";
+        //    ws.Cell(row, 16).Value = "Import Tax RMB";
+        //    ws.Cell(row, 17).Value = "Cost/KG TK";
+        //    ws.Cell(row, 18).Value = "Cost/LBS TK";
+        //    ws.Cell(row, 19).Value = "Cost/PCS TK";
+        //    ws.Cell(row, 20).Value = "Cost/KG RMB";
+        //    ws.Cell(row, 21).Value = "Cost/LBS RMB";
+        //    ws.Cell(row, 22).Value = "Cost/PCS RMB";
+        //    ws.Cell(row, 23).Value = "Total Without Tax TK";
+        //    ws.Cell(row, 24).Value = "Total With Tax TK";
+        //    ws.Cell(row, 25).Value = "Total Without Tax RMB";
+        //    ws.Cell(row, 26).Value = "Total With Tax RMB";
+        //    ws.Cell(row, 27).Value = "Remarks";
+
+        //    //============================================
+        //    // STEP 4.2 (ADD HERE)
+        //    //============================================
+
+        //    ws.Range("A1:AA1").Style.Font.Bold = true;
+        //    ws.Range("A1:AA1").Style.Fill.BackgroundColor = XLColor.DarkBlue;
+        //    ws.Range("A1:AA1").Style.Font.FontColor = XLColor.White;
+        //    ws.Range("A1:AA1").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+        //    //============================================
+        //    // STEP 4.4 (ADD HERE)
+        //    //============================================
+
+        //    ws.SheetView.FreezeRows(1);
+
+        //    row++;
+
+        //    foreach (var item in list)
+        //    {
+        //        ws.Cell(row, 1).Value = item.CreatedDate;
+        //        ws.Cell(row, 2).Value = item.ShipmentNo;
+        //        ws.Cell(row, 3).Value = item.SupplierName;
+        //        ws.Cell(row, 4).Value = item.WarehouseName;
+        //        ws.Cell(row, 5).Value = item.ProductName;
+        //        ws.Cell(row, 6).Value = item.ColorName;
+        //        ws.Cell(row, 7).Value = item.Thickness;
+        //        ws.Cell(row, 8).Value = item.ProductSize;
+        //        ws.Cell(row, 9).Value = item.InitialQuantity;
+        //        ws.Cell(row, 10).Value = item.UnitWeightKg;
+        //        ws.Cell(row, 11).Value = item.TotalWeightKg;
+        //        ws.Cell(row, 12).Value = item.ExchangeRate;
+        //        ws.Cell(row, 13).Value = item.UnitPriceTk;
+        //        ws.Cell(row, 14).Value = item.UnitPriceRmb;
+        //        ws.Cell(row, 15).Value = item.ImportTaxPerKgTk;
+        //        ws.Cell(row, 16).Value = item.ImportTaxPerKgRmb;
+        //        ws.Cell(row, 17).Value = item.CostPriceKgTk;
+        //        ws.Cell(row, 18).Value = item.CostPriceLbsTk;
+        //        ws.Cell(row, 19).Value = item.CostPricePerPieceTk;
+        //        ws.Cell(row, 20).Value = item.CostPriceKgRmb;
+        //        ws.Cell(row, 21).Value = item.CostPriceLbsRmb;
+        //        ws.Cell(row, 22).Value = item.CostPricePcsRmb;
+        //        ws.Cell(row, 23).Value = item.TotalAmountWithoutTaxTk;
+        //        ws.Cell(row, 24).Value = item.TotalAmountIncludingTaxTk;
+        //        ws.Cell(row, 25).Value = item.TotalAmountWithoutTaxRmb;
+        //        ws.Cell(row, 26).Value = item.TotalAmountIncludingTaxRmb;
+        //        ws.Cell(row, 27).Value = item.Remarks;
+
+        //        row++;
+        //    }
+
+        //    //============================================
+        //    // STEP 4.3 (ADD HERE)
+        //    //============================================
+
+        //    var range = ws.Range(1, 1, row - 1, 27);
+
+        //    range.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+        //    range.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+
+        //    ws.Columns().AdjustToContents();
+
+        //    using var stream = new MemoryStream();
+
+        //    workbook.SaveAs(stream);
+
+        //    stream.Position = 0;
+
+        //    return File(
+        //        stream.ToArray(),
+        //        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        //        $"PurchaseReport_{DateTime.Now:yyyyMMddHHmmss}.xlsx");
+        //}
         [HttpGet]
-        public async Task<IActionResult> ExportExcel()
+        public async Task<IActionResult> ExportExcel(PurchaseReportFilterDto filter)
         {
-            var list = await _purchaseService.GetPurchaseReportAsync();
+            // Get filtered data
+            var list = await _purchaseService.GetPurchaseReportAsync(filter);
 
             using var workbook = new XLWorkbook();
 
@@ -95,22 +211,20 @@ namespace SunwinInventory.Controllers
             ws.Cell(row, 26).Value = "Total With Tax RMB";
             ws.Cell(row, 27).Value = "Remarks";
 
-            //============================================
-            // STEP 4.2 (ADD HERE)
-            //============================================
-
+            // Header style
             ws.Range("A1:AA1").Style.Font.Bold = true;
             ws.Range("A1:AA1").Style.Fill.BackgroundColor = XLColor.DarkBlue;
             ws.Range("A1:AA1").Style.Font.FontColor = XLColor.White;
-            ws.Range("A1:AA1").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-
-            //============================================
-            // STEP 4.4 (ADD HERE)
-            //============================================
+            ws.Range("A1:AA1").Style.Alignment.Horizontal =
+                XLAlignmentHorizontalValues.Center;
 
             ws.SheetView.FreezeRows(1);
 
             row++;
+
+            //==============================
+            // Data
+            //==============================
 
             foreach (var item in list)
             {
@@ -145,16 +259,40 @@ namespace SunwinInventory.Controllers
                 row++;
             }
 
-            //============================================
-            // STEP 4.3 (ADD HERE)
-            //============================================
+            //==============================
+            // Formatting
+            //==============================
 
             var range = ws.Range(1, 1, row - 1, 27);
 
-            range.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-            range.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+            range.Style.Border.OutsideBorder =
+                XLBorderStyleValues.Thin;
+
+            range.Style.Border.InsideBorder =
+                XLBorderStyleValues.Thin;
 
             ws.Columns().AdjustToContents();
+
+            // Number formatting
+            ws.Column(7).Style.NumberFormat.Format = "0.00";
+            ws.Column(9).Style.NumberFormat.Format = "#,##0";
+            ws.Column(10).Style.NumberFormat.Format = "0.0000";
+            ws.Column(11).Style.NumberFormat.Format = "#,##0.00";
+            ws.Column(12).Style.NumberFormat.Format = "0.00";
+            ws.Column(13).Style.NumberFormat.Format = "#,##0.00";
+            ws.Column(14).Style.NumberFormat.Format = "#,##0.00";
+            ws.Column(15).Style.NumberFormat.Format = "#,##0.00";
+            ws.Column(16).Style.NumberFormat.Format = "#,##0.00";
+            ws.Column(17).Style.NumberFormat.Format = "#,##0.00";
+            ws.Column(18).Style.NumberFormat.Format = "#,##0.00";
+            ws.Column(19).Style.NumberFormat.Format = "#,##0.00";
+            ws.Column(20).Style.NumberFormat.Format = "#,##0.00";
+            ws.Column(21).Style.NumberFormat.Format = "#,##0.00";
+            ws.Column(22).Style.NumberFormat.Format = "#,##0.00";
+            ws.Column(23).Style.NumberFormat.Format = "#,##0.00";
+            ws.Column(24).Style.NumberFormat.Format = "#,##0.00";
+            ws.Column(25).Style.NumberFormat.Format = "#,##0.00";
+            ws.Column(26).Style.NumberFormat.Format = "#,##0.00";
 
             using var stream = new MemoryStream();
 
@@ -515,81 +653,7 @@ namespace SunwinInventory.Controllers
 
             return 0;
         }
-        //[HttpPost]
-        //public async Task<IActionResult> UploadExcel(
-        //    IFormFile file,
-        //    int shipmentId,
-        //    int supplierId,
-        //    int warehouseId)
-        //{
-        //    if (file == null || file.Length == 0)
-        //        return BadRequest("Please select an Excel file.");
-
-        //    var items = new List<ProductPurchaseDetailDto>();
-
-        //    using var stream = file.OpenReadStream();
-        //    using var workbook = new XLWorkbook(stream);
-
-        //    var ws = workbook.Worksheet(1);
-
-        //    int lastRow = ws.LastRowUsed().RowNumber();
-
-        //    for (int row = 3; row <= lastRow; row++)
-        //    {
-        //        if (string.IsNullOrWhiteSpace(ws.Cell(row, 3).GetString()))
-        //            continue;
-
-        //        var dto = new ProductPurchaseDetailDto();
-
-        //        dto.ShipmentId = shipmentId;
-        //        dto.SupplierId = supplierId;
-        //        dto.WarehouseId = warehouseId;
-
-        //        dto.ProductName = ws.Cell(row, 3).GetString().Trim();
-        //        dto.ColorName = ws.Cell(row, 4).GetString().Trim();
-
-        //        dto.Thickness = GetDecimal(ws, row, 5);
-        //        dto.ProductSize = ws.Cell(row, 6).GetString();
-
-        //        dto.InitialQuantity = (int)GetDecimal(ws, row, 7);
-
-        //        dto.UnitWeightKg = GetDecimal(ws, row, 8);
-        //        dto.TotalWeightKg = GetDecimal(ws, row, 9);
-
-        //        dto.UnitPriceTk = GetDecimal(ws, row, 10);
-        //        dto.ExchangeRate = GetDecimal(ws, row, 11);
-        //        dto.UnitPriceRmb = GetDecimal(ws, row, 12);
-
-        //        dto.ImportTaxPerKgTk = GetDecimal(ws, row, 13);
-        //        dto.ImportTaxPerKgRmb = GetDecimal(ws, row, 14);
-
-        //        dto.CostPriceKgTk = GetDecimal(ws, row, 15);
-        //        dto.CostPriceLbsTk = GetDecimal(ws, row, 16);
-        //        dto.CostPricePerPieceTk = GetDecimal(ws, row, 17);
-
-        //        dto.CostPriceKgRmb = GetDecimal(ws, row, 18);
-        //        dto.CostPriceLbsRmb = GetDecimal(ws, row, 19);
-        //        dto.CostPricePcsRmb = GetDecimal(ws, row, 20);
-
-        //        dto.TotalAmountWithoutTaxTk = GetDecimal(ws, row, 21);
-        //        dto.TotalAmountIncludingTaxTk = GetDecimal(ws, row, 22);
-
-        //        dto.TotalAmountWithoutTaxRmb = GetDecimal(ws, row, 23);
-        //        dto.TotalAmountIncludingTaxRmb = GetDecimal(ws, row, 24);
-
-        //        dto.Remarks = ws.Cell(row, 25).GetString();
-
-        //        dto.ProductNameId =
-        //            await _lookupService.GetProductIdAsync(dto.ProductName) ?? 0;
-
-        //        dto.ColorId =
-        //            await _lookupService.GetColorIdAsync(dto.ColorName) ?? 0;
-
-        //        items.Add(dto);
-        //    }
-
-        //    return Json(items);
-        //}
+      
 
         //=====================================================
         // SAVE EXCEL PURCHASE
@@ -656,22 +720,7 @@ namespace SunwinInventory.Controllers
             return RedirectToAction(nameof(Create));
         }
 
-        //=====================================================
-        // HELPER
-        //=====================================================
-
-        //private decimal GetDecimal(IXLWorksheet ws, int row, int column)
-        //{
-        //    var value = ws.Cell(row, column)
-        //                  .GetString()
-        //                  .Replace(",", "")
-        //                  .Trim();
-
-        //    if (decimal.TryParse(value, out decimal result))
-        //        return result;
-
-        //    return 0;
-        //}       
+        
         //=====================================================
         // LOAD DROPDOWNS
         //=====================================================
@@ -712,22 +761,7 @@ namespace SunwinInventory.Controllers
         // EDIT
         //=====================================================
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(ProductPurchaseDetail model)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        await LoadDropDowns();
-        //        return View(model);
-        //    }
-
-        //    await _purchaseService.UpdateAsync(model);
-
-        //    TempData["Success"] = "Purchase Updated Successfully.";
-
-        //    return RedirectToAction(nameof(Index));
-        //}
+     
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {

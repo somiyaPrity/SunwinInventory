@@ -60,4 +60,10 @@ public partial class SalesHeader
 
     [Column(TypeName = "datetime")]
     public DateTime? UpdatedDate { get; set; }
+
+    [Column(TypeName = "decimal(18, 2)")]
+    public decimal CuttingCharge { get; set; }
+
+    [Column(TypeName = "decimal(18, 2)")]
+    public decimal DeliveryCharge { get; set; }
 }

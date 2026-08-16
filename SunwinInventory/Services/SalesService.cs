@@ -87,7 +87,8 @@ namespace SunwinInventory.Services
                     subtotal
                     - model.Discount
                     + model.Vat
-                    + model.Ait;
+                    + model.Ait + model.CuttingCharge
+                    + model.DeliveryCharge; 
 
                 if (totalAmount < 0)
                     totalAmount = 0;
@@ -147,7 +148,8 @@ namespace SunwinInventory.Services
                     Discount = model.Discount,
                     Vat = model.Vat,
                     Ait = model.Ait,
-
+                    CuttingCharge = model.CuttingCharge,
+                    DeliveryCharge = model.DeliveryCharge,
                     PaidAmount = model.ReceiveAmount,
                     DueAmount = dueAmount,
 
@@ -182,7 +184,8 @@ namespace SunwinInventory.Services
                     Discount = model.Discount,
                     Vat = model.Vat,
                     Ait = model.Ait,
-
+                    CuttingCharge = model.CuttingCharge,
+                    DeliveryCharge = model.DeliveryCharge,
                     Note = model.Note,
 
                     TotalAmount = totalAmount,

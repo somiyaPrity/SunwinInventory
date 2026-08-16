@@ -26,7 +26,14 @@ namespace SunwinInventory.DTOs.Sales
         public decimal Ait { get; set; }
 
         public string? Note { get; set; }
+        // NEW
+        public decimal CuttingCharge { get; set; }
 
+        public decimal DeliveryCharge { get; set; }
         public List<SalesItemDto> Items { get; set; } = new();
+      
+
+
+
     }
 }

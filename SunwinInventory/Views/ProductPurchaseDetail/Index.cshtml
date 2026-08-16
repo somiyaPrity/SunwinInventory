@@ -15,21 +15,33 @@
                 <i class="bi bi-plus-circle"></i>
                 New Purchase
             </a>
-
             <a asp-action="ExportExcel"
+               asp-route-FromDate="@ViewBag.Filter?.FromDate?.ToString("yyyy-MM-dd")"
+               asp-route-ToDate="@ViewBag.Filter?.ToDate?.ToString("yyyy-MM-dd")"
+               asp-route-SupplierId="@ViewBag.Filter?.SupplierId"
+               asp-route-WarehouseId="@ViewBag.Filter?.WarehouseId"
+               asp-route-ShipmentId="@ViewBag.Filter?.ShipmentId"
+               asp-route-ProductNameId="@ViewBag.Filter?.ProductNameId"
+               class="btn btn-success">
+
+                <i class="bi bi-file-earmark-excel"></i>
+                Export Excel
+
+            </a>
+           @*  <a asp-action="ExportExcel"
                class="btn btn-success">
 
                 <i class="bi bi-file-earmark-excel"></i>
 
                 Export Excel
 
-            </a>
+            </a> *@
 
         </div>
 
     </div>
     <div class="card shadow mt-3">
-       
+
         <div class="card-header text-white border-bottom-0">
 
             <form asp-action="Index" method="get">
@@ -148,10 +160,140 @@
                     </div>
                 </div>
             </form>
-      
+
+        </div>
+    </div>
+    <div class="row mt-4">
+
+        <!-- Total Quantity -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Total Quantity (PCS)</h6>
+                            <h2 class="fw-bold mb-0">
+                                @Model.Sum(x => x.InitialQuantity).ToString("N0")
+                            </h2>
+                        </div>
+                        <i class="bi bi-box-seam fs-1"></i>
+                    </div>
+                </div>
             </div>
         </div>
-    <div class="row mt-4">
+
+
+        <!-- Total Weight -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Total Weight (KG)</h6>
+                            <h2 class="fw-bold mb-0">
+                                @Model.Sum(x => x.TotalWeightKg).ToString("N2")
+                            </h2>
+                        </div>
+                        <i class="bi bi-speedometer2 fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Total Cost Without Tax - Taka -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Cost Without Tax (Taka)</h6>
+                            <h2 class="fw-bold mb-0">
+                                ৳ @Model.Sum(x => x.TotalAmountWithoutTaxTk).ToString("N2")
+                            </h2>
+                        </div>
+                        <i class="bi bi-currency-exchange fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Total Cost Without Tax - RMB -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-secondary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Cost Without Tax (RMB)</h6>
+                            <h2 class="fw-bold mb-0">
+                                ¥ @Model.Sum(x => x.TotalAmountWithoutTaxRmb).ToString("N2")
+                            </h2>
+                        </div>
+                        <i class="bi bi-cash-stack fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Import Tax -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Import Tax Applied (Taka)</h6>
+                            <h2 class="fw-bold mb-0">
+                                ৳ @Model.Sum(x =>
+                                       x.ImportTaxPerKgTk * x.TotalWeightKg
+                                       ).ToString("N2")
+                            </h2>
+                        </div>
+                        <i class="bi bi-percent fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Total Cost With Tax - Taka -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Cost With Tax (Taka)</h6>
+                            <h2 class="fw-bold mb-0">
+                                ৳ @Model.Sum(x => x.TotalAmountIncludingTaxTk).ToString("N2")
+                            </h2>
+                        </div>
+                        <i class="bi bi-cash-coin fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Total Cost With Tax - RMB -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-dark text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Cost With Tax (RMB)</h6>
+                            <h2 class="fw-bold mb-0">
+                                ¥ @Model.Sum(x => x.TotalAmountIncludingTaxRmb).ToString("N2")
+                            </h2>
+                        </div>
+                        <i class="bi bi-currency-yen fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+   @*  <div class="row mt-4">
 
         <div class="col-lg-3 col-md-6 mb-3">
 
@@ -257,148 +399,150 @@
 
         </div>
 
-    </div>
-        <div class="card-body mt-3">
+    </div> *@
+
+
+    <div class="card-body mt-3">
 
         @* <div class="purchase-report-table"> *@
 
-                <table class="table table-bordered table-striped table-hover" id="purchaseTable">
+        <table class="table table-bordered table-striped table-hover" id="purchaseTable">
 
-                    <thead class="table-dark">
+            <thead class="table-dark">
 
-                        <tr>
+                <tr>
 
-                            <th>SL</th>
+                    <th>SL</th>
 
-                            <th>Date</th>
+                    <th>Date</th>
 
-                            <th>Shipment</th>
+                    <th>Shipment</th>
 
-                            <th>Supplier</th>
+                    <th>Supplier</th>
 
-                            <th>Warehouse</th>
+                    <th>Warehouse</th>
 
-                            <th>Product</th>
+                    <th>Product</th>
 
-                            <th>Color</th>
+                    <th>Color</th>
 
-                            <th>Thickness</th>
+                    <th>Thickness</th>
 
-                            <th>Size</th>
+                    <th>Size</th>
 
-                            <th class="text-end">Qty</th>
+                    <th class="text-end">Qty</th>
 
-                            <th class="text-end">Weight</th>
+                    <th class="text-end">Weight</th>
 
-                            <th class="text-end">Unit Price</th>
+                    <th class="text-end">Unit Price</th>
 
-                            <th class="text-end">Total TK</th>
+                    <th class="text-end">Total TK</th>
 
-                            <th width="180">Action</th>
+                    <th width="180">Action</th>
 
-                        </tr>
+                </tr>
 
-                    </thead>
+            </thead>
 
-                    <tbody>
-                        @* <h3>Total Rows = @Model.Count()</h3> *@
-                        @{
-                            int sl = 1;
+            <tbody>
+                @* <h3>Total Rows = @Model.Count()</h3> *@
+                @{
+                    int sl = 1;
 
-                            decimal totalQty = 0;
-                            decimal totalWeight = 0;
-                            decimal totalTk = 0;
-                        }
+                    decimal totalQty = 0;
+                    decimal totalWeight = 0;
+                    decimal totalTk = 0;
+                }
 
-                        @foreach (var item in Model)
-                        {
-                            totalQty += item.InitialQuantity;
-                            totalWeight += item.TotalWeightKg;
-                            totalTk += item.TotalAmountIncludingTaxTk;
+                @foreach (var item in Model)
+                {
+                    totalQty += item.InitialQuantity;
+                    totalWeight += item.TotalWeightKg;
+                    totalTk += item.TotalAmountIncludingTaxTk;
 
-                            <tr>
+                    <tr>
 
-                                <td>@sl</td>
+                        <td>@sl</td>
 
-                                <td>@item.CreatedDate.ToString("dd-MMM-yyyy")</td>
+                        <td>@item.CreatedDate.ToString("dd-MMM-yyyy")</td>
 
-                                <td>@item.ShipmentNo</td>
+                        <td>@item.ShipmentNo</td>
 
-                                <td>@item.SupplierName</td>
+                        <td>@item.SupplierName</td>
 
-                                <td>@item.WarehouseName</td>
+                        <td>@item.WarehouseName</td>
 
-                                <td>@item.ProductName</td>
+                        <td>@item.ProductName</td>
 
-                                <td>@item.ColorName</td>
+                        <td>@item.ColorName</td>
 
-                                <td>@item.Thickness</td>
+                        <td>@item.Thickness</td>
 
-                                <td>@item.ProductSize</td>
+                        <td>@item.ProductSize</td>
 
-                                <td class="text-end">@item.InitialQuantity</td>
+                        <td class="text-end">@item.InitialQuantity</td>
 
-                                <td class="text-end">@item.TotalWeightKg.ToString("N2")</td>
+                        <td class="text-end">@item.TotalWeightKg.ToString("N2")</td>
 
-                                <td class="text-end">@item.UnitPriceTk.ToString("N2")</td>
+                        <td class="text-end">@item.UnitPriceTk.ToString("N2")</td>
 
-                                <td class="text-end">@item.TotalAmountIncludingTaxTk.ToString("N2")</td>
+                        <td class="text-end">@item.TotalAmountIncludingTaxTk.ToString("N2")</td>
 
-                                <td>
+                        <td>
 
-                                    <a asp-action="Edit"
-                                       asp-route-id="@item.ProductPurchaseDetailId"
-                                   class="btn btn-warning  btn-sm">
-                                        Edit
-                                    </a>
+                            <a asp-action="Edit"
+                               asp-route-id="@item.ProductPurchaseDetailId"
+                               class="btn btn-warning  btn-sm">
+                                Edit
+                            </a>
 
-                                    <button class="btn btn-danger btn-sm w-75 btnDelete"
-                                            data-id="@item.ProductPurchaseDetailId">
-                                        Delete
-                                    </button>
+                            <button class="btn btn-danger btn-sm w-75 btnDelete"
+                                    data-id="@item.ProductPurchaseDetailId">
+                                Delete
+                            </button>
 
-                                </td>
+                        </td>
 
-                            </tr>
+                    </tr>
 
-                            sl++;
-                        }
+                    sl++;
+                }
 
-                    </tbody>
+            </tbody>
 
-                    <tfoot class="table-secondary">
+            <tfoot class="table-secondary">
 
-                        <tr>
+                <tr>
 
-                            <th colspan="9" class="text-end">
-                                Grand Total
-                            </th>
+                    <th colspan="9" class="text-end">
+                        Grand Total
+                    </th>
 
-                            <th class="text-end">
-                                @totalQty
-                            </th>
+                    <th class="text-end">
+                        @totalQty
+                    </th>
 
-                            <th class="text-end">
-                                @totalWeight.ToString("N2")
-                            </th>
+                    <th class="text-end">
+                        @totalWeight.ToString("N2")
+                    </th>
 
-                            <th></th>
+                    <th></th>
 
-                            <th class="text-end">
-                                @totalTk.ToString("N2")
-                            </th>
+                    <th class="text-end">
+                        @totalTk.ToString("N2")
+                    </th>
 
-                            <th></th>
+                    <th></th>
 
-                        </tr>
+                </tr>
 
-                    </tfoot>
+            </tfoot>
 
-                </table>
+        </table>
 
-            </div>
+    </div>
 
-        </div>
+</div>
 
 @section Scripts {
 
@@ -451,7 +595,7 @@
     </script>
 
 }
-@* 
+@*
 @section Scripts {
 
     <script>

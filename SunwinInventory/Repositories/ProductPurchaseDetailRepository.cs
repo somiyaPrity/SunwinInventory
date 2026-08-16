@@ -135,7 +135,8 @@ namespace SunwinInventory.Repositories
                 }
             ).ToListAsync();
         }
-        public async Task<List<PurchaseReportDto>> GetPurchaseReportAsync(PurchaseReportFilterDto filter)
+        public async Task<List<PurchaseReportDto>> GetPurchaseReportAsync(
+    PurchaseReportFilterDto filter)
         {
             var query =
                 from p in _context.ProductPurchaseDetails
@@ -167,35 +168,49 @@ namespace SunwinInventory.Repositories
                     c
                 };
 
+            // =========================
+            // FILTERS
+            // =========================
+
             if (filter.FromDate.HasValue)
             {
-                query = query.Where(x => x.p.CreatedDate.Date >= filter.FromDate.Value.Date);
+                query = query.Where(x =>
+                    x.p.CreatedDate.Date >= filter.FromDate.Value.Date);
             }
 
             if (filter.ToDate.HasValue)
             {
-                query = query.Where(x => x.p.CreatedDate.Date <= filter.ToDate.Value.Date);
+                query = query.Where(x =>
+                    x.p.CreatedDate.Date <= filter.ToDate.Value.Date);
             }
 
             if (filter.SupplierId.HasValue)
             {
-                query = query.Where(x => x.p.SupplierId == filter.SupplierId);
+                query = query.Where(x =>
+                    x.p.SupplierId == filter.SupplierId.Value);
             }
 
             if (filter.WarehouseId.HasValue)
             {
-                query = query.Where(x => x.p.WarehouseId == filter.WarehouseId);
+                query = query.Where(x =>
+                    x.p.WarehouseId == filter.WarehouseId.Value);
             }
 
             if (filter.ShipmentId.HasValue)
             {
-                query = query.Where(x => x.p.ShipmentId == filter.ShipmentId);
+                query = query.Where(x =>
+                    x.p.ShipmentId == filter.ShipmentId.Value);
             }
 
             if (filter.ProductNameId.HasValue)
             {
-                query = query.Where(x => x.p.ProductNameId == filter.ProductNameId);
+                query = query.Where(x =>
+                    x.p.ProductNameId == filter.ProductNameId.Value);
             }
+
+            // =========================
+            // RESULT
+            // =========================
 
             return await query
                 .OrderByDescending(x => x.p.PurchaseDetailId)
@@ -213,19 +228,89 @@ namespace SunwinInventory.Repositories
 
                     ProductName = x.pn.Name,
 
-                    ColorName = x.c == null ? "" : x.c.ColorName,
+                    ColorName = x.c == null
+                        ? ""
+                        : x.c.ColorName,
 
                     Thickness = x.p.Thickness ?? 0,
 
                     ProductSize = x.p.ProductSize,
 
-                    InitialQuantity = x.p.InitialQuantity,
+                    // =========================
+                    // QUANTITY / WEIGHT
+                    // =========================
 
-                    TotalWeightKg = x.p.TotalWeightKg ?? 0,
+                    InitialQuantity =
+                        x.p.InitialQuantity,
 
-                    UnitPriceTk = x.p.UnitPriceTk ?? 0,
+                    UnitWeightKg =
+                        x.p.UnitWeightKg ?? 0,
 
-                    TotalAmountIncludingTaxTk = x.p.TotalAmountIncludingTaxTk ?? 0
+                    TotalWeightKg =
+                        x.p.TotalWeightKg ?? 0,
+
+                    // =========================
+                    // PRICE
+                    // =========================
+
+                    ExchangeRate =
+                        x.p.ExchangeRate ?? 0,
+
+                    UnitPriceTk =
+                        x.p.UnitPriceTk ?? 0,
+
+                    UnitPriceRmb =
+                        x.p.UnitPriceRmb ?? 0,
+
+                    // =========================
+                    // IMPORT TAX
+                    // =========================
+
+                    ImportTaxPerKgTk =
+                        x.p.ImportTaxPerKgTk ?? 0,
+
+                    ImportTaxPerKgRmb =
+                        x.p.ImportTaxPerKgRmb ?? 0,
+
+                    // =========================
+                    // COST PRICE
+                    // =========================
+
+                    CostPriceKgTk =
+                        x.p.CostPriceKgTk ?? 0,
+
+                    CostPriceLbsTk =
+                        x.p.CostPriceLbsTk ?? 0,
+
+                    CostPricePerPieceTk =
+                        x.p.CostPricePerPieceTk ?? 0,
+
+                    CostPriceKgRmb =
+                        x.p.CostPriceKgRmb ?? 0,
+
+                    CostPriceLbsRmb =
+                        x.p.CostPriceLbsRmb ?? 0,
+
+                    CostPricePcsRmb =
+                        x.p.CostPricePerPieceRmb ?? 0,
+
+                    // =========================
+                    // TOTAL COST
+                    // =========================
+
+                    TotalAmountWithoutTaxTk =
+                        x.p.TotalAmountWithoutTaxTk ?? 0,
+
+                    TotalAmountIncludingTaxTk =
+                        x.p.TotalAmountIncludingTaxTk ?? 0,
+
+                    TotalAmountWithoutTaxRmb =
+                        x.p.TotalAmountWithoutTaxRmb ?? 0,
+
+                    TotalAmountIncludingTaxRmb =
+                        x.p.TotalAmountIncludingTaxRmb ?? 0,
+
+                    Remarks = x.p.Remarks
                 })
                 .ToListAsync();
         }

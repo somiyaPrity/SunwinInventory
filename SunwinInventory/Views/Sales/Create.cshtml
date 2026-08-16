@@ -8,7 +8,42 @@
     var products = ViewBag.Products as List<SelectListItem>;
     var colors = ViewBag.Colors as List<SelectListItem>;
 }
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show shadow-sm"
+         role="alert">
 
+        <i class="bi bi-check-circle-fill me-2"></i>
+
+        <strong>@TempData["Success"]</strong>
+
+        @if (TempData["SalesInvoiceId"] != null)
+        {
+            <a asp-action="DownloadInvoicePdf"
+               asp-route-id="@TempData["SalesInvoiceId"]"
+               target="_blank"
+               class="btn btn-sm btn-danger ms-3">
+
+                <i class="bi bi-file-earmark-pdf me-1"></i>
+                PDF
+            </a>
+        }
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+}@if (TempData["SalesInvoiceId"] != null)
+{
+    <script>
+        window.open(
+            '@Url.Action("DownloadInvoicePdf", "Sales")/@TempData["SalesInvoiceId"]',
+            '_blank'
+        );
+    </script>
+}
 <div class="container-fluid">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -496,10 +531,67 @@
             </div>
 
             <div class="card-body">
-
                 <div class="row g-3">
 
                     <div class="col-md-3">
+                        <label class="form-label">Discount</label>
+                        <input type="number"
+                               id="Discount"
+                               name="Discount"
+                               class="form-control"
+                               step="0.01"
+                               min="0"
+                               value="@Model.Discount" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">VAT</label>
+                        <input type="number"
+                               id="Vat"
+                               name="Vat"
+                               class="form-control"
+                               step="0.01"
+                               min="0"
+                               value="@Model.Vat" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">AIT</label>
+                        <input type="number"
+                               id="Ait"
+                               name="Ait"
+                               class="form-control"
+                               step="0.01"
+                               min="0"
+                               value="@Model.Ait" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Cutting Charge</label>
+                        <input type="number"
+                               id="CuttingCharge"
+                               name="CuttingCharge"
+                               class="form-control"
+                               step="0.01"
+                               min="0"
+                               value="@Model.CuttingCharge" />
+                    </div>
+
+                    
+
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Delivery Charge</label>
+                        <input type="number"
+                               id="DeliveryCharge"
+                               name="DeliveryCharge"
+                               class="form-control"
+                               step="0.01"
+                               min="0"
+                               value="@Model.DeliveryCharge" />
+                    </div>
+                  @*   <div class="col-md-3">
 
                         <label class="form-label">
                             Discount
@@ -541,7 +633,7 @@
                                class="form-control"
                                id="ait" />
 
-                    </div>
+                    </div> *@
 
 
                     <div class="col-md-3">
@@ -1168,13 +1260,14 @@
             const ait =
                 parseFloat($("#ait").val())
                 || 0;
-
+            var cuttingCharge = parseFloat($("#CuttingCharge").val()) || 0;
+            var deliveryCharge = parseFloat($("#DeliveryCharge").val()) || 0;
 
             const total =
                 subtotal
                 - discount
                 + vat
-                + ait;
+                + ait + cuttingCharge + deliveryCharge;
 
 
             $("#grandTotal")
@@ -1196,7 +1289,7 @@
         }
 
 
-        $("#discount, #vat, #ait, #receiveAmount")
+        $("#discount, #vat, #ait,#CuttingCharge,#DeliveryCharge, #receiveAmount")
             .on("input", calculateTotals);
 
 
