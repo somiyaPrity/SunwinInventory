@@ -126,7 +126,7 @@
 
             </a>
         </li>
-
+       
         <li class="menu-title">
 
             <span>Sale</span>
@@ -155,7 +155,22 @@
 
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="CustomerPayment" asp-action="Index">
+                <i class="bi bi-cash-coin me-2"></i>
+                Customer Payments
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               asp-controller="CustomerPayment"
+               asp-action="CustomerDue">
 
+                <i class="bi bi-hourglass-split me-2"></i>
+                Customer Due
+
+            </a>
+        </li>
         <li>
 
             <a href="#">

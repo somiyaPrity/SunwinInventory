@@ -20,6 +20,8 @@ public partial class SunwinInventoryContext : DbContext
 
     public virtual DbSet<Customer> Customers { get; set; }
 
+    public virtual DbSet<CustomerPayment> CustomerPayments { get; set; }
+
     public virtual DbSet<Designation> Designations { get; set; }
 
     public virtual DbSet<ProductCategory> ProductCategories { get; set; }
@@ -65,6 +67,11 @@ public partial class SunwinInventoryContext : DbContext
 
             entity.Property(e => e.CreatedDate).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.IsActive).HasDefaultValue(true);
+        });
+
+        modelBuilder.Entity<CustomerPayment>(entity =>
+        {
+            entity.HasKey(e => e.CustomerPaymentId).HasName("PK__Customer__4017BED3889DAF2E");
         });
 
         modelBuilder.Entity<Designation>(entity =>
