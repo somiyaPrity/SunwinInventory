@@ -60,6 +60,9 @@ builder.Services.AddScoped<ISalesService, SalesService>();
 builder.Services.AddScoped<IInvoicePdfService, InvoicePdfService>();
 builder.Services.AddScoped<ICustomerPaymentService, CustomerPaymentService>();
 builder.Services.AddScoped<ICustomerPaymentRepository, CustomerPaymentRepository>();
+builder.Services.AddScoped<
+    ICustomerStatementPdfService,
+    CustomerStatementPdfService>();
 
 builder.Services.AddSession(options =>
 {

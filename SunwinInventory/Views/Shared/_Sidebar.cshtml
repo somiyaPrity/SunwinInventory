@@ -149,16 +149,10 @@
                asp-action="Create"
                class="@(controller == "Sales" ? "active" : "")">
 
-                <i class="fas fa-cash-register"></i>
+                <i class="bi bi-arrow-left-right"></i>
 
                 <span>Sales Entry</span>
 
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" asp-controller="CustomerPayment" asp-action="Index">
-                <i class="bi bi-cash-coin me-2"></i>
-                Customer Payments
             </a>
         </li>
         <li class="nav-item">
@@ -171,6 +165,13 @@
 
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="CustomerPayment" asp-action="Index">
+                <i class="bi bi-cash-coin me-2"></i>
+                Customer Payments
+            </a>
+        </li>
+       
         <li>
 
             <a href="#">

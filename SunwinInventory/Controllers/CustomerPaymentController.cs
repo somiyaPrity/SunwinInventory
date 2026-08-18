@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using SunwinInventory.DTOs.CustomerPayment;
 using SunwinInventory.Services;
 using SunwinInventory.Services.Interfaces;
+using SunwinInventory.Services.Pdf;
 
 namespace SunwinInventory.Controllers
 {
@@ -10,13 +11,28 @@ namespace SunwinInventory.Controllers
     {
         private readonly ICustomerPaymentService _paymentService;
         private readonly ICustomerService _customerService;
-
+        private readonly ICustomerStatementPdfService _customerStatementPdfService;
         public CustomerPaymentController(
             ICustomerPaymentService paymentService,
-            ICustomerService customerService)
+            ICustomerService customerService, ICustomerStatementPdfService customerStatementPdfService)
         {
             _paymentService = paymentService;
             _customerService = customerService;
+            _customerStatementPdfService =
+       customerStatementPdfService;
+        }
+        [HttpGet]
+        public async Task<IActionResult> DownloadCustomerStatement(
+    int customerId)
+        {
+            var pdf =
+                await _customerStatementPdfService
+                    .GenerateStatementAsync(customerId);
+
+            return File(
+                pdf,
+                "application/pdf",
+                $"CustomerStatement_{customerId}_{DateTime.Now:yyyyMMdd}.pdf");
         }
 
         //=====================================================
