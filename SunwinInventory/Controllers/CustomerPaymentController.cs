@@ -12,14 +12,17 @@ namespace SunwinInventory.Controllers
         private readonly ICustomerPaymentService _paymentService;
         private readonly ICustomerService _customerService;
         private readonly ICustomerStatementPdfService _customerStatementPdfService;
+        private readonly IPaymentReceiptPdfService _paymentReceiptPdfService;
         public CustomerPaymentController(
             ICustomerPaymentService paymentService,
-            ICustomerService customerService, ICustomerStatementPdfService customerStatementPdfService)
+            ICustomerService customerService, ICustomerStatementPdfService customerStatementPdfService
+            , IPaymentReceiptPdfService paymentReceiptPdfService)
         {
             _paymentService = paymentService;
             _customerService = customerService;
-            _customerStatementPdfService =
-       customerStatementPdfService;
+            _customerStatementPdfService = customerStatementPdfService;
+            _paymentReceiptPdfService = paymentReceiptPdfService;
+            
         }
         [HttpGet]
         public async Task<IActionResult> DownloadCustomerStatement(
@@ -33,6 +36,17 @@ namespace SunwinInventory.Controllers
                 pdf,
                 "application/pdf",
                 $"CustomerStatement_{customerId}_{DateTime.Now:yyyyMMdd}.pdf");
+        }
+        [HttpGet]
+        public async Task<IActionResult> DownloadPaymentReceipt(int id)
+        {
+            var pdf = await _paymentReceiptPdfService
+                .GeneratePaymentReceiptAsync(id);
+
+            return File(
+                pdf,
+                "application/pdf",
+                $"PaymentReceipt_{id}.pdf");
         }
 
         //=====================================================
@@ -69,37 +83,81 @@ namespace SunwinInventory.Controllers
         // CREATE - POST
         //=====================================================
 
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Create(
+        //    CustomerPaymentDto model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        await LoadCustomers();
+
+        //        return View(model);
+        //    }
+
+        //    try
+        //    {
+        //        await _paymentService.CreateAsync(model);
+
+        //        TempData["Success"] =
+        //            "Payment saved successfully.";
+
+        //        return RedirectToAction(nameof(Create));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TempData["Error"] = ex.Message;
+
+        //        await LoadCustomers();
+
+        //        return View(model);
+        //    }
+        //}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(
-            CustomerPaymentDto model)
+        public async Task<IActionResult> Create(CustomerPaymentDto model)
         {
             if (!ModelState.IsValid)
             {
                 await LoadCustomers();
-
                 return View(model);
             }
 
             try
             {
-                await _paymentService.CreateAsync(model);
+                var paymentId = await _paymentService.AddPaymentAsync(model);
 
-                TempData["Success"] =
-                    "Payment saved successfully.";
+                if (!paymentId.HasValue)
+                {
+                    TempData["Error"] = "Payment could not be saved.";
+                    await LoadCustomers();
+                    return View(model);
+                }
 
-                return RedirectToAction(nameof(Create));
+                TempData["Success"] = "Payment saved successfully.";
+
+                return RedirectToAction(
+                    nameof(PaymentReceipt),
+                    new { id = paymentId.Value });
             }
             catch (Exception ex)
             {
                 TempData["Error"] = ex.Message;
 
                 await LoadCustomers();
-
                 return View(model);
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> PaymentReceipt(int id)
+        {
+            var pdf = await _paymentReceiptPdfService
+                .GeneratePaymentReceiptAsync(id);
 
+            return File(
+                pdf,
+                "application/pdf");
+        }
         //=====================================================
         // GET CUSTOMER INVOICES
         //=====================================================

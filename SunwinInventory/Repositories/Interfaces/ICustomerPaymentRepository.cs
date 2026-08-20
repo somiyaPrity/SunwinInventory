@@ -10,6 +10,8 @@ namespace SunwinInventory.Repositories.Interfaces
 
         Task<bool> CreateAsync(CustomerPaymentDto model);
 
+        Task<int?> AddPaymentAsync(CustomerPaymentDto model);
+
         Task DeleteAsync(int id);
 
         Task<List<CustomerPaymentDto>> GetByInvoiceAsync(
@@ -23,6 +25,7 @@ namespace SunwinInventory.Repositories.Interfaces
 
         Task<CustomerPaymentDto?> GetInvoiceInfoAsync(
             int salesInvoiceId);
+
         Task<List<CustomerDueDto>> GetCustomerDueReportAsync();
     }
 }

@@ -62,7 +62,80 @@ namespace SunwinInventory.Repositories
                 }
             ).ToListAsync();
         }
+        public async Task<int?> AddPaymentAsync(CustomerPaymentDto model)
+        {
+            await using var transaction =
+                await _context.Database.BeginTransactionAsync();
 
+            try
+            {
+                var invoice = await _context.SalesInvoices
+                    .FirstOrDefaultAsync(x =>
+                        x.SalesInvoiceId == model.SalesInvoiceId);
+
+                if (invoice == null)
+                    return null;
+
+                if (invoice.CustomerId != model.CustomerId)
+                    return null;
+
+                decimal totalAmount = invoice.TotalAmount ?? 0;
+                decimal currentPaid = invoice.PaidAmount ?? 0;
+                decimal currentDue = invoice.DueAmount ?? 0;
+
+                if (model.PaymentAmount <= 0)
+                    return null;
+
+                if (model.PaymentAmount > currentDue)
+                    return null;
+
+                var payment = new CustomerPayment
+                {
+                    CustomerId = model.CustomerId,
+
+                    SalesInvoiceId = model.SalesInvoiceId,
+
+                    PaymentAmount = model.PaymentAmount,
+
+                    PaymentDate = model.PaymentDate,
+
+                    PaymentMethod = model.PaymentMethod,
+
+                    Remarks = model.Remarks,
+
+                    CreatedBy = "Admin",
+
+                    CreatedDate = DateTime.Now
+                };
+
+                _context.CustomerPayments.Add(payment);
+
+                decimal newPaid =
+                    currentPaid + model.PaymentAmount;
+
+                decimal newDue =
+                    Math.Max(0, totalAmount - newPaid);
+
+                invoice.PaidAmount = newPaid;
+
+                invoice.DueAmount = newDue;
+
+                invoice.UpdatedBy = "Admin";
+
+                invoice.UpdatedDate = DateTime.Now;
+
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                return payment.CustomerPaymentId;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
         //=====================================================
         // GET PAYMENT BY ID
         //=====================================================

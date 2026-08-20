@@ -153,7 +153,7 @@
                                     @item.Remarks
                                 </td>
 
-                                <td>
+                               @*  <td>
 
                                     <a asp-action="InvoicePayments"
                                        asp-route-salesInvoiceId="@item.SalesInvoiceId"
@@ -171,8 +171,38 @@
 
                                     </button>
 
-                                </td>
+                                </td> *@
+                                <td>
 
+                                    <a asp-action="InvoicePayments"
+                                       asp-route-salesInvoiceId="@item.SalesInvoiceId"
+                                       class="btn btn-info btn-sm"
+                                       title="View Payments">
+
+                                        <i class="bi bi-eye"></i>
+
+                                    </a>
+
+                                    <a asp-action="DownloadPaymentReceipt"
+                                       asp-route-id="@item.CustomerPaymentId"
+                                       class="btn btn-success btn-sm"
+                                       title="Payment Receipt"
+                                       target="_blank">
+
+                                        <i class="bi bi-receipt"></i>
+
+                                    </a>
+
+                                    <button type="button"
+                                            class="btn btn-danger btn-sm btnDelete"
+                                            data-id="@item.CustomerPaymentId"
+                                            title="Delete Payment">
+
+                                        <i class="bi bi-trash"></i>
+
+                                    </button>
+
+                                </td>
                             </tr>
 
                             sl++;
