@@ -1,0 +1,580 @@
+﻿@model SunwinInventory.DTOs.CustomerPayment.CustomerPaymentDto
+
+@{
+    ViewData["Title"] = "Receive Customer Payment";
+}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <h4>
+            <i class="bi bi-cash-coin"></i>
+            Receive Customer Payment
+        </h4>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+
+            <i class="bi bi-arrow-left"></i>
+            Payment List
+
+        </a>
+
+    </div>
+
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+
+            <i class="bi bi-check-circle"></i>
+
+            @TempData["Success"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"></button>
+
+        </div>
+    }
+
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+
+            <i class="bi bi-exclamation-triangle"></i>
+
+            @TempData["Error"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"></button>
+
+        </div>
+    }
+
+
+    <form asp-action="Create"
+          method="post">
+
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger mb-3">
+        </div>
+
+
+        <div class="card shadow-sm mb-3">
+
+            <div class="card-header">
+
+                <strong>
+                    Customer & Invoice
+                </strong>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <!-- Customer -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <label class="form-label">
+                            Customer
+                        </label>
+
+                        <select asp-for="CustomerId"
+                                asp-items="ViewBag.Customers"
+                                class="form-select"
+                                id="CustomerId">
+
+                            <option value="">
+                                -- Select Customer --
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="CustomerId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Invoice -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <label class="form-label">
+                            Invoice
+                        </label>
+
+                        <select asp-for="SalesInvoiceId"
+                                class="form-select"
+                                id="SalesInvoiceId">
+
+                            <option value="">
+                                -- Select Invoice --
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="SalesInvoiceId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Invoice No -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <label class="form-label">
+                            Invoice No
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               id="InvoiceNo"
+                               readonly />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Invoice Summary -->
+
+        <div class="row mb-3">
+
+            <div class="col-md-4">
+
+                <div class="card shadow-sm border-primary">
+
+                    <div class="card-body">
+
+                        <small class="text-muted">
+                            Invoice Total
+                        </small>
+
+                        <h4 class="text-primary"
+                            id="InvoiceTotal">
+
+                            0.00
+
+                        </h4>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="card shadow-sm border-success">
+
+                    <div class="card-body">
+
+                        <small class="text-muted">
+                            Already Paid
+                        </small>
+
+                        <h4 class="text-success"
+                            id="InvoicePaid">
+
+                            0.00
+
+                        </h4>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="card shadow-sm border-danger">
+
+                    <div class="card-body">
+
+                        <small class="text-muted">
+                            Current Due
+                        </small>
+
+                        <h4 class="text-danger"
+                            id="InvoiceDue">
+
+                            0.00
+
+                        </h4>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Payment -->
+
+        <div class="card shadow-sm">
+
+            <div class="card-header">
+
+                <strong>
+                    Payment Information
+                </strong>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <!-- Payment Amount -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <label asp-for="PaymentAmount"
+                               class="form-label">
+
+                            Payment Amount
+
+                        </label>
+
+                        <input asp-for="PaymentAmount"
+                               class="form-control"
+                               id="PaymentAmount"
+                               type="number"
+                               step="0.01"
+                               min="0.01" />
+
+                        <span asp-validation-for="PaymentAmount"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Payment Date -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <label asp-for="PaymentDate"
+                               class="form-label">
+
+                            Payment Date
+
+                        </label>
+
+                        <input asp-for="PaymentDate"
+                               class="form-control"
+                               type="date" />
+
+                        <span asp-validation-for="PaymentDate"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Payment Method -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <label asp-for="PaymentMethod"
+                               class="form-label">
+
+                            Payment Method
+
+                        </label>
+
+                        <select asp-for="PaymentMethod"
+                                class="form-select">
+
+                            <option value="">
+                                -- Select Method --
+                            </option>
+
+                            <option value="Cash">
+                                Cash
+                            </option>
+
+                            <option value="Bank">
+                                Bank
+                            </option>
+
+                            <option value="Cheque">
+                                Cheque
+                            </option>
+
+                            <option value="Mobile Banking">
+                                Mobile Banking
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Remarks -->
+
+                    <div class="col-md-12 mb-3">
+
+                        <label asp-for="Remarks"
+                               class="form-label">
+
+                            Remarks
+
+                        </label>
+
+                        <textarea asp-for="Remarks"
+                                  class="form-control"
+                                  rows="3">
+                        </textarea>
+
+                    </div>
+
+                </div>
+
+
+                <div class="text-end">
+
+                    <a asp-action="Index"
+                       class="btn btn-secondary">
+
+                        Cancel
+
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-success"
+                            id="btnSave">
+
+                        <i class="bi bi-check-circle"></i>
+
+                        Save Payment
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        $(document).ready(function () {
+
+            //==================================================
+            // CUSTOMER CHANGE
+            //==================================================
+
+            $("#CustomerId").change(function () {
+
+                var customerId = $(this).val();
+
+                $("#SalesInvoiceId").empty();
+
+                $("#SalesInvoiceId").append(
+                    '<option value="">-- Select Invoice --</option>'
+                );
+
+                clearInvoiceInfo();
+
+                if (!customerId)
+                    return;
+
+                $.ajax({
+
+                    url: '@Url.Action("GetCustomerInvoices", "CustomerPayment")',
+
+                    type: 'GET',
+
+                    data: {
+                        customerId: customerId
+                    },
+
+                    success: function (data) {
+
+                        $.each(data, function (i, item) {
+
+                            var text =
+                                item.invoiceNo +
+                                " | Due: " +
+                                Number(item.dueAmount).toFixed(2);
+
+                            $("#SalesInvoiceId").append(
+
+                                $("<option>", {
+                                    value: item.salesInvoiceId,
+                                    text: text
+                                })
+
+                            );
+
+                        });
+
+                    },
+
+                    error: function () {
+
+                        alert("Could not load customer invoices.");
+
+                    }
+
+                });
+
+            });
+
+
+            //==================================================
+            // INVOICE CHANGE
+            //==================================================
+
+            $("#SalesInvoiceId").change(function () {
+
+                var invoiceId = $(this).val();
+
+                clearInvoiceInfo();
+
+                if (!invoiceId)
+                    return;
+
+                $.ajax({
+
+                    url: '@Url.Action("GetInvoiceInfo", "CustomerPayment")',
+
+                    type: 'GET',
+
+                    data: {
+                        salesInvoiceId: invoiceId
+                    },
+
+                    success: function (data) {
+
+                        $("#InvoiceNo")
+                            .val(data.invoiceNo);
+
+                        $("#InvoiceTotal")
+                            .text(
+                                Number(data.invoiceTotal)
+                                    .toFixed(2)
+                            );
+
+                        $("#InvoicePaid")
+                            .text(
+                                Number(data.paidAmount)
+                                    .toFixed(2)
+                            );
+
+                        $("#InvoiceDue")
+                            .text(
+                                Number(data.dueAmount)
+                                    .toFixed(2)
+                            );
+
+                        // Set maximum payment
+                        $("#PaymentAmount")
+                            .attr(
+                                "max",
+                                data.dueAmount
+                            );
+
+                    },
+
+                    error: function () {
+
+                        alert("Could not load invoice information.");
+
+                    }
+
+                });
+
+            });
+
+
+            //==================================================
+            // PAYMENT VALIDATION
+            //==================================================
+
+            $("#PaymentAmount").on("input", function () {
+
+                var amount =
+                    parseFloat($(this).val()) || 0;
+
+                var due =
+                    parseFloat(
+                        $("#InvoiceDue").text()
+                    ) || 0;
+
+                if (amount > due) {
+
+                    $(this).addClass("is-invalid");
+
+                    $("#btnSave").prop("disabled", true);
+
+                }
+                else {
+
+                    $(this).removeClass("is-invalid");
+
+                    $("#btnSave").prop("disabled", false);
+
+                }
+
+            });
+
+
+            //==================================================
+            // CLEAR INVOICE INFO
+            //==================================================
+
+            function clearInvoiceInfo() {
+
+                $("#InvoiceNo").val("");
+
+                $("#InvoiceTotal").text("0.00");
+
+                $("#InvoicePaid").text("0.00");
+
+                $("#InvoiceDue").text("0.00");
+
+                $("#PaymentAmount")
+                    .val("")
+                    .removeAttr("max");
+
+                $("#btnSave")
+                    .prop("disabled", false);
+            }
+
+        });
+
+    </script>
+}

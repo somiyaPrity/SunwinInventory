@@ -1,0 +1,1372 @@
+﻿@model SunwinInventory.DTOs.Sales.SalesEntryDto
+
+@{
+    ViewData["Title"] = "Sales Entry";
+
+    var customers = ViewBag.Customers as List<SelectListItem>;
+    var warehouses = ViewBag.Warehouses as List<SelectListItem>;
+    var products = ViewBag.Products as List<SelectListItem>;
+    var colors = ViewBag.Colors as List<SelectListItem>;
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show shadow-sm"
+         role="alert">
+
+        <i class="bi bi-check-circle-fill me-2"></i>
+
+        <strong>@TempData["Success"]</strong>
+
+        @if (TempData["SalesInvoiceId"] != null)
+        {
+            <a asp-action="DownloadInvoicePdf"
+               asp-route-id="@TempData["SalesInvoiceId"]"
+               target="_blank"
+               class="btn btn-sm btn-danger ms-3">
+
+                <i class="bi bi-file-earmark-pdf me-1"></i>
+                PDF
+            </a>
+        }
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+}@if (TempData["SalesInvoiceId"] != null)
+{
+    <script>
+        window.open(
+            '@Url.Action("DownloadInvoicePdf", "Sales")/@TempData["SalesInvoiceId"]',
+            '_blank'
+        );
+    </script>
+}
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">
+                <i class="fas fa-cash-register"></i>
+                Sales Entry
+            </h3>
+
+            <small class="text-muted">
+                FIFO warehouse-wise stock issue
+            </small>
+        </div>
+
+        <a asp-controller="Sales"
+           asp-action="Index"
+           class="btn btn-outline-secondary">
+            <i class="fas fa-list"></i>
+            Sales Report
+        </a>
+    </div>
+
+
+    <form asp-controller="Sales" asp-action="Create"
+          method="post"
+          id="salesForm">
+
+        @Html.AntiForgeryToken()
+
+        <!-- ========================================= -->
+        <!-- HEADER -->
+        <!-- ========================================= -->
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header bg-primary text-white">
+                <strong>
+                    Sales Information
+                </strong>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row g-3">
+
+                    <!-- Date -->
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            Sales Date
+                        </label>
+
+                        <input asp-for="SalesDate"
+                               type="datetime-local"
+                               class="form-control" />
+
+                    </div>
+
+
+                    <!-- Customer -->
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            Customer
+                        </label>
+
+                        <select asp-for="CustomerId"
+                                class="form-select"
+                                id="customerId">
+
+                            <option value="">
+                                Select Customer
+                            </option>
+
+                            @foreach (var item in customers ?? new())
+                            {
+                                <option value="@item.Value">
+                                    @item.Text
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Warehouse -->
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            Warehouse
+                        </label>
+
+                        <select asp-for="WarehouseId"
+                                class="form-select"
+                                id="warehouseId">
+
+                            <option value="">
+                                Select Warehouse
+                            </option>
+
+                            @foreach (var item in warehouses ?? new())
+                            {
+                                <option value="@item.Value">
+                                    @item.Text
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Sales Type -->
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            Sales Type
+                        </label>
+
+                        <select asp-for="SalesType"
+                                class="form-select">
+
+                            <option value="Sale">
+                                Sale
+                            </option>
+
+                            <option value="Return">
+                                Return
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================================= -->
+        <!-- PRODUCT ENTRY -->
+        <!-- ========================================= -->
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header bg-light">
+
+                <strong>
+                    Product Selection
+                </strong>
+
+            </div>
+
+
+            <div class="card-body">
+
+                <div class="row g-3">
+
+                    <!-- Product -->
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            Product
+                        </label>
+
+                        <select id="productNameId"
+                                class="form-select">
+
+                            <option value="">
+                                Select Product
+                            </option>
+
+                            @foreach (var item in products ?? new())
+                            {
+                                <option value="@item.Value">
+                                    @item.Text
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Color -->
+
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            Color
+                        </label>
+
+                        <select id="colorId"
+                                class="form-select">
+
+                            <option value="">
+                                Select Color
+                            </option>
+
+                            @foreach (var item in colors ?? new())
+                            {
+                                <option value="@item.Value">
+                                    @item.Text
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Thickness -->
+
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            Thickness
+                        </label>
+
+                        <input type="number"
+                               id="thickness"
+                               class="form-control"
+                               step="0.01"
+                               placeholder="Thickness" />
+
+                    </div>
+
+
+                    <!-- Size -->
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            Size
+                        </label>
+
+                        <select id="productSize"
+                                class="form-select">
+
+                            <option value="">
+                                Select Size
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Search Stock -->
+
+                    <div class="col-md-2 d-flex align-items-end">
+
+                        <button type="button"
+                                class="btn btn-primary w-100"
+                                id="btnCheckStock">
+
+                            <i class="fas fa-search"></i>
+                            Check Stock
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================= -->
+                <!-- STOCK RESULT -->
+                <!-- ================================= -->
+
+                <div id="stockSection"
+                     class="mt-4"
+                     style="display:none;">
+
+                    <div class="alert alert-info">
+
+                        <strong>
+                            Available FIFO Stock
+                        </strong>
+
+                        <span id="totalAvailable"
+                              class="float-end fw-bold">
+                            0
+                        </span>
+
+                    </div>
+
+
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered table-sm">
+
+                            <thead class="table-dark">
+
+                                <tr>
+
+                                    <th>FIFO</th>
+
+                                    <th>Shipment</th>
+
+                                    <th>Purchase Date</th>
+
+                                    <th>Available Qty</th>
+
+                                    <th>Available Weight (KG)</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="stockTableBody">
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                    <!-- Quantity / Price -->
+
+                    <div class="row g-3 mt-2">
+
+                        <div class="col-md-3">
+
+                            <label class="form-label">
+                                Sale Quantity
+                            </label>
+
+                            <input type="number"
+                                   id="saleQuantity"
+                                   class="form-control"
+                                   min="1"
+                                   value="1" />
+
+                        </div>
+                        <div class="col-md-2">
+
+                            <label class="form-label">
+                                Unit
+                            </label>
+
+                            <select id="saleUnit"
+                                    class="form-select">
+
+                                <option value="">Select Unit</option>
+                                <option value="Pcs">Pcs</option>
+                                <option value="KG">KG</option>
+                                <option value="LBS">LBS</option>
+                                <option value="SFT">SFT</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <label class="form-label">
+                                Unit Price
+                            </label>
+
+                            <input type="number"
+                                   id="unitPrice"
+                                   class="form-control"
+                                   step="0.01"
+                                   min="0" />
+
+                        </div>
+
+
+                        <div class="col-md-3">
+
+                            <label class="form-label">
+                                Line Total
+                            </label>
+
+                            <input type="text"
+                                   id="lineTotal"
+                                   class="form-control"
+                                   readonly />
+
+                        </div>
+
+
+                        <div class="col-md-3 d-flex align-items-end">
+
+                            <button type="button"
+                                    id="btnAddItem"
+                                    class="btn btn-success w-100">
+
+                                <i class="fas fa-plus"></i>
+                                Add Item
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================================= -->
+        <!-- SALES ITEMS -->
+        <!-- ========================================= -->
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header bg-light">
+
+                <strong>
+                    Sales Items
+                </strong>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover"
+                           id="salesTable">
+
+                        <thead class="table-dark">
+
+                            <tr>
+
+                                <th>#</th>
+
+                                <th>Product</th>
+
+                                <th>Color</th>
+
+                                <th>Thickness</th>
+
+                                <th>Size</th>
+
+                                <th>Quantity</th>
+                                <th>Unit</th>
+                                <th>Unit Price</th>
+
+                                <th>Total</th>
+
+                                <th>Action</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="salesTableBody">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================================= -->
+        <!-- PAYMENT -->
+        <!-- ========================================= -->
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header bg-light">
+
+                <strong>
+                    Payment Information
+                </strong>
+
+            </div>
+
+            <div class="card-body">
+                <div class="row g-3">
+
+                    <div class="col-md-3">
+                        <label class="form-label">Discount</label>
+                        <input type="number"
+                               id="Discount"
+                               name="Discount"
+                               class="form-control"
+                               step="0.01"
+                               min="0"
+                               value="@Model.Discount" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">VAT</label>
+                        <input type="number"
+                               id="Vat"
+                               name="Vat"
+                               class="form-control"
+                               step="0.01"
+                               min="0"
+                               value="@Model.Vat" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">AIT</label>
+                        <input type="number"
+                               id="Ait"
+                               name="Ait"
+                               class="form-control"
+                               step="0.01"
+                               min="0"
+                               value="@Model.Ait" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Cutting Charge</label>
+                        <input type="number"
+                               id="CuttingCharge"
+                               name="CuttingCharge"
+                               class="form-control"
+                               step="0.01"
+                               min="0"
+                               value="@Model.CuttingCharge" />
+                    </div>
+
+                    
+
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Delivery Charge</label>
+                        <input type="number"
+                               id="DeliveryCharge"
+                               name="DeliveryCharge"
+                               class="form-control"
+                               step="0.01"
+                               min="0"
+                               value="@Model.DeliveryCharge" />
+                    </div>
+                  @*   <div class="col-md-3">
+
+                        <label class="form-label">
+                            Discount
+                        </label>
+
+                        <input asp-for="Discount"
+                               type="number"
+                               step="0.01"
+                               class="form-control"
+                               id="discount" />
+
+                    </div>
+
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            VAT
+                        </label>
+
+                        <input asp-for="Vat"
+                               type="number"
+                               step="0.01"
+                               class="form-control"
+                               id="vat" />
+
+                    </div>
+
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            AIT
+                        </label>
+
+                        <input asp-for="Ait"
+                               type="number"
+                               step="0.01"
+                               class="form-control"
+                               id="ait" />
+
+                    </div> *@
+
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            Receive Method
+                        </label>
+
+                        <select asp-for="ReceiveMethod"
+                                class="form-select">
+
+                            <option value="">
+                                Select Method
+                            </option>
+
+                            <option value="Cash">
+                                Cash
+                            </option>
+
+                            <option value="Bank">
+                                Bank
+                            </option>
+
+                            <option value="Cheque">
+                                Cheque
+                            </option>
+
+                            <option value="Mobile Banking">
+                                Mobile Banking
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Total Amount
+                        </label>
+
+                        <input type="text"
+                               id="grandTotal"
+                               class="form-control fw-bold"
+                               readonly />
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Receive Amount
+                        </label>
+
+                        <input asp-for="ReceiveAmount"
+                               type="number"
+                               step="0.01"
+                               class="form-control"
+                               id="receiveAmount" />
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Due Amount
+                        </label>
+
+                        <input type="text"
+                               id="dueAmount"
+                               class="form-control fw-bold"
+                               readonly />
+
+                    </div>
+
+
+                    <div class="col-md-12">
+
+                        <label class="form-label">
+                            Note
+                        </label>
+
+                        <textarea asp-for="Note"
+                                  class="form-control"
+                                  rows="2"></textarea>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================================= -->
+        <!-- SAVE -->
+        <!-- ========================================= -->
+
+        <div class="d-flex justify-content-end gap-2 mb-5">
+
+            <a asp-action="Index"
+               class="btn btn-secondary">
+
+                Cancel
+
+            </a>
+
+            <button type="submit"
+                    class="btn btn-success px-5"
+                    id="btnSaveSale">
+
+                <i class="fas fa-save"></i>
+                Complete Sale
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+@section Scripts {
+
+    <script>
+
+        let stockData = [];
+        let salesItems = [];
+
+
+        // =====================================================
+        // PRODUCT / WAREHOUSE / THICKNESS → SIZE
+        // =====================================================
+
+        async function loadProductSizes() {
+
+            const warehouseId =
+                $("#warehouseId").val();
+
+            const productNameId =
+                $("#productNameId").val();
+
+            const colorId =
+                $("#colorId").val();
+
+            const thickness =
+                $("#thickness").val();
+
+
+            if (!warehouseId || !productNameId)
+                return;
+
+
+            const url =
+                `/Sales/GetProductSizes`
+                + `?warehouseId=${warehouseId}`
+                + `&productNameId=${productNameId}`
+                + (colorId
+                    ? `&colorId=${colorId}`
+                    : "")
+                + (thickness
+                    ? `&thickness=${thickness}`
+                    : "");
+
+
+            const response =
+                await fetch(url);
+
+
+            if (!response.ok)
+                return;
+
+
+            const sizes =
+                await response.json();
+
+
+            $("#productSize").empty();
+
+            $("#productSize").append(
+                `<option value="">Select Size</option>`
+            );
+
+
+            sizes.forEach(size => {
+
+                $("#productSize").append(
+                    `<option value="${size}">
+                            ${size}
+                        </option>`
+                );
+
+            });
+
+        }
+
+
+        $("#warehouseId, #productNameId, #colorId, #thickness")
+            .on("change", loadProductSizes);
+
+
+        // =====================================================
+        // CHECK STOCK
+        // =====================================================
+
+        $("#btnCheckStock").click(async function () {
+
+            const warehouseId =
+                $("#warehouseId").val();
+
+            const productNameId =
+                $("#productNameId").val();
+
+            const colorId =
+                $("#colorId").val();
+
+            const thickness =
+                $("#thickness").val();
+
+            const productSize =
+                $("#productSize").val();
+
+
+            if (!warehouseId) {
+
+                alert("Please select warehouse.");
+                return;
+
+            }
+
+
+            if (!productNameId) {
+
+                alert("Please select product.");
+                return;
+
+            }
+
+
+            const url =
+                `/Sales/GetStock`
+                + `?warehouseId=${warehouseId}`
+                + `&productNameId=${productNameId}`
+                + (colorId
+                    ? `&colorId=${colorId}`
+                    : "")
+                + (thickness
+                    ? `&thickness=${thickness}`
+                    : "")
+                + (productSize
+                    ? `&productSize=${encodeURIComponent(productSize)}`
+                    : "");
+
+
+            const response =
+                await fetch(url);
+
+
+            if (!response.ok) {
+
+                alert("Unable to load stock.");
+                return;
+
+            }
+
+
+            stockData =
+                await response.json();
+
+
+            renderStock();
+
+        });
+
+
+        // =====================================================
+        // RENDER FIFO STOCK
+        // =====================================================
+
+        function renderStock() {
+
+            $("#stockTableBody").empty();
+
+
+            let totalQty = 0;
+
+
+            stockData.forEach((stock, index) => {
+
+                totalQty += stock.availableQty;
+
+
+                $("#stockTableBody").append(`
+
+                        <tr>
+
+                            <td>
+                                ${index + 1}
+                            </td>
+
+                            <td>
+                                ${stock.shipmentNo}
+                            </td>
+
+                            <td>
+                                ${formatDate(stock.purchaseDate)}
+                            </td>
+
+                            <td class="fw-bold">
+                                ${stock.availableQty}
+                            </td>
+
+                            <td>
+                                ${stock.availableWeight.toFixed(2)}
+                            </td>
+
+                        </tr>
+
+                    `);
+
+            });
+
+
+            $("#totalAvailable")
+                .text(totalQty);
+
+
+            $("#stockSection")
+                .show();
+
+        }
+
+
+        // =====================================================
+        // DATE FORMAT
+        // =====================================================
+
+        function formatDate(date) {
+
+            if (!date)
+                return "";
+
+            return new Date(date)
+                .toLocaleDateString();
+
+        }
+
+
+        // =====================================================
+        // LINE TOTAL
+        // =====================================================
+
+        $("#saleQuantity, #unitPrice")
+            .on("input", function () {
+
+                const qty =
+                    parseFloat($("#saleQuantity").val())
+                    || 0;
+
+                const price =
+                    parseFloat($("#unitPrice").val())
+                    || 0;
+
+
+                $("#lineTotal")
+                    .val((qty * price).toFixed(2));
+
+            });
+
+
+        // =====================================================
+        // ADD ITEM
+        // =====================================================
+
+        $("#btnAddItem").click(function () {
+
+            const productId =
+                $("#productNameId").val();
+
+            const productName =
+                $("#productNameId option:selected")
+                    .text();
+
+            const colorId =
+                $("#colorId").val();
+
+            const colorName =
+                $("#colorId option:selected")
+                    .text();
+
+            const thickness =
+                $("#thickness").val();
+
+            const productSize =
+                $("#productSize").val();
+
+            const quantity =
+                parseInt($("#saleQuantity").val())
+                || 0;
+            const unit =
+                $("#saleUnit").val();
+            const unitPrice =
+                parseFloat($("#unitPrice").val())
+                || 0;
+
+            if (!unit) {
+
+                alert("Please select unit.");
+                return;
+
+            }
+            if (!productId) {
+
+                alert("Please select product.");
+                return;
+
+            }
+
+
+            if (!productSize) {
+
+                alert("Please select size.");
+                return;
+
+            }
+
+
+            if (quantity <= 0) {
+
+                alert("Enter valid quantity.");
+                return;
+
+            }
+
+
+            const availableQty =
+                stockData.reduce(
+                    (sum, x) =>
+                        sum + x.availableQty,
+                    0
+                );
+
+
+            if (quantity > availableQty) {
+
+                alert(
+                    `Available stock is ${availableQty}.`
+                );
+
+                return;
+
+            }
+
+
+            if (unitPrice <= 0) {
+
+                alert("Enter unit price.");
+                return;
+
+            }
+
+
+            const item = {
+
+                productNameId:
+                    parseInt(productId),
+
+                colorId:
+                    colorId
+                        ? parseInt(colorId)
+                        : null,
+
+                thickness:
+                    thickness
+                        ? parseFloat(thickness)
+                        : null,
+
+                productSize:
+                    productSize,
+
+                quantity:
+                    quantity,
+                unit:
+                    unit,
+                unitPrice:
+                    unitPrice,
+
+                lineTotal:
+                    quantity * unitPrice,
+
+                productName:
+                    productName,
+
+                colorName:
+                    colorId
+                        ? colorName
+                        : ""
+
+            };
+
+
+            salesItems.push(item);
+
+
+            renderSalesItems();
+
+            calculateTotals();
+
+        });
+
+
+        // =====================================================
+        // RENDER SALES ITEMS
+        // =====================================================
+
+        function renderSalesItems() {
+
+            $("#salesTableBody").empty();
+
+
+            salesItems.forEach((item, index) => {
+
+                $("#salesTableBody").append(`
+
+                        <tr>
+
+                            <td>
+                                ${index + 1}
+                            </td>
+
+                            <td>
+                                ${item.productName}
+                            </td>
+
+                            <td>
+                                ${item.colorName}
+                            </td>
+
+                            <td>
+                                ${item.thickness ?? ""}
+                            </td>
+
+                            <td>
+                                ${item.productSize}
+                            </td>
+
+                            <td>
+                                ${item.quantity}
+                            </td>
+                                    <td>
+            ${item.unit}
+        </td>
+                            <td>
+                                ${item.unitPrice.toFixed(2)}
+                            </td>
+
+                            <td>
+                                ${item.lineTotal.toFixed(2)}
+                            </td>
+
+                            <td>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="removeItem(${index})">
+
+                                    <i class="fas fa-trash"></i>
+
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                    `);
+
+            });
+
+        }
+
+
+        // =====================================================
+        // REMOVE ITEM
+        // =====================================================
+
+        function removeItem(index) {
+
+            salesItems.splice(index, 1);
+
+            renderSalesItems();
+
+            calculateTotals();
+
+        }
+
+
+        // =====================================================
+        // CALCULATE TOTAL
+        // =====================================================
+
+        function calculateTotals() {
+
+            let subtotal =
+                salesItems.reduce(
+                    (sum, item) =>
+                        sum + item.lineTotal,
+                    0
+                );
+
+
+            const discount =
+                parseFloat($("#discount").val())
+                || 0;
+
+            const vat =
+                parseFloat($("#vat").val())
+                || 0;
+
+            const ait =
+                parseFloat($("#ait").val())
+                || 0;
+            var cuttingCharge = parseFloat($("#CuttingCharge").val()) || 0;
+            var deliveryCharge = parseFloat($("#DeliveryCharge").val()) || 0;
+
+            const total =
+                subtotal
+                - discount
+                + vat
+                + ait + cuttingCharge + deliveryCharge;
+
+
+            $("#grandTotal")
+                .val(total.toFixed(2));
+
+
+            const received =
+                parseFloat($("#receiveAmount").val())
+                || 0;
+
+
+            const due =
+                total - received;
+
+
+            $("#dueAmount")
+                .val(due.toFixed(2));
+
+        }
+
+
+        $("#discount, #vat, #ait,#CuttingCharge,#DeliveryCharge, #receiveAmount")
+            .on("input", calculateTotals);
+
+
+        // =====================================================
+        // BEFORE SUBMIT
+        // =====================================================
+
+        $("#salesForm").submit(function (e) {
+
+            if (salesItems.length === 0) {
+
+                e.preventDefault();
+
+                alert("Please add at least one product.");
+
+                return;
+
+            }
+
+
+            // Remove previously generated hidden items
+
+            $("#salesForm .dynamic-item")
+                .remove();
+
+
+            salesItems.forEach((item, index) => {
+
+                addHidden(
+                    `Items[${index}].ProductNameId`,
+                    item.productNameId
+                );
+
+                addHidden(
+                    `Items[${index}].ColorId`,
+                    item.colorId
+                );
+
+                addHidden(
+                    `Items[${index}].Thickness`,
+                    item.thickness
+                );
+
+                addHidden(
+                    `Items[${index}].ProductSize`,
+                    item.productSize
+                );
+
+                addHidden(
+                    `Items[${index}].Quantity`,
+                    item.quantity
+                );
+                addHidden(
+                    `Items[${index}].Unit`,
+                    item.unit
+                );
+                addHidden(
+                    `Items[${index}].UnitPrice`,
+                    item.unitPrice
+                );
+
+            });
+
+        });
+
+
+        function addHidden(name, value) {
+
+            $("<input>")
+                .attr("type", "hidden")
+                .addClass("dynamic-item")
+                .attr("name", name)
+                .val(value ?? "")
+                .appendTo("#salesForm");
+
+        }
+
+    </script>
+
+}

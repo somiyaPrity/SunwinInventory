@@ -5,209 +5,597 @@
 }
 
 <div class="container-fluid">
-   
-    <div class="card shadow">
+    <div class="d-flex justify-content-between">
 
-        <div class="card-header bg-primary text-white">
+        <h4>Purchase Report</h4>
 
-            <div class="d-flex justify-content-between">
+        <div>
 
-                <h4>Purchase Report</h4>
-               
-                <a asp-action="Create" class="btn btn-light">
-                    <i class="fa fa-plus"></i> New Purchase
-                </a>
+            <a asp-action="Create" class="btn btn-light">
+                <i class="bi bi-plus-circle"></i>
+                New Purchase
+            </a>
+            <a asp-action="ExportExcel"
+               asp-route-FromDate="@ViewBag.Filter?.FromDate?.ToString("yyyy-MM-dd")"
+               asp-route-ToDate="@ViewBag.Filter?.ToDate?.ToString("yyyy-MM-dd")"
+               asp-route-SupplierId="@ViewBag.Filter?.SupplierId"
+               asp-route-WarehouseId="@ViewBag.Filter?.WarehouseId"
+               asp-route-ShipmentId="@ViewBag.Filter?.ShipmentId"
+               asp-route-ProductNameId="@ViewBag.Filter?.ProductNameId"
+               class="btn btn-success">
 
-            </div>
-            <div class="row mb-3">
+                <i class="bi bi-file-earmark-excel"></i>
+                Export Excel
 
-                <div class="col-md-2">
-                    <label>From Date</label>
-                    <input type="date" id="fromDate" class="form-control" />
+            </a>
+           @*  <a asp-action="ExportExcel"
+               class="btn btn-success">
+
+                <i class="bi bi-file-earmark-excel"></i>
+
+                Export Excel
+
+            </a> *@
+
+        </div>
+
+    </div>
+    <div class="card shadow mt-3">
+
+        <div class="card-header text-white border-bottom-0">
+
+            <form asp-action="Index" method="get">
+
+                <div class="row mb-3 mt-4">
+
+                    <div class="col-md-2">
+                        <label>From Date</label>
+
+                        <input type="date"
+                               name="FromDate"
+                               class="form-control"
+                               value="@ViewBag.Filter?.FromDate?.ToString("yyyy-MM-dd")" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label>To Date</label>
+
+                        <input type="date"
+                               name="ToDate"
+                               class="form-control"
+                               value="@ViewBag.Filter?.ToDate?.ToString("yyyy-MM-dd")" />
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <label>Supplier</label>
+
+                        <select name="SupplierId" class="form-select">
+
+                            <option value="">All Suppliers</option>
+
+                            @foreach (var item in ViewBag.Suppliers)
+                            {
+                                if (ViewBag.Filter?.SupplierId?.ToString() == item.Value)
+                                {
+                                    <option value="@item.Value" selected>@item.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <label>Warehouse</label>
+
+                        <select name="WarehouseId" class="form-select">
+
+                            <option value="">All Warehouses</option>
+
+                            @foreach (var item in ViewBag.Warehouses)
+                            {
+                                if (ViewBag.Filter?.WarehouseId?.ToString() == item.Value)
+                                {
+                                    <option value="@item.Value" selected>@item.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <label>Shipment</label>
+
+                        <select name="ShipmentId" class="form-select">
+
+                            <option value="">All Shipments</option>
+
+                            @foreach (var item in ViewBag.Shipments)
+                            {
+                                if (ViewBag.Filter?.ShipmentId?.ToString() == item.Value)
+                                {
+                                    <option value="@item.Value" selected>@item.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end">
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+
+                    </div>
+
                 </div>
+                <div class="row">
+                    <div class="col-md-3 d-flex align-items-end">
 
-                <div class="col-md-2">
-                    <label>To Date</label>
-                    <input type="date" id="toDate" class="form-control" />
+                        <a asp-action="Index"
+                           class="btn btn-secondary w-100">
+
+                            Clear
+
+                        </a>
+
+                    </div>
                 </div>
+            </form>
 
-                <div class="col-md-3">
-                    <label>Supplier</label>
-                    <select id="supplierFilter" class="form-select">
-                        <option value="">All Suppliers</option>
-                        @*   @foreach (var item in ViewBag.Suppliers)
-                        {
-                        <option value="@item.Text">@item.Text</option>
-                        } *@
-                    </select>
+        </div>
+    </div>
+    <div class="row mt-4">
+
+        <!-- Total Quantity -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Total Quantity (PCS)</h6>
+                            <h2 class="fw-bold mb-0">
+                                @Model.Sum(x => x.InitialQuantity).ToString("N0")
+                            </h2>
+                        </div>
+                        <i class="bi bi-box-seam fs-1"></i>
+                    </div>
                 </div>
-
-                <div class="col-md-3">
-                    <label>Warehouse</label>
-                    <select id="warehouseFilter" class="form-select">
-                        <option value="">All Warehouses</option>
-                        @*     @foreach (var item in ViewBag.Warehouses)
-                        {
-                        <option value="@item.Text">@item.Text</option>
-                        } *@
-                    </select>
-                </div>
-
-                <div class="col-md-2 d-flex align-items-end">
-                    <button class="btn btn-primary w-100" id="btnFilter">
-                        Search
-                    </button>
-                </div>
-
             </div>
         </div>
 
-        <div class="card-body">
 
-            <div class="table-responsive">
+        <!-- Total Weight -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Total Weight (KG)</h6>
+                            <h2 class="fw-bold mb-0">
+                                @Model.Sum(x => x.TotalWeightKg).ToString("N2")
+                            </h2>
+                        </div>
+                        <i class="bi bi-speedometer2 fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                <table class="table table-bordered table-striped table-hover" id="purchaseTable">
 
-                    <thead class="table-dark">
+        <!-- Total Cost Without Tax - Taka -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Cost Without Tax (Taka)</h6>
+                            <h2 class="fw-bold mb-0">
+                                ৳ @Model.Sum(x => x.TotalAmountWithoutTaxTk).ToString("N2")
+                            </h2>
+                        </div>
+                        <i class="bi bi-currency-exchange fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                        <tr>
 
-                            <th>SL</th>
+        <!-- Total Cost Without Tax - RMB -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-secondary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Cost Without Tax (RMB)</h6>
+                            <h2 class="fw-bold mb-0">
+                                ¥ @Model.Sum(x => x.TotalAmountWithoutTaxRmb).ToString("N2")
+                            </h2>
+                        </div>
+                        <i class="bi bi-cash-stack fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                            <th>Date</th>
 
-                            <th>Shipment</th>
+        <!-- Import Tax -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Import Tax Applied (Taka)</h6>
+                            <h2 class="fw-bold mb-0">
+                                ৳ @Model.Sum(x =>
+                                       x.ImportTaxPerKgTk * x.TotalWeightKg
+                                       ).ToString("N2")
+                            </h2>
+                        </div>
+                        <i class="bi bi-percent fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                            <th>Supplier</th>
 
-                            <th>Warehouse</th>
+        <!-- Total Cost With Tax - Taka -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Cost With Tax (Taka)</h6>
+                            <h2 class="fw-bold mb-0">
+                                ৳ @Model.Sum(x => x.TotalAmountIncludingTaxTk).ToString("N2")
+                            </h2>
+                        </div>
+                        <i class="bi bi-cash-coin fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                            <th>Product</th>
 
-                            <th>Color</th>
+        <!-- Total Cost With Tax - RMB -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-dark text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Cost With Tax (RMB)</h6>
+                            <h2 class="fw-bold mb-0">
+                                ¥ @Model.Sum(x => x.TotalAmountIncludingTaxRmb).ToString("N2")
+                            </h2>
+                        </div>
+                        <i class="bi bi-currency-yen fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                            <th>Thickness</th>
+    </div>
+   @*  <div class="row mt-4">
 
-                            <th>Size</th>
+        <div class="col-lg-3 col-md-6 mb-3">
 
-                            <th class="text-end">Qty</th>
+            <div class="card border-0 shadow-sm bg-primary text-white">
 
-                            <th class="text-end">Weight</th>
+                <div class="card-body">
 
-                            <th class="text-end">Unit Price</th>
+                    <div class="d-flex justify-content-between align-items-center">
 
-                            <th class="text-end">Total TK</th>
+                        <div>
+                            <h6 class="mb-1">Total Purchase</h6>
 
-                            <th width="180">Action</th>
+                            <h2 class="fw-bold mb-0">
+                                @Model.Count()
+                            </h2>
+                        </div>
 
-                        </tr>
+                        <i class="bi bi-cart-check fs-1"></i>
 
-                    </thead>
+                    </div>
 
-                    <tbody>
-                        @* <h3>Total Rows = @Model.Count()</h3> *@
-                        @{
-                            int sl = 1;
-
-                            decimal totalQty = 0;
-                            decimal totalWeight = 0;
-                            decimal totalTk = 0;
-                        }
-
-                        @foreach (var item in Model)
-                        {
-                            totalQty += item.InitialQuantity;
-                            totalWeight += item.TotalWeightKg;
-                            totalTk += item.TotalAmountIncludingTaxTk;
-
-                            <tr>
-
-                                <td>@sl</td>
-
-                                <td>@item.CreatedDate.ToString("dd-MMM-yyyy")</td>
-
-                                <td>@item.ShipmentNo</td>
-
-                                <td>@item.SupplierName</td>
-
-                                <td>@item.WarehouseName</td>
-
-                                <td>@item.ProductName</td>
-
-                                <td>@item.ColorName</td>
-
-                                <td>@item.Thickness</td>
-
-                                <td>@item.ProductSize</td>
-
-                                <td class="text-end">@item.InitialQuantity</td>
-
-                                <td class="text-end">@item.TotalWeightKg.ToString("N2")</td>
-
-                                <td class="text-end">@item.UnitPriceTk.ToString("N2")</td>
-
-                                <td class="text-end">@item.TotalAmountIncludingTaxTk.ToString("N2")</td>
-
-                                <td>
-
-                                    <a asp-action="Edit"
-                                       asp-route-id="@item.ProductPurchaseDetailId"
-                                       class="btn btn-warning btn-sm">
-                                        Edit
-                                    </a>
-
-                                    <button class="btn btn-danger btn-sm btnDelete"
-                                            data-id="@item.ProductPurchaseDetailId">
-                                        Delete
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-                            sl++;
-                        }
-
-                    </tbody>
-
-                    <tfoot class="table-secondary">
-
-                        <tr>
-
-                            <th colspan="9" class="text-end">
-                                Grand Total
-                            </th>
-
-                            <th class="text-end">
-                                @totalQty
-                            </th>
-
-                            <th class="text-end">
-                                @totalWeight.ToString("N2")
-                            </th>
-
-                            <th></th>
-
-                            <th class="text-end">
-                                @totalTk.ToString("N2")
-                            </th>
-
-                            <th></th>
-
-                        </tr>
-
-                    </tfoot>
-
-                </table>
+                </div>
 
             </div>
 
         </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card border-0 shadow-sm bg-success text-white">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <h6 class="mb-1">Total Quantity</h6>
+
+                            <h2 class="fw-bold mb-0">
+                                @Model.Sum(x => x.InitialQuantity).ToString("N0")
+                            </h2>
+                        </div>
+
+                        <i class="bi bi-box-seam fs-1"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card border-0 shadow-sm bg-warning text-dark">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <h6 class="mb-1">Total Weight</h6>
+
+                            <h2 class="fw-bold mb-0">
+                                @Model.Sum(x => x.TotalWeightKg).ToString("N2") KG
+                            </h2>
+                        </div>
+
+                        <i class="bi bi-speedometer2 fs-1"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card border-0 shadow-sm bg-danger text-white">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <h6 class="mb-1">Total Purchase (TK)</h6>
+
+                            <h2 class="fw-bold mb-0">
+                                ৳ @Model.Sum(x => x.TotalAmountIncludingTaxTk).ToString("N2")
+                            </h2>
+                        </div>
+
+                        <i class="bi bi-cash-stack fs-1"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div> *@
+
+
+    <div class="card-body mt-3">
+
+        @* <div class="purchase-report-table"> *@
+
+        <table class="table table-bordered table-striped table-hover" id="purchaseTable">
+
+            <thead class="table-dark">
+
+                <tr>
+
+                    <th>SL</th>
+
+                    <th>Date</th>
+
+                    <th>Shipment</th>
+
+                    <th>Supplier</th>
+
+                    <th>Warehouse</th>
+
+                    <th>Product</th>
+
+                    <th>Color</th>
+
+                    <th>Thickness</th>
+
+                    <th>Size</th>
+
+                    <th class="text-end">Qty</th>
+
+                    <th class="text-end">Weight</th>
+
+                    <th class="text-end">Unit Price</th>
+
+                    <th class="text-end">Total TK</th>
+
+                    <th width="180">Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+                @* <h3>Total Rows = @Model.Count()</h3> *@
+                @{
+                    int sl = 1;
+
+                    decimal totalQty = 0;
+                    decimal totalWeight = 0;
+                    decimal totalTk = 0;
+                }
+
+                @foreach (var item in Model)
+                {
+                    totalQty += item.InitialQuantity;
+                    totalWeight += item.TotalWeightKg;
+                    totalTk += item.TotalAmountIncludingTaxTk;
+
+                    <tr>
+
+                        <td>@sl</td>
+
+                        <td>@item.CreatedDate.ToString("dd-MMM-yyyy")</td>
+
+                        <td>@item.ShipmentNo</td>
+
+                        <td>@item.SupplierName</td>
+
+                        <td>@item.WarehouseName</td>
+
+                        <td>@item.ProductName</td>
+
+                        <td>@item.ColorName</td>
+
+                        <td>@item.Thickness</td>
+
+                        <td>@item.ProductSize</td>
+
+                        <td class="text-end">@item.InitialQuantity</td>
+
+                        <td class="text-end">@item.TotalWeightKg.ToString("N2")</td>
+
+                        <td class="text-end">@item.UnitPriceTk.ToString("N2")</td>
+
+                        <td class="text-end">@item.TotalAmountIncludingTaxTk.ToString("N2")</td>
+
+                        <td>
+
+                            <a asp-action="Edit"
+                               asp-route-id="@item.ProductPurchaseDetailId"
+                               class="btn btn-warning  btn-sm">
+                                Edit
+                            </a>
+
+                            <button class="btn btn-danger btn-sm w-75 btnDelete"
+                                    data-id="@item.ProductPurchaseDetailId">
+                                Delete
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                    sl++;
+                }
+
+            </tbody>
+
+            <tfoot class="table-secondary">
+
+                <tr>
+
+                    <th colspan="9" class="text-end">
+                        Grand Total
+                    </th>
+
+                    <th class="text-end">
+                        @totalQty
+                    </th>
+
+                    <th class="text-end">
+                        @totalWeight.ToString("N2")
+                    </th>
+
+                    <th></th>
+
+                    <th class="text-end">
+                        @totalTk.ToString("N2")
+                    </th>
+
+                    <th></th>
+
+                </tr>
+
+            </tfoot>
+
+        </table>
 
     </div>
 
 </div>
 
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+
+            $("#purchaseTable").DataTable({
+
+                pageLength: 25,
+
+                lengthMenu: [10, 25, 50, 100],
+
+                scrollX: true,
+
+                scrollCollapse: true,
+
+                autoWidth: false,
+
+                ordering: true,
+
+                searching: true,
+
+                columnDefs: [
+                    {
+                        targets: "_all",
+                        className: "text-nowrap"
+                    }
+                ]
+
+            });
+
+
+            $(".btnDelete").click(function () {
+
+                if (!confirm("Delete this purchase?"))
+                    return;
+
+                var id = $(this).data("id");
+
+                $.post(
+                    "/ProductPurchaseDetail/Delete/" + id,
+                    function () {
+                        location.reload();
+                    }
+                );
+
+            });
+
+        });
+    </script>
+
+}
+@*
 @section Scripts {
 
     <script>
@@ -217,10 +605,22 @@
             $("#purchaseTable").DataTable({
 
                 pageLength: 25,
+                lengthMenu: [10, 25, 50, 100],
 
-                responsive: true,
+                scrollX: true,
+                scrollCollapse: true,
 
-                dom: 'Bfrtip',
+                autoWidth: false,
+
+                ordering: true,
+                searching: true,
+
+                columnDefs: [
+                    {
+                        targets: '_all',
+                        className: 'text-nowrap'
+                    }
+                ]
 
                 buttons: [
                     'copy',
@@ -250,4 +650,4 @@
 
     </script>
 
-}
+} *@

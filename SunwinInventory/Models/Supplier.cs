@@ -6,8 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SunwinInventory.Models;
 
-[Index("SupplierCode", Name = "IX_Suppliers_SupplierCode", IsUnique = true)]
-[Index("SupplierName", Name = "IX_Suppliers_SupplierName", IsUnique = true)]
 public partial class Supplier
 {
     [Key]

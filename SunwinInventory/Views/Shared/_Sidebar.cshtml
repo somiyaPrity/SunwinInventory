@@ -126,37 +126,52 @@
 
             </a>
         </li>
-
+       
         <li class="menu-title">
 
-            <span>TRANSACTIONS</span>
+            <span>Sale</span>
 
         </li>
 
         <li>
+            <a asp-controller="Customer"
+               asp-action="Index"
+               class="@(controller == "Customer" ? "active" : "")">
 
-            <a href="#">
+                <i class="bi bi-people"></i>
 
-                <i class="bi bi-cart-plus"></i>
-
-                <span>Purchase</span>
+                <span>Customers</span>
 
             </a>
-
         </li>
-
         <li>
+            <a asp-controller="Sales"
+               asp-action="Create"
+               class="@(controller == "Sales" ? "active" : "")">
 
-            <a href="#">
+                <i class="bi bi-arrow-left-right"></i>
 
-                <i class="bi bi-cart-check"></i>
-
-                <span>Sales</span>
+                <span>Sales Entry</span>
 
             </a>
-
         </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               asp-controller="CustomerPayment"
+               asp-action="CustomerDue">
 
+                <i class="bi bi-hourglass-split me-2"></i>
+                Customer Due
+
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="CustomerPayment" asp-action="Index">
+                <i class="bi bi-cash-coin me-2"></i>
+                Customer Payments
+            </a>
+        </li>
+       
         <li>
 
             <a href="#">

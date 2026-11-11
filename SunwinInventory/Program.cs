@@ -8,7 +8,12 @@ using SunwinInventory.Repositories.Implementations;
 using SunwinInventory.Services.Implementations;
 using SunwinInventory.Filters;
 using Microsoft.AspNetCore.Http.Features;
+using QuestPDF.Infrastructure;
+using SunwinInventory.Services.Pdf;
+
 var builder = WebApplication.CreateBuilder(args);
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 // Add services to the container.
 builder.Services.AddControllersWithViews(options =>
@@ -46,6 +51,21 @@ builder.Services.AddScoped<IShipmentService, ShipmentService>();
 builder.Services.AddScoped<ILookupService, LookupService>();
 builder.Services.AddScoped<IProductPurchaseDetailRepository, ProductPurchaseDetailRepository>();
 builder.Services.AddScoped<IProductPurchaseDetailService, ProductPurchaseDetailService>();
+builder.Services.AddScoped<IStockLedgerRepository, StockLedgerRepository>();
+builder.Services.AddScoped<IStockLedgerService, StockLedgerService>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<ISalesRepository, SalesRepository>();
+builder.Services.AddScoped<ISalesService, SalesService>();
+builder.Services.AddScoped<IInvoicePdfService, InvoicePdfService>();
+builder.Services.AddScoped<ICustomerPaymentService, CustomerPaymentService>();
+builder.Services.AddScoped<ICustomerPaymentRepository, CustomerPaymentRepository>();
+builder.Services.AddScoped<
+    ICustomerStatementPdfService,
+    CustomerStatementPdfService>();
+builder.Services.AddScoped<
+    IPaymentReceiptPdfService,
+    PaymentReceiptPdfService>();
 
 builder.Services.AddSession(options =>
 {

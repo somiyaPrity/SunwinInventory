@@ -1,0 +1,403 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using SunwinInventory.Data;
+using SunwinInventory.DTOs.Sales;
+using SunwinInventory.Repositories.Interfaces;
+using SunwinInventory.Services.Interfaces;
+using SunwinInventory.Services.Pdf;
+
+namespace SunwinInventory.Controllers
+{
+    public class SalesController : Controller
+    {
+        private readonly SunwinInventoryContext _context;
+        private readonly ISalesRepository _salesRepository;
+        private readonly ISalesService _salesService;
+        private readonly IInvoicePdfService _invoicePdfService;
+        public SalesController(
+            SunwinInventoryContext context,
+            ISalesRepository salesRepository,
+            IInvoicePdfService invoicePdfService,
+            ISalesService salesService)
+        {
+            _context = context;
+            _salesRepository = salesRepository;
+           
+            _salesService = salesService;
+            _invoicePdfService = invoicePdfService;
+        }
+
+
+        // =========================================================
+        // SALES ENTRY PAGE
+        // =========================================================
+
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            await LoadDropdowns();
+
+            var model = new SalesEntryDto
+            {
+                SalesDate = DateTime.Now
+            };
+
+            return View(model);
+        }
+
+
+        // =========================================================
+        // LOAD CUSTOMER / WAREHOUSE / PRODUCT / COLOR
+        // =========================================================
+
+        private async Task LoadDropdowns()
+        {
+            ViewBag.Customers = await _context.Customers
+                .Where(x => x.IsActive == true)
+                .OrderBy(x => x.CustomerName)
+                .Select(x => new SelectListItem
+                {
+                    Value = x.CustomerId.ToString(),
+                    Text = x.CustomerName
+                })
+                .ToListAsync();
+
+
+            ViewBag.Warehouses = await _context.Warehouses
+                .Where(x => x.IsActive == true)
+                .OrderBy(x => x.WarehouseName)
+                .Select(x => new SelectListItem
+                {
+                    Value = x.WarehouseId.ToString(),
+                    Text = x.WarehouseName
+                })
+                .ToListAsync();
+
+
+            ViewBag.Products = await _context.ProductNames
+                .Where(x => x.IsActive == true)
+                .OrderBy(x => x.Name)
+                .Select(x => new SelectListItem
+                {
+                    Value = x.ProductNameId.ToString(),
+                    Text = x.Name
+                })
+                .ToListAsync();
+
+
+            ViewBag.Colors = await _context.Colors
+                .OrderBy(x => x.ColorName)
+                .Select(x => new SelectListItem
+                {
+                    Value = x.ColorId.ToString(),
+                    Text = x.ColorName
+                })
+                .ToListAsync();
+        }
+
+
+        // =========================================================
+        // GET STOCK - FIFO / SHIPMENT WISE
+        // =========================================================
+
+        [HttpGet]
+        public async Task<IActionResult> GetStock(
+            int warehouseId,
+            int productNameId,
+            int? colorId,
+            decimal? thickness,
+            string? productSize)
+        {
+            if (warehouseId <= 0)
+                return BadRequest("Warehouse is required.");
+
+            if (productNameId <= 0)
+                return BadRequest("Product is required.");
+
+
+            var stock =
+                await _salesRepository.GetAvailableStockAsync(
+                    warehouseId,
+                    productNameId,
+                    colorId,
+                    thickness,
+                    productSize);
+
+
+            return Json(stock);
+        }
+
+
+        // =========================================================
+        // GET PRODUCT SIZES
+        // =========================================================
+
+        [HttpGet]
+        public async Task<IActionResult> GetProductSizes(
+            int warehouseId,
+            int productNameId,
+            int? colorId,
+            decimal? thickness)
+        {
+            if (warehouseId <= 0 || productNameId <= 0)
+                return Json(new List<string>());
+
+
+            var query =
+                from stock in _context.StockLedgers
+
+                join purchase in _context.ProductPurchaseDetails
+                    on stock.PurchaseDetailId
+                    equals purchase.PurchaseDetailId
+
+                where
+                    stock.WarehouseId == warehouseId &&
+                    stock.ProductNameId == productNameId &&
+                    stock.AvailableQty > 0
+
+                select purchase;
+
+
+            if (colorId.HasValue)
+            {
+                query = query.Where(x =>
+                    x.ColorId == colorId.Value);
+            }
+
+
+            if (thickness.HasValue)
+            {
+                query = query.Where(x =>
+                    x.Thickness == thickness.Value);
+            }
+
+
+            var sizes = await query
+                .Where(x => x.ProductSize != null)
+                .Select(x => x.ProductSize!)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToListAsync();
+
+
+            return Json(sizes);
+        }
+
+
+        // =========================================================
+        // SAVE SALE
+        // =========================================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(SalesEntryDto model)
+        {
+            if (!ModelState.IsValid)
+            {
+                await LoadDropdowns();
+                return View(model);
+            }
+
+            try
+            {
+                var salesInvoiceId =
+                    await _salesService.CreateSaleAsync(model);
+
+                if (!salesInvoiceId.HasValue)
+                {
+                    TempData["Error"] =
+                        "Sale could not be completed.";
+
+                    await LoadDropdowns();
+                    return View(model);
+                }
+
+                TempData["Success"] =
+                    $"Sale completed successfully. Invoice No: INV-{salesInvoiceId.Value:D5}";
+
+                TempData["SalesInvoiceId"] =
+                    salesInvoiceId.Value;
+
+                return RedirectToAction("Create");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+
+                await LoadDropdowns();
+                return View(model);
+            }
+        }
+        //   [HttpPost]
+        //   [ValidateAntiForgeryToken]
+        //   public async Task<IActionResult> Create(SalesEntryDto model)
+        //   {
+        //       if (!ModelState.IsValid)
+        //       {
+        //           await LoadDropdowns();
+        //           return View(model);
+        //       }
+
+        //       try
+        //       {
+        //           var salesInvoiceId =
+        //               await _salesService.CreateSaleAsync(model);
+
+        //           if (!salesInvoiceId.HasValue)
+        //           {
+        //               TempData["Error"] =
+        //                   "Sale could not be completed.";
+
+        //               await LoadDropdowns();
+        //               return View(model);
+        //           }
+
+        //           TempData["Success"] =
+        //$"Sale completed successfully. Invoice No: INV-{salesInvoiceId.Value:D5}";
+
+        //           TempData["SalesInvoiceId"] = salesInvoiceId.Value;
+
+        //           // Redirect to fresh Create page
+        //           return RedirectToAction("Create");
+        //       }
+        //       catch (Exception ex)
+        //       {
+        //           TempData["Error"] = ex.Message;
+
+        //           await LoadDropdowns();
+        //           return View(model);
+        //       }
+        //   }
+
+
+        // =========================================================
+        // SALES LIST / REPORT
+        // =========================================================
+
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            var invoices =
+                await _context.SalesInvoices
+                    .OrderByDescending(x => x.SalesInvoiceId)
+                    .ToListAsync();
+
+
+            return View(invoices);
+        }
+
+
+        // =========================================================
+        // GET INVOICE
+        // =========================================================
+
+        [HttpGet]
+        public async Task<IActionResult> Invoice(int id)
+        {
+            var invoice =
+                await _context.SalesInvoices
+                    .FirstOrDefaultAsync(x =>
+                        x.SalesInvoiceId == id);
+
+
+            if (invoice == null)
+                return NotFound();
+
+
+            var customer =
+                await _context.Customers
+                    .FirstOrDefaultAsync(x =>
+                        x.CustomerId == invoice.CustomerId);
+
+
+            var warehouse =
+                await _context.Warehouses
+                    .FirstOrDefaultAsync(x =>
+                        x.WarehouseId == invoice.WarehouseId);
+
+
+            var details =
+                await (
+                    from d in _context.SalesDetails
+
+                    join p in _context.ProductNames
+                        on d.ProductNameId
+                        equals p.ProductNameId
+
+                    join c in _context.Colors
+                        on d.ColorId
+                        equals c.ColorId
+                        into colorGroup
+
+                    from c in colorGroup.DefaultIfEmpty()
+
+                    join shipment in _context.Shipments
+                        on d.ShipmentId
+                        equals shipment.ShipmentId
+
+                    where d.SalesInvoiceId == invoice.SalesInvoiceId
+
+                    select new
+                    {
+                        d.SalesDetailId,
+
+                        ProductName = p.Name,
+
+                        ColorName =
+                            c != null
+                                ? c.ColorName
+                                : "",
+
+                        d.Thickness,
+
+                        d.ProductSize,
+
+                        d.Quantity,
+
+                        d.WeightKg,
+
+                        d.UnitPrice,
+
+                        d.LineTotal,
+
+                        ShipmentNo =
+                            shipment.ShipmentNo
+                    })
+                    .ToListAsync();
+
+
+            ViewBag.Customer = customer;
+            ViewBag.Warehouse = warehouse;
+            ViewBag.Details = details;
+
+
+            return View(invoice);
+        }
+
+
+        // =========================================================
+        // PDF INVOICE
+        // =========================================================
+
+        [HttpGet]
+        public async Task<IActionResult> DownloadInvoicePdf(int id)
+        {
+            var invoice =
+                await _context.SalesInvoices
+                    .FirstOrDefaultAsync(x =>
+                        x.SalesInvoiceId == id);
+
+            if (invoice == null)
+                return NotFound();
+
+            var pdf =
+                await _invoicePdfService
+                    .GenerateInvoiceAsync(id);
+
+            return File(
+                pdf,
+                "application/pdf",
+                $"Invoice-{invoice.InvoiceNo}.pdf");
+        }
+    }
+}

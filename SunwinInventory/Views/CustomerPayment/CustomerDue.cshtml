@@ -1,0 +1,222 @@
+﻿@model IEnumerable<SunwinInventory.DTOs.CustomerPayment.CustomerDueDto>
+
+@{
+    ViewData["Title"] = "Customer Due Report";
+}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <h4>
+            <i class="bi bi-hourglass-split me-2"></i>
+            Customer Due Report
+        </h4>
+
+        <div>
+            <span class="badge bg-danger fs-6">
+                Customers With Due:
+                @Model.Count()
+            </span>
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table id="customerDueTable"
+                       class="table table-bordered table-striped table-hover">
+
+                    <thead class="table-dark">
+
+                        <tr>
+                            <th>SL</th>
+                            <th>Customer Code</th>
+                            <th>Customer</th>
+                            <th>Contact Person</th>
+                            <th>Mobile</th>
+
+                            <th class="text-end">
+                                Previous Due
+                            </th>
+
+                            <th class="text-end">
+                                Invoice Amount
+                            </th>
+
+                            <th class="text-end">
+                                Paid
+                            </th>
+
+                            <th class="text-end">
+                                Total Due
+                            </th>
+
+                            <th width="100">
+                                Action
+                            </th>
+                            <th width="100">
+                                Download Statement
+                            </th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @{
+                            int sl = 1;
+                        }
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @sl
+                                </td>
+
+                                <td>
+                                    @item.CustomerCode
+                                </td>
+
+                                <td class="fw-bold">
+                                    @item.CustomerName
+                                </td>
+
+                                <td>
+                                    @item.ContactPerson
+                                </td>
+
+                                <td>
+                                    @item.Mobile
+                                </td>
+
+                                <td class="text-end">
+                                    @item.PreviousDue.ToString("N2")
+                                </td>
+
+                                <td class="text-end">
+                                    @item.TotalInvoiceAmount.ToString("N2")
+                                </td>
+
+                                <td class="text-end text-success">
+                                    @item.TotalPaidAmount.ToString("N2")
+                                </td>
+
+                                <td class="text-end">
+
+                                    <span class="text-danger fw-bold">
+                                        @item.TotalDueAmount.ToString("N2")
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    <a asp-action="CustomerPayments"
+                                       asp-route-customerId="@item.CustomerId"
+                                       class="btn btn-info btn-sm"
+                                       title="View Customer Payments">
+
+                                        <i class="bi bi-eye"></i>
+
+                                    </a>
+
+                                </td>
+                                <td class="text-center">
+
+                                    <a asp-controller="CustomerPayment"
+                                       asp-action="DownloadCustomerStatement"
+                                       asp-route-customerId="@item.CustomerId"
+                                       class="btn btn-danger btn-sm"
+                                       title="Download Customer Statement">
+
+                                        <i class="bi bi-file-earmark-pdf"></i>
+
+                                    </a>
+
+                                </td>
+                            </tr>
+
+                            sl++;
+                        }
+
+                    </tbody>
+
+                    <tfoot class="table-light">
+
+                        <tr>
+
+                            <th colspan="5" class="text-end">
+                                Total:
+                            </th>
+
+                            <th class="text-end">
+                                @Model.Sum(x => x.PreviousDue).ToString("N2")
+                            </th>
+
+                            <th class="text-end">
+                                @Model.Sum(x => x.TotalInvoiceAmount).ToString("N2")
+                            </th>
+
+                            <th class="text-end text-success">
+                                @Model.Sum(x => x.TotalPaidAmount).ToString("N2")
+                            </th>
+
+                            <th class="text-end text-danger">
+                                @Model.Sum(x => x.TotalDueAmount).ToString("N2")
+                            </th>
+
+                            <th></th>
+
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+   
+</div>
+
+@section Scripts {
+
+    <script>
+
+        $(document).ready(function () {
+
+            $("#customerDueTable").DataTable({
+
+                pageLength: 25,
+
+                lengthMenu: [10, 25, 50, 100],
+
+                scrollX: true,
+
+                ordering: true,
+
+                searching: true,
+
+                columnDefs: [
+                    {
+                        targets: "_all",
+                        className: "text-nowrap"
+                    }
+                ]
+
+            });
+
+        });
+
+    </script>
+
+}

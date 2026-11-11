@@ -1,0 +1,450 @@
+﻿@model IEnumerable<SunwinInventory.DTOs.CustomerPayment.CustomerPaymentDto>
+
+@{
+    ViewData["Title"] = "Customer Payment History";
+
+    var first = Model.FirstOrDefault();
+
+    string reportType = ViewBag.ReportType ?? "Customer";
+}
+
+<div class="container-fluid">
+
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+
+            <h4>
+                <i class="bi bi-person-lines-fill"></i>
+                Customer Payment History
+            </h4>
+
+            @if (first != null)
+            {
+                <div class="text-muted">
+
+                    Customer:
+                    <strong>
+                        @first.CustomerName
+                    </strong>
+
+                    @if (reportType == "Invoice")
+                    {
+                        <span class="ms-2">
+                            | Invoice:
+                            <strong>
+                                @first.InvoiceNo
+                            </strong>
+                        </span>
+                    }
+
+                </div>
+            }
+
+        </div>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+
+            <i class="bi bi-arrow-left"></i>
+            Back
+
+        </a>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- SUMMARY CARDS -->
+    <!-- ===================================================== -->
+
+    <div class="row mb-3">
+
+        @if (reportType == "Invoice")
+        {
+            <!-- ============================================= -->
+            <!-- INVOICE TOTAL -->
+            <!-- ============================================= -->
+
+            <div class="col-md-4">
+
+                <div class="card border-primary shadow-sm">
+
+                    <div class="card-body">
+
+                        <small class="text-muted">
+                            Invoice Total
+                        </small>
+
+                        <h4 class="text-primary">
+
+                            ৳ @(first?.InvoiceTotal.ToString("N2") ?? "0.00")
+
+                        </h4>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ============================================= -->
+            <!-- TOTAL PAYMENT -->
+            <!-- ============================================= -->
+
+            <div class="col-md-4">
+
+                <div class="card border-success shadow-sm">
+
+                    <div class="card-body">
+
+                        <small class="text-muted">
+                            Total Payment
+                        </small>
+
+                        <h4 class="text-success">
+
+                            ৳ @(Model
+                              .Sum(x => x.PaymentAmount)
+                              .ToString("N2"))
+
+                        </h4>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ============================================= -->
+            <!-- CURRENT DUE -->
+            <!-- ============================================= -->
+
+            <div class="col-md-4">
+
+                <div class="card border-danger shadow-sm">
+
+                    <div class="card-body">
+
+                        <small class="text-muted">
+                            Current Due
+                        </small>
+
+                        <h4 class="text-danger">
+
+                            ৳ @(first?.InvoiceDueAmount.ToString("N2") ?? "0.00")
+
+                        </h4>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <!-- ============================================= -->
+            <!-- CUSTOMER TOTAL INVOICE -->
+            <!-- ============================================= -->
+
+            <div class="col-md-4">
+
+                <div class="card border-primary shadow-sm">
+
+                    <div class="card-body">
+
+                        <small class="text-muted">
+                            Total Invoice
+                        </small>
+
+                        <h4 class="text-primary">
+
+                            ৳ @(Model
+                              .GroupBy(x => x.SalesInvoiceId)
+                              .Sum(g => g.First().InvoiceTotal)
+                              .ToString("N2"))
+
+                        </h4>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ============================================= -->
+            <!-- CUSTOMER TOTAL PAYMENT -->
+            <!-- ============================================= -->
+
+            <div class="col-md-4">
+
+                <div class="card border-success shadow-sm">
+
+                    <div class="card-body">
+
+                        <small class="text-muted">
+                            Total Payment
+                        </small>
+
+                        <h4 class="text-success">
+
+                            ৳ @(Model
+                              .Sum(x => x.PaymentAmount)
+                              .ToString("N2"))
+
+                        </h4>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ============================================= -->
+            <!-- CUSTOMER CURRENT DUE -->
+            <!-- ============================================= -->
+
+            <div class="col-md-4">
+
+                <div class="card border-danger shadow-sm">
+
+                    <div class="card-body">
+
+                        <small class="text-muted">
+                            Current Due
+                        </small>
+
+                        <h4 class="text-danger">
+
+                            ৳ @(Model
+                              .GroupBy(x => x.SalesInvoiceId)
+                              .Sum(g => g.First().InvoiceDueAmount)
+                              .ToString("N2"))
+
+                        </h4>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- PAYMENT TABLE -->
+    <!-- ===================================================== -->
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table id="customerPaymentTable"
+                       class="table table-bordered table-striped table-hover">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th>SL</th>
+
+                            <th>Date</th>
+
+                            <th>Invoice No</th>
+
+                            <th class="text-end">
+                                Invoice Total
+                            </th>
+
+                            <th class="text-end">
+                                Payment
+                            </th>
+
+                            <th class="text-end">
+                                Paid
+                            </th>
+
+                            <th class="text-end">
+                                Due
+                            </th>
+
+                            <th>
+                                Method
+                            </th>
+
+                            <th>
+                                Remarks
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @{
+                            int sl = 1;
+                        }
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <!-- SL -->
+
+                                <td>
+                                    @sl
+                                </td>
+
+
+                                <!-- DATE -->
+
+                                <td>
+                                    @item.PaymentDate.ToString("dd-MMM-yyyy")
+                                </td>
+
+
+                                <!-- INVOICE -->
+
+                                <td>
+
+                                    @item.InvoiceNo
+
+                                </td>
+
+
+                                <!-- INVOICE TOTAL -->
+
+                                <td class="text-end">
+
+                                    @item.InvoiceTotal.ToString("N2")
+
+                                </td>
+
+
+                                <!-- PAYMENT -->
+
+                                <td class="text-end fw-bold">
+
+                                    @item.PaymentAmount.ToString("N2")
+
+                                </td>
+
+
+                                <!-- PAID -->
+
+                                <td class="text-end">
+
+                                    @item.InvoicePaidAmount.ToString("N2")
+
+                                </td>
+
+
+                                <!-- DUE -->
+
+                                <td class="text-end">
+
+                                    @if (item.InvoiceDueAmount > 0)
+                                    {
+                                        <span class="text-danger fw-bold">
+
+                                            @item.InvoiceDueAmount.ToString("N2")
+
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-success">
+
+                                            0.00
+
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- PAYMENT METHOD -->
+
+                                <td>
+
+                                    @item.PaymentMethod
+
+                                </td>
+
+
+                                <!-- REMARKS -->
+
+                                <td>
+
+                                    @item.Remarks
+
+                                </td>
+
+                            </tr>
+
+                            sl++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- DATATABLE -->
+<!-- ========================================================= -->
+@section Scripts {
+
+    <script>
+
+        $(document).ready(function () {
+
+            $("#customerPaymentTable").DataTable({
+
+                pageLength: 25,
+
+                lengthMenu: [10, 25, 50, 100],
+
+                ordering: true,
+
+                searching: true,
+
+                scrollX: true,
+
+                columnDefs: [
+                    {
+                        targets: "_all",
+                        className: "text-nowrap"
+                    }
+                ]
+
+            });
+
+        });
+
+    </script>
+
+}

@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SunwinInventory.Models;
 
-[Index("UserName", Name = "IX_Users_UserName", IsUnique = true)]
 public partial class User
 {
     [Key]

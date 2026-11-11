@@ -158,5 +158,9 @@ namespace SunwinInventory.Services
         {
             return await _repository.GetByIdAsync(id);
         }
+        public async Task<List<PurchaseReportDto>> GetPurchaseReportAsync(PurchaseReportFilterDto filter)
+        {
+            return await _repository.GetPurchaseReportAsync(filter);
+        }
     }
 }

@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SunwinInventory.Models;
 
-[Index("DesignationName", Name = "IX_Designations_DesignationName", IsUnique = true)]
 public partial class Designation
 {
     [Key]
