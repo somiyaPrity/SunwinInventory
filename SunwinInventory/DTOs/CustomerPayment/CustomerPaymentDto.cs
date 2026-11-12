@@ -27,6 +27,12 @@ namespace SunwinInventory.DTOs.CustomerPayment
         [StringLength(30)]
         public string? PaymentMethod { get; set; }
 
+        [StringLength(30)]
+        public string? BankName { get; set; }
+
+        [StringLength(30)]
+        public string? TransactionCode { get; set; }
+
         [StringLength(500)]
         public string? Remarks { get; set; }
 

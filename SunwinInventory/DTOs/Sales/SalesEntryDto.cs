@@ -17,6 +17,10 @@ namespace SunwinInventory.DTOs.Sales
 
         public string? ReceiveMethod { get; set; }
 
+        public string? BankName { get; set; }
+
+        public string? TransactionCode { get; set; }
+
         public decimal ReceiveAmount { get; set; }
 
         public decimal Discount { get; set; }

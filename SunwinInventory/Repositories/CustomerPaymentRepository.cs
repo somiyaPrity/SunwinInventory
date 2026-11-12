@@ -101,6 +101,10 @@ namespace SunwinInventory.Repositories
 
                     PaymentMethod = model.PaymentMethod,
 
+                    BankName = model.BankName,
+
+                    TransectionCode = model.TransactionCode,
+
                     Remarks = model.Remarks,
 
                     CreatedBy = "Admin",

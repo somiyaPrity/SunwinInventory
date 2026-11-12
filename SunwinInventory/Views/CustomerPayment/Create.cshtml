@@ -324,11 +324,69 @@
                                 Cheque
                             </option>
 
-                            <option value="Mobile Banking">
-                                Mobile Banking
+                            <option value="Bkash">
+                                Bkash
+                            </option>
+
+                            <option value="Nagad">
+                                Nagad
+                            </option>
+
+                            <option value="Tap">
+                                Tap
+                            </option>
+
+                            <option value="Roket">
+                                Roket
                             </option>
 
                         </select>
+
+                    </div>
+
+
+                    <!-- Bank Name -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <label asp-for="BankName"
+                               class="form-label">
+
+                            Bank Name
+
+                        </label>
+
+                        <input asp-for="BankName"
+                               class="form-control"
+                               id="bankName"
+                               type="text" />
+
+                        <span asp-validation-for="BankName"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Transaction Code -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <label asp-for="TransactionCode"
+                               class="form-label">
+
+                            Transaction Code
+
+                        </label>
+
+                        <input asp-for="TransactionCode"
+                               class="form-control"
+                               id="transactionCode"
+                               type="text" />
+
+                        <span asp-validation-for="TransactionCode"
+                              class="text-danger">
+                        </span>
 
                     </div>
 

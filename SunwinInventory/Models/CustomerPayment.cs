@@ -28,6 +28,13 @@ public partial class CustomerPayment
     [Unicode(false)]
     public string? PaymentMethod { get; set; }
 
+    [StringLength(30)]
+    public string? BankName { get; set; }
+
+    [Column("Transection_code")]
+    [StringLength(30)]
+    public string? TransectionCode { get; set; }
+
     [StringLength(500)]
     [Unicode(false)]
     public string? Remarks { get; set; }
