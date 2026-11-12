@@ -22,7 +22,7 @@
             <a asp-action="DownloadInvoicePdf"
                asp-route-id="@TempData["SalesInvoiceId"]"
                target="_blank"
-               class="btn btn-sm btn-danger ms-3">
+               class="btn btn-lg btn-danger ms-3">
 
                 <i class="bi bi-file-earmark-pdf me-1"></i>
                 PDF
@@ -661,15 +661,46 @@
                                 Cheque
                             </option>
 
-                            <option value="Mobile Banking">
-                                Mobile Banking
+                            <option value="Bkash">
+                                Bkash
                             </option>
-
+                            <option value="Bkash">
+                                Nagad
+                            </option>
+                               <option value="Bkash">
+                                Tap
+                            </option>
+                               <option value="Bkash">
+                                Roket
+                            </option>
                         </select>
 
                     </div>
 
+                     <div class="col-md-4">
 
+                        <label class="form-label">
+                            Bank Name
+                        </label>
+
+                        <input type="text"
+                               id="bankName"
+                               class="form-control fw-bold"
+                                />
+
+                    </div>
+                        <div class="col-md-4">
+
+                        <label class="form-label">
+                            Transection Code
+                        </label>
+
+                        <input type="text"
+                               id="bankName"
+                               class="form-control fw-bold"
+                                />
+
+                    </div>
                     <div class="col-md-4">
 
                         <label class="form-label">
@@ -1235,62 +1266,47 @@
         }
 
 
-        // =====================================================
-        // CALCULATE TOTAL
-        // =====================================================
+  // =====================================================
+// CALCULATE TOTAL
+// =====================================================
 
-        function calculateTotals() {
+function calculateTotals() {
 
-            let subtotal =
-                salesItems.reduce(
-                    (sum, item) =>
-                        sum + item.lineTotal,
-                    0
-                );
+    const subtotal = salesItems.reduce(
+        (sum, item) => sum + item.lineTotal,
+        0
+    );
 
+    const discount       = parseFloat($("#Discount").val())       || 0;
+    const vat            = parseFloat($("#Vat").val())            || 0;
+    const ait            = parseFloat($("#Ait").val())            || 0;
+    const cuttingCharge  = parseFloat($("#CuttingCharge").val())  || 0;
+    const deliveryCharge = parseFloat($("#DeliveryCharge").val()) || 0;
 
-            const discount =
-                parseFloat($("#discount").val())
-                || 0;
+    const total =
+        subtotal
+        - discount
+        + vat
+        + ait
+        + cuttingCharge
+        + deliveryCharge;
 
-            const vat =
-                parseFloat($("#vat").val())
-                || 0;
+    $("#grandTotal").val(total.toFixed(2));
 
-            const ait =
-                parseFloat($("#ait").val())
-                || 0;
-            var cuttingCharge = parseFloat($("#CuttingCharge").val()) || 0;
-            var deliveryCharge = parseFloat($("#DeliveryCharge").val()) || 0;
+    const received = parseFloat($("#receiveAmount").val()) || 0;
 
-            const total =
-                subtotal
-                - discount
-                + vat
-                + ait + cuttingCharge + deliveryCharge;
+    const due = total - received;
 
-
-            $("#grandTotal")
-                .val(total.toFixed(2));
+    $("#dueAmount").val(due.toFixed(2));
+}
 
 
-            const received =
-                parseFloat($("#receiveAmount").val())
-                || 0;
+// =====================================================
+// RECALCULATE ON INPUT
+// =====================================================
 
-
-            const due =
-                total - received;
-
-
-            $("#dueAmount")
-                .val(due.toFixed(2));
-
-        }
-
-
-        $("#discount, #vat, #ait,#CuttingCharge,#DeliveryCharge, #receiveAmount")
-            .on("input", calculateTotals);
+$("#Discount, #Vat, #Ait, #CuttingCharge, #DeliveryCharge, #receiveAmount")
+    .on("input", calculateTotals);
 
 
         // =====================================================
