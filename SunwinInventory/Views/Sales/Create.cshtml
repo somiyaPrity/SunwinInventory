@@ -35,7 +35,24 @@
         </button>
 
     </div>
-}@if (TempData["SalesInvoiceId"] != null)
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm"
+         role="alert">
+
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+        <strong>@TempData["Error"]</strong>
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+}
+@if (TempData["SalesInvoiceId"] != null)
 {
     <script>
         window.open(
@@ -1438,6 +1455,35 @@ $("#Discount, #Vat, #Ait, #CuttingCharge, #DeliveryCharge, #receiveAmount")
                 e.preventDefault();
 
                 alert("Please add at least one product.");
+
+                return;
+
+            }
+
+
+            const total =
+                parseFloat($("#grandTotal").val()) || 0;
+
+            const received =
+                parseFloat($("#receiveAmount").val()) || 0;
+
+
+            if (received < 0) {
+
+                e.preventDefault();
+
+                alert("Receive amount cannot be negative.");
+
+                return;
+
+            }
+
+
+            if (received > total) {
+
+                e.preventDefault();
+
+                alert("Receive amount cannot exceed total amount.");
 
                 return;
 
