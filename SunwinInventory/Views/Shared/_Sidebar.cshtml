@@ -228,7 +228,9 @@
 
         <li>
 
-            <a href="#">
+            <a asp-controller="StockReport"
+               asp-action="Index"
+               class="@(controller == "StockReport" ? "active" : "")">
 
                 <i class="bi bi-clipboard-data"></i>
 
