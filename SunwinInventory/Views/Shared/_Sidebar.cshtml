@@ -147,11 +147,22 @@
         <li>
             <a asp-controller="Sales"
                asp-action="Create"
-               class="@(controller == "Sales" ? "active" : "")">
+               class="@((controller == "Sales" && action == "Create") ? "active" : "")">
 
                 <i class="bi bi-arrow-left-right"></i>
 
                 <span>Sales Entry</span>
+
+            </a>
+        </li>
+        <li>
+            <a asp-controller="Sales"
+               asp-action="Index"
+               class="@((controller == "Sales" && (action == "Index" || action == "DownloadInvoicePdf")) ? "active" : "")">
+
+                <i class="bi bi-printer"></i>
+
+                <span>Invoice Print</span>
 
             </a>
         </li>
