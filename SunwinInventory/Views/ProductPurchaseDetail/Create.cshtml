@@ -116,6 +116,7 @@
                         <label>Color</label>
                         <select id="ColorId" class="form-select">
                             <option value="">Select Color</option>
+                            <option value="0">No Color</option>
                             @foreach (var item in ViewBag.Colors)
                             {
                                 <option value="@item.Value">@item.Text</option>
@@ -733,7 +734,12 @@
 
                         html += Hidden(rowIndex, "CostPriceKgRmb", $("#CostPriceKgRmb").val());
                         html += Hidden(rowIndex, "CostPriceLbsRmb", $("#CostPriceLbsRmb").val());
-                        html += Hidden(rowIndex, "CostPricePcsRmb", $("#CostPricePcsRmb").val());
+
+                        var costPcsRmb = n("#ExchangeRate") != 0
+                            ? n("#CostPricePerPieceTk") / n("#ExchangeRate")
+                            : 0;
+
+                        html += Hidden(rowIndex, "CostPricePcsRmb", costPcsRmb.toFixed(4));
 
                         html += Hidden(rowIndex, "TotalAmountWithoutTaxTk", $("#TotalAmountWithoutTaxTk").val());
                         html += Hidden(rowIndex, "TotalAmountIncludingTaxTk", $("#TotalAmountIncludingTaxTk").val());
@@ -1015,7 +1021,7 @@
 
                                     html += "<td class='sl'></td>";
                                     html += "<td>" + item.productName + "</td>";
-                                    html += "<td>" + item.colorName + "</td>";
+                                    html += "<td>" + (item.colorName || "-") + "</td>";
                                     html += "<td>" + item.thickness + "</td>";
                                     html += "<td>" + item.productSize + "</td>";
                                     html += "<td class='qty'>" + item.initialQuantity + "</td>";
@@ -1084,8 +1090,8 @@
 
                             },
 
-                            error: function () {
-                                alert("Excel Upload Failed.");
+                            error: function (xhr) {
+                                alert(xhr.responseText || "Excel Upload Failed.");
                             }
 
                         });

@@ -46,6 +46,12 @@ namespace SunwinInventory.Repositories
 
             if (entity != null)
             {
+                var ledger = await _context.StockLedgers
+                    .FirstOrDefaultAsync(x => x.PurchaseDetailId == id);
+
+                if (ledger != null)
+                    _context.StockLedgers.Remove(ledger);
+
                 _context.ProductPurchaseDetails.Remove(entity);
                 await _context.SaveChangesAsync();
             }
