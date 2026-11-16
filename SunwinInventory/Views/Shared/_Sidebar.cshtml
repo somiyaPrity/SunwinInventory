@@ -1,6 +1,47 @@
-﻿@{
+@inject SunwinInventory.Services.Interfaces.IPermissionService PermissionService
+
+@{
     var controller = ViewContext.RouteData.Values["controller"]?.ToString();
     var action = ViewContext.RouteData.Values["Action"]?.ToString();
+
+    var roleId = Context.Session.GetInt32("RoleId");
+
+    var access = roleId.HasValue
+        ? await PermissionService.GetAccessAsync(roleId.Value)
+        : new Dictionary<string, SunwinInventory.DTOs.Role.MenuAccessDto>();
+
+    bool isAdministrator = roleId.HasValue &&
+        await PermissionService.IsAdministratorAsync(roleId.Value);
+
+    bool CanView(string key) =>
+        isAdministrator ||
+        (access.TryGetValue(key, out var permission) && permission.CanView);
+
+    bool masterVisible =
+        CanView("warehouse") ||
+        CanView("product-category") ||
+        CanView("product-name") ||
+        CanView("supplier") ||
+        CanView("shipment") ||
+        CanView("purchase-entry");
+
+    bool saleVisible =
+        CanView("customers") ||
+        CanView("sales-entry") ||
+        CanView("invoice-print") ||
+        CanView("customer-due") ||
+        CanView("customer-due-payment");
+
+    bool reportsVisible =
+        CanView("purchase-report") ||
+        CanView("sales-report") ||
+        CanView("stock-report");
+
+    bool administrativeVisible =
+        CanView("designation") ||
+        CanView("role") ||
+        CanView("users") ||
+        CanView("menu-access");
 }
 
 <aside class="sidebar" id="sidebar">
@@ -40,149 +81,193 @@
 
         </li>
 
-        <li class="menu-title">
+        @if (masterVisible)
+        {
+            <li class="menu-title">
 
-            <span>MASTER SETUP</span>
+                <span>MASTER SETUP</span>
 
-        </li>
+            </li>
 
-        <li>
+            @if (CanView("warehouse"))
+            {
+                <li>
 
-            <a asp-controller="Warehouse"
-               asp-action="Index"
-               class="@(controller=="Warehouse" ? "active" : "")">
+                    <a asp-controller="Warehouse"
+                       asp-action="Index"
+                       class="@(controller=="Warehouse" ? "active" : "")">
 
-                <i class="bi bi-building"></i>
+                        <i class="bi bi-building"></i>
 
-                <span>Warehouse</span>
+                        <span>Warehouse</span>
 
-            </a>
+                    </a>
 
-        </li>
-        <li>
+                </li>
+            }
 
-            <a asp-controller="ProductCategory"
-               asp-action="Index"
-               class="@(controller=="ProductCategory" ? "active" : "")">
+            @if (CanView("product-category"))
+            {
+                <li>
 
-                <i class="bi bi-tags"></i>
+                    <a asp-controller="ProductCategory"
+                       asp-action="Index"
+                       class="@(controller=="ProductCategory" ? "active" : "")">
 
-                <span>Product Category</span>
+                        <i class="bi bi-tags"></i>
 
-            </a>
+                        <span>Product Category</span>
 
-        </li>
+                    </a>
 
-        <li>
+                </li>
+            }
 
-            <a asp-controller="ProductName"
-               asp-action="Index"
-               class="@(controller == "ProductName" ? "active" : "")">
+            @if (CanView("product-name"))
+            {
+                <li>
 
-                <i class="bi bi-box-seam"></i>
+                    <a asp-controller="ProductName"
+                       asp-action="Index"
+                       class="@(controller == "ProductName" ? "active" : "")">
 
-                <span>Product Name</span>
+                        <i class="bi bi-box-seam"></i>
 
-            </a>
+                        <span>Product Name</span>
 
-        </li>
+                    </a>
 
-        <li>
+                </li>
+            }
 
-            <a asp-controller="Supplier"
-               asp-action="Index"
-               class="@(controller=="Supplier" ? "active" : "")">
+            @if (CanView("supplier"))
+            {
+                <li>
 
-                <i class="bi bi-truck"></i>
+                    <a asp-controller="Supplier"
+                       asp-action="Index"
+                       class="@(controller=="Supplier" ? "active" : "")">
 
-                <span>Supplier</span>
+                        <i class="bi bi-truck"></i>
 
-            </a>
+                        <span>Supplier</span>
 
-        </li>
+                    </a>
 
-        <li>
+                </li>
+            }
 
-            <a asp-controller="Shipment"
-               asp-action="Index"
-               class="@(controller=="Shipment" ? "active" : "")">
+            @if (CanView("shipment"))
+            {
+                <li>
 
-                <i class="bi bi-truck"></i>
+                    <a asp-controller="Shipment"
+                       asp-action="Index"
+                       class="@(controller=="Shipment" ? "active" : "")">
 
-                <span>Shipment</span>
+                        <i class="bi bi-truck"></i>
 
-            </a>
+                        <span>Shipment</span>
 
-        </li>
+                    </a>
 
-        <li>
-            <a asp-controller="ProductPurchaseDetail"
-               asp-action="Create"
-               class="@((controller=="ProductPurchaseDetail" && action=="Create") ? "active" : "")">
+                </li>
+            }
 
-                <i class="bi bi-cart-plus"></i>
+            @if (CanView("purchase-entry"))
+            {
+                <li>
+                    <a asp-controller="ProductPurchaseDetail"
+                       asp-action="Create"
+                       class="@((controller=="ProductPurchaseDetail" && action=="Create") ? "active" : "")">
 
-                <span>Purchase Entry</span>
+                        <i class="bi bi-cart-plus"></i>
 
-            </a>
-        </li>
-       
-        <li class="menu-title">
+                        <span>Purchase Entry</span>
 
-            <span>Sale</span>
+                    </a>
+                </li>
+            }
+        }
 
-        </li>
+        @if (saleVisible)
+        {
+            <li class="menu-title">
 
-        <li>
-            <a asp-controller="Customer"
-               asp-action="Index"
-               class="@(controller == "Customer" ? "active" : "")">
+                <span>Sale</span>
 
-                <i class="bi bi-people"></i>
+            </li>
 
-                <span>Customers</span>
+            @if (CanView("customers"))
+            {
+                <li>
+                    <a asp-controller="Customer"
+                       asp-action="Index"
+                       class="@(controller == "Customer" ? "active" : "")">
 
-            </a>
-        </li>
-        <li>
-            <a asp-controller="Sales"
-               asp-action="Create"
-               class="@((controller == "Sales" && action == "Create") ? "active" : "")">
+                        <i class="bi bi-people"></i>
 
-                <i class="bi bi-arrow-left-right"></i>
+                        <span>Customers</span>
 
-                <span>Sales Entry</span>
+                    </a>
+                </li>
+            }
 
-            </a>
-        </li>
-        <li>
-            <a asp-controller="Sales"
-               asp-action="Index"
-               class="@((controller == "Sales" && (action == "Index" || action == "DownloadInvoicePdf")) ? "active" : "")">
+            @if (CanView("sales-entry"))
+            {
+                <li>
+                    <a asp-controller="Sales"
+                       asp-action="Create"
+                       class="@((controller == "Sales" && action == "Create") ? "active" : "")">
 
-                <i class="bi bi-printer"></i>
+                        <i class="bi bi-arrow-left-right"></i>
 
-                <span>Invoice Print</span>
+                        <span>Sales Entry</span>
 
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link"
-               asp-controller="CustomerPayment"
-               asp-action="CustomerDue">
+                    </a>
+                </li>
+            }
 
-                <i class="bi bi-hourglass-split me-2"></i>
-                Customer Due Statement
+            @if (CanView("invoice-print"))
+            {
+                <li>
+                    <a asp-controller="Sales"
+                       asp-action="Index"
+                       class="@((controller == "Sales" && (action == "Index" || action == "DownloadInvoicePdf")) ? "active" : "")">
 
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" asp-controller="CustomerPayment" asp-action="Index">
-                <i class="bi bi-cash-coin me-2"></i>
-                Customer Due Payment List
-            </a>
-        </li>
-       
+                        <i class="bi bi-printer"></i>
+
+                        <span>Invoice Print</span>
+
+                    </a>
+                </li>
+            }
+
+            @if (CanView("customer-due"))
+            {
+                <li class="nav-item">
+                    <a class="nav-link"
+                       asp-controller="CustomerPayment"
+                       asp-action="CustomerDue">
+
+                        <i class="bi bi-hourglass-split me-2"></i>
+                        Customer Due Statement
+
+                    </a>
+                </li>
+            }
+
+            @if (CanView("customer-due-payment"))
+            {
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="CustomerPayment" asp-action="Index">
+                        <i class="bi bi-cash-coin me-2"></i>
+                        Customer Due Payment List
+                    </a>
+                </li>
+            }
+        }
+
         <li>
 
             <a href="#">
@@ -195,97 +280,138 @@
 
         </li>
 
-        <li class="menu-title">
+        @if (reportsVisible)
+        {
+            <li class="menu-title">
 
-            <span>REPORTS</span>
+                <span>REPORTS</span>
 
-        </li>
+            </li>
 
-        <li>
-            <a asp-controller="ProductPurchaseDetail"
-               asp-action="Index"
-               class="@((controller=="ProductPurchaseDetail" && action=="Index") ? "active" : "")">
+            @if (CanView("purchase-report"))
+            {
+                <li>
+                    <a asp-controller="ProductPurchaseDetail"
+                       asp-action="Index"
+                       class="@((controller=="ProductPurchaseDetail" && action=="Index") ? "active" : "")">
 
-                @* <i class="bi bi-cart-plus"></i> *@
-                <i class="bi bi-receipt"></i>
+                        <i class="bi bi-receipt"></i>
 
-                <span>Purchase Report</span>
+                        <span>Purchase Report</span>
 
-            </a>
-        </li>
+                    </a>
+                </li>
+            }
 
-        <li>
-            <a asp-controller="SalesReport"
-               asp-action="Index"
-               class="@(controller == "SalesReport" ? "active" : "")">
+            @if (CanView("sales-report"))
+            {
+                <li>
+                    <a asp-controller="SalesReport"
+                       asp-action="Index"
+                       class="@(controller == "SalesReport" ? "active" : "")">
 
-                <i class="bi bi-bar-chart"></i>
+                        <i class="bi bi-bar-chart"></i>
 
-                <span>Sales Report</span>
+                        <span>Sales Report</span>
 
-            </a>
-        </li>
+                    </a>
+                </li>
+            }
 
-        <li>
+            @if (CanView("stock-report"))
+            {
+                <li>
 
-            <a asp-controller="StockReport"
-               asp-action="Index"
-               class="@(controller == "StockReport" ? "active" : "")">
+                    <a asp-controller="StockReport"
+                       asp-action="Index"
+                       class="@(controller == "StockReport" ? "active" : "")">
 
-                <i class="bi bi-clipboard-data"></i>
+                        <i class="bi bi-clipboard-data"></i>
 
-                <span>Stock Report</span>
+                        <span>Stock Report</span>
 
-            </a>
+                    </a>
 
-        </li>
-        @* ----------Administrative-------- *@
-        <li class="menu-title">
+                </li>
+            }
+        }
 
-            <span>Administrative</span>
+        @if (administrativeVisible)
+        {
+            <li class="menu-title">
 
-        </li>
-        <li>
+                <span>Administrative</span>
 
-            <a asp-controller="Designation"
-               asp-action="Index"
-               class="@(controller=="Designation" ? "active" : "")">
+            </li>
 
-                <i class="bi bi-person-badge"></i>
+            @if (CanView("designation"))
+            {
+                <li>
 
-                <span>Designation</span>
+                    <a asp-controller="Designation"
+                       asp-action="Index"
+                       class="@(controller=="Designation" ? "active" : "")">
 
-            </a>
+                        <i class="bi bi-person-badge"></i>
 
-        </li>
-        <li>
+                        <span>Designation</span>
 
-            <a asp-controller="Role"
-               asp-action="Index"
-               class="@(controller=="Role" ? "active" : "")">
+                    </a>
 
-                <i class="bi bi-shield-lock"></i>
+                </li>
+            }
 
-                <span>Role</span>
+            @if (CanView("role"))
+            {
+                <li>
 
-            </a>
+                    <a asp-controller="Role"
+                       asp-action="Index"
+                       class="@(controller=="Role" ? "active" : "")">
 
-        </li>
-        <li>
+                        <i class="bi bi-shield-lock"></i>
 
-            <a asp-controller="User"
-               asp-action="Index"
-               class="@(controller=="User" ? "active" : "")">
+                        <span>Role</span>
 
-                <i class="bi bi-people-fill"></i>
+                    </a>
 
-                <span>Users</span>
+                </li>
+            }
 
-            </a>
+            @if (CanView("users"))
+            {
+                <li>
 
-        </li>
+                    <a asp-controller="User"
+                       asp-action="Index"
+                       class="@(controller=="User" ? "active" : "")">
 
-     
+                        <i class="bi bi-people-fill"></i>
+
+                        <span>Users</span>
+
+                    </a>
+
+                </li>
+            }
+
+            @if (CanView("menu-access"))
+            {
+                <li>
+
+                    <a asp-controller="MenuAccess"
+                       asp-action="Index"
+                       class="@(controller=="MenuAccess" ? "active" : "")">
+
+                        <i class="bi bi-ui-checks"></i>
+
+                        <span>Menu Access</span>
+
+                    </a>
+
+                </li>
+            }
+        }
 
     </ul>
 

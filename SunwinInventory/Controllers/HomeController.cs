@@ -86,6 +86,16 @@ namespace SunwinInventory.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public IActionResult AccessDenied(string? menu)
+        {
+            ViewData["Title"] = "Access Denied";
+
+            ViewBag.Menu = menu;
+
+            return View();
+        }
+
         private async Task<List<DailySalesDto>> BuildSalesTrendAsync(
             DateTime start,
             DateTime end)

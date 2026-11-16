@@ -51,7 +51,7 @@ namespace SunwinInventory.Services
             };
         }
 
-        public async Task CreateAsync(RoleDto dto)
+        public async Task<int> CreateAsync(RoleDto dto)
         {
             var role = new Role
             {
@@ -63,6 +63,8 @@ namespace SunwinInventory.Services
             };
 
             await _repository.AddAsync(role);
+
+            return role.RoleId;
         }
 
         public async Task UpdateAsync(RoleDto dto)

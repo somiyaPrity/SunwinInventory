@@ -45,7 +45,13 @@ namespace SunwinInventory.Repositories
 
             if (role != null)
             {
+                var permissions = await _context.RoleMenuPermissions
+                    .Where(x => x.RoleId == id)
+                    .ToListAsync();
+
+                _context.RoleMenuPermissions.RemoveRange(permissions);
                 _context.Roles.Remove(role);
+
                 await _context.SaveChangesAsync();
             }
         }

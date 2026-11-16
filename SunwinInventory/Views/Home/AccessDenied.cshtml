@@ -1,0 +1,54 @@
+@{
+    ViewData["Title"] = "Access Denied";
+
+    var menu = ViewBag.Menu as string;
+}
+
+<div class="container-fluid">
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body text-center py-5">
+
+            <i class="bi bi-shield-x text-danger"
+               style="font-size: 4rem;"></i>
+
+            <h3 class="fw-bold mt-3">
+                Access Denied
+            </h3>
+
+            <p class="text-muted mb-4">
+
+                @if (string.IsNullOrWhiteSpace(menu))
+                {
+                    <span>Your role does not have permission to open this page.</span>
+                }
+                else
+                {
+                    <span>
+                        Your role does not have permission to open
+                        <strong>@menu</strong>.
+                    </span>
+                }
+
+                <br />
+
+                Contact an administrator if you need access.
+
+            </p>
+
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="btn btn-primary">
+
+                <i class="bi bi-speedometer2"></i>
+
+                Back to Dashboard
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

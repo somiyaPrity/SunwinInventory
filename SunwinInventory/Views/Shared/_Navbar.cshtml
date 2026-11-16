@@ -22,6 +22,7 @@
         ["Designation"] = "Designation",
         ["Role"] = "Role",
         ["User"] = "Users",
+        ["MenuAccess"] = "Menu Access",
         ["Account"] = "Account"
     };
 
@@ -47,7 +48,8 @@
         ["User/Create"] = "Create User",
         ["User/Edit"] = "Edit User",
         ["Account/Login"] = "Login",
-        ["Account/ChangePassword"] = "Change Password"
+        ["Account/ChangePassword"] = "Change Password",
+        ["Home/AccessDenied"] = "Access Denied"
     };
 
     var controllerDisplay = controllerNames.TryGetValue(controller, out var mappedName)

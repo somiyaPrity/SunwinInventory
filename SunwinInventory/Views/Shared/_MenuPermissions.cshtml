@@ -1,0 +1,108 @@
+@model IEnumerable<SunwinInventory.DTOs.Role.MenuAccessDto>
+
+@{
+    bool disabled = ViewData["Disabled"] as bool? ?? false;
+}
+
+<div class="table-responsive">
+
+    <table class="table table-sm table-bordered align-middle">
+
+        <thead class="table-light">
+
+            <tr>
+
+                <th>Menu</th>
+
+                <th class="text-center" style="width: 90px;">View</th>
+
+                <th class="text-center" style="width: 90px;">Create</th>
+
+                <th class="text-center" style="width: 90px;">Edit</th>
+
+                <th class="text-center" style="width: 90px;">Delete</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            @foreach (var group in Model.GroupBy(m => m.Group))
+            {
+                <tr class="table-light">
+
+                    <td colspan="5"
+                        class="fw-semibold small text-uppercase text-muted">
+
+                        @group.Key
+
+                    </td>
+
+                </tr>
+
+                @foreach (var menu in group)
+                {
+                    <tr>
+
+                        <td>
+
+                            <i class="bi @menu.Icon me-2"></i>
+
+                            @menu.Title
+
+                        </td>
+
+                        <td class="text-center">
+
+                            <input type="checkbox"
+                                   class="form-check-input perm-view"
+                                   name="Permissions"
+                                   value="@(menu.MenuKey)|view"
+                                   checked="@menu.CanView"
+                                   disabled="@disabled" />
+
+                        </td>
+
+                        <td class="text-center">
+
+                            <input type="checkbox"
+                                   class="form-check-input perm-create"
+                                   name="Permissions"
+                                   value="@(menu.MenuKey)|create"
+                                   checked="@menu.CanCreate"
+                                   disabled="@disabled" />
+
+                        </td>
+
+                        <td class="text-center">
+
+                            <input type="checkbox"
+                                   class="form-check-input perm-edit"
+                                   name="Permissions"
+                                   value="@(menu.MenuKey)|edit"
+                                   checked="@menu.CanEdit"
+                                   disabled="@disabled" />
+
+                        </td>
+
+                        <td class="text-center">
+
+                            <input type="checkbox"
+                                   class="form-check-input perm-delete"
+                                   name="Permissions"
+                                   value="@(menu.MenuKey)|delete"
+                                   checked="@menu.CanDelete"
+                                   disabled="@disabled" />
+
+                        </td>
+
+                    </tr>
+                }
+            }
+
+        </tbody>
+
+    </table>
+
+</div>

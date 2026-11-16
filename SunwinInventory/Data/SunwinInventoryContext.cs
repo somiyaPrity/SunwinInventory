@@ -32,6 +32,8 @@ public partial class SunwinInventoryContext : DbContext
 
     public virtual DbSet<Role> Roles { get; set; }
 
+    public virtual DbSet<RoleMenuPermission> RoleMenuPermissions { get; set; }
+
     public virtual DbSet<SalesDetail> SalesDetails { get; set; }
 
     public virtual DbSet<SalesHeader> SalesHeaders { get; set; }
@@ -109,6 +111,20 @@ public partial class SunwinInventoryContext : DbContext
 
             entity.Property(e => e.CreatedDate).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.IsActive).HasDefaultValue(true);
+        });
+
+        modelBuilder.Entity<RoleMenuPermission>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_RoleMenuPermissions");
+
+            entity.HasIndex(e => new { e.RoleId, e.MenuKey })
+                .IsUnique()
+                .HasDatabaseName("UQ_RoleMenuPermissions_Role_Menu");
+
+            entity.HasOne<Role>()
+                .WithMany()
+                .HasForeignKey(e => e.RoleId)
+                .HasConstraintName("FK_RoleMenuPermissions_Roles");
         });
 
         modelBuilder.Entity<SalesDetail>(entity =>
