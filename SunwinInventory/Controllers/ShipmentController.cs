@@ -36,6 +36,10 @@ namespace SunwinInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ShipmentDto dto)
         {
+            if (HasNoShipmentDetails(dto))
+                ModelState.AddModelError(string.Empty,
+                    "Enter at least one shipment detail before saving.");
+
             if (!ModelState.IsValid)
                 return View(dto);
 
@@ -60,6 +64,10 @@ namespace SunwinInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ShipmentDto dto)
         {
+            if (HasNoShipmentDetails(dto))
+                ModelState.AddModelError(string.Empty,
+                    "Enter at least one shipment detail before saving.");
+
             if (!ModelState.IsValid)
                 return View(dto);
 
@@ -80,6 +88,17 @@ namespace SunwinInventory.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        private static bool HasNoShipmentDetails(ShipmentDto dto)
+        {
+            return string.IsNullOrWhiteSpace(dto.ShipmentType)
+                && string.IsNullOrWhiteSpace(dto.VesselName)
+                && string.IsNullOrWhiteSpace(dto.ContainerNo)
+                && string.IsNullOrWhiteSpace(dto.BLNo)
+                && dto.ArrivalDate == null
+                && string.IsNullOrWhiteSpace(dto.Remarks);
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetShipment(int id)
         {
