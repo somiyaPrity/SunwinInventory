@@ -22,13 +22,15 @@ namespace SunwinInventory.Controllers
         private readonly IProductNameService _productNameService;
         private readonly ILookupService _lookupService;
         private readonly IStockLedgerService _stockLedgerService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         public ProductPurchaseDetailController(
             IProductPurchaseDetailService purchaseService,
             IShipmentService shipmentService,
             ISupplierService supplierService,
             IWarehouseService warehouseService,
             IProductNameService productNameService,
-            ILookupService lookupService, IStockLedgerService stockLedgerService)
+            ILookupService lookupService, IStockLedgerService stockLedgerService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _purchaseService = purchaseService;
             _shipmentService = shipmentService;
@@ -37,7 +39,12 @@ namespace SunwinInventory.Controllers
             _productNameService = productNameService;
             _lookupService = lookupService;
             _stockLedgerService = stockLedgerService;
+            _httpContextAccessor = httpContextAccessor;
         }
+
+        private string CurrentUserName =>
+            _httpContextAccessor.HttpContext?
+                .Session.GetString("UserName") ?? "System";
 
         //=====================================================
         // INDEX
@@ -936,7 +943,7 @@ namespace SunwinInventory.Controllers
 
             // Preserve CreatedDate and CreatedBy
             entity.UpdatedDate = DateTime.Now;
-            entity.UpdatedBy = "Admin"; // Replace with logged-in username
+            entity.UpdatedBy = CurrentUserName;
 
             await _purchaseService.UpdateAsync(entity);
 

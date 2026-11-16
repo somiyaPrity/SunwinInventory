@@ -1,4 +1,5 @@
-﻿using SunwinInventory.DTOs.User;
+﻿using Microsoft.AspNetCore.Http;
+using SunwinInventory.DTOs.User;
 using SunwinInventory.Models;
 using SunwinInventory.Repositories.Interfaces;
 using SunwinInventory.Services.Interfaces;
@@ -11,18 +12,25 @@ namespace SunwinInventory.Services
         private readonly IRoleRepository _roleRepository;
         private readonly IDesignationRepository _designationRepository;
         private readonly IWarehouseRepository _warehouseRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public UserService(
             IUserRepository userRepository,
             IRoleRepository roleRepository,
             IDesignationRepository designationRepository,
-            IWarehouseRepository warehouseRepository)
+            IWarehouseRepository warehouseRepository,
+            IHttpContextAccessor httpContextAccessor)
         {
             _userRepository = userRepository;
             _roleRepository = roleRepository;
             _designationRepository = designationRepository;
             _warehouseRepository = warehouseRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
+
+        private string CurrentUserName =>
+            _httpContextAccessor.HttpContext?
+                .Session.GetString("UserName") ?? "System";
 
         public async Task<List<UserDto>> GetAllAsync()
         {
@@ -91,7 +99,7 @@ namespace SunwinInventory.Services
                 DesignationId = dto.DesignationId,
                 WarehouseId = dto.WarehouseId,
                 IsActive = dto.IsActive,
-                CreatedBy = "Admin",
+                CreatedBy = CurrentUserName,
                 CreatedDate = DateTime.Now
             };
 
@@ -114,7 +122,7 @@ namespace SunwinInventory.Services
             user.DesignationId = dto.DesignationId;
             user.WarehouseId = dto.WarehouseId;
             user.IsActive = dto.IsActive;
-            user.UpdatedBy = "Admin";
+            user.UpdatedBy = CurrentUserName;
             user.UpdatedDate = DateTime.Now;
 
             await _userRepository.UpdateAsync(user);
