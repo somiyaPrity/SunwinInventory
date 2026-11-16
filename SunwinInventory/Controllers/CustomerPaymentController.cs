@@ -28,6 +28,16 @@ namespace SunwinInventory.Controllers
         public async Task<IActionResult> DownloadCustomerStatement(
     int customerId)
         {
+            var customer =
+                await _customerService.GetByIdAsync(customerId);
+
+            if (customer == null)
+            {
+                TempData["Error"] = "Customer not found.";
+
+                return RedirectToAction(nameof(CustomerDue));
+            }
+
             var pdf =
                 await _customerStatementPdfService
                     .GenerateStatementAsync(customerId);
