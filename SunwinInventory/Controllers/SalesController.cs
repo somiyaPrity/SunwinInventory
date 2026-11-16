@@ -300,6 +300,87 @@ namespace SunwinInventory.Controllers
 
 
         // =========================================================
+        // GET STOCK OPTIONS - AVAILABLE COLORS + THICKNESSES
+        // =========================================================
+
+        [HttpGet]
+        public async Task<IActionResult> GetStockOptions(
+            int warehouseId,
+            int productNameId,
+            int? colorId)
+        {
+            if (warehouseId <= 0 || productNameId <= 0)
+            {
+                return Json(new
+                {
+                    colors = new List<object>(),
+                    thicknesses = new List<decimal>()
+                });
+            }
+
+
+            var query =
+                from stock in _context.StockLedgers
+
+                join purchase in _context.ProductPurchaseDetails
+                    on stock.PurchaseDetailId
+                    equals purchase.PurchaseDetailId
+
+                where
+                    stock.WarehouseId == warehouseId &&
+                    stock.ProductNameId == productNameId &&
+                    stock.AvailableQty > 0
+
+                select purchase;
+
+
+            var colorIds = await query
+                .Select(x => x.ColorId)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToListAsync();
+
+
+            var colorNames = await _context.Colors
+                .Where(x => colorIds.Contains(x.ColorId))
+                .ToDictionaryAsync(x => x.ColorId, x => x.ColorName);
+
+
+            var colors = colorIds
+                .Select(id => new
+                {
+                    value = id,
+                    text = id == 0
+                        ? "No Color"
+                        : colorNames.TryGetValue(id, out var name)
+                            ? name
+                            : $"Color {id}"
+                })
+                .ToList();
+
+
+            var thicknessQuery = query;
+
+            if (colorId.HasValue)
+            {
+                thicknessQuery = thicknessQuery.Where(x =>
+                    x.ColorId == colorId.Value);
+            }
+
+
+            var thicknesses = await thicknessQuery
+                .Where(x => x.Thickness != null)
+                .Select(x => x.Thickness!.Value)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToListAsync();
+
+
+            return Json(new { colors, thicknesses });
+        }
+
+
+        // =========================================================
         // SAVE SALE
         // =========================================================
         [HttpPost]

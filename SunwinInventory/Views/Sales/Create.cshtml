@@ -6,7 +6,6 @@
     var customers = ViewBag.Customers as List<SelectListItem>;
     var warehouses = ViewBag.Warehouses as List<SelectListItem>;
     var products = ViewBag.Products as List<SelectListItem>;
-    var colors = ViewBag.Colors as List<SelectListItem>;
 }
 @if (TempData["Success"] != null)
 {
@@ -268,13 +267,6 @@
                                 Select Color
                             </option>
 
-                            @foreach (var item in colors ?? new())
-                            {
-                                <option value="@item.Value">
-                                    @item.Text
-                                </option>
-                            }
-
                         </select>
 
                     </div>
@@ -288,11 +280,14 @@
                             Thickness
                         </label>
 
-                        <input type="number"
-                               id="thickness"
-                               class="form-control"
-                               step="0.01"
-                               placeholder="Thickness" />
+                        <select id="thickness"
+                                class="form-select">
+
+                            <option value="">
+                                Select Thickness
+                            </option>
+
+                        </select>
 
                     </div>
 
@@ -888,8 +883,207 @@
         }
 
 
-        $("#warehouseId, #productNameId, #colorId, #thickness")
+        // =====================================================
+        // STOCK OPTIONS - COLORS & THICKNESSES
+        // =====================================================
+
+        function fillThicknesses(thicknesses) {
+
+            const $thickness = $("#thickness");
+
+            $thickness.empty();
+
+            $thickness.append(
+                `<option value="">Select Thickness</option>`
+            );
+
+            thicknesses.forEach(t => {
+
+                $thickness.append(
+                    `<option value="${t}">${Number(t)}</option>`
+                );
+
+            });
+
+        }
+
+
+        function resetSizes() {
+
+            $("#productSize")
+                .empty()
+                .append(`<option value="">Select Size</option>`);
+
+        }
+
+
+        function resetStock() {
+
+            stockData = [];
+
+            $("#stockTableBody").empty();
+
+        }
+
+
+        async function loadStockOptions() {
+
+            const warehouseId =
+                $("#warehouseId").val();
+
+            const productNameId =
+                $("#productNameId").val();
+
+
+            $("#colorId")
+                .empty()
+                .append(`<option value="">Select Color</option>`);
+
+            $("#thickness")
+                .empty()
+                .append(`<option value="">Select Thickness</option>`);
+
+            resetSizes();
+
+            resetStock();
+
+
+            if (!warehouseId || !productNameId)
+                return;
+
+
+            const url =
+                `/Sales/GetStockOptions`
+                + `?warehouseId=${warehouseId}`
+                + `&productNameId=${productNameId}`;
+
+
+            const response =
+                await fetch(url);
+
+
+            if (!response.ok)
+                return;
+
+
+            const data =
+                await response.json();
+
+
+            data.colors.forEach(color => {
+
+                $("#colorId").append(
+                    `<option value="${color.value}">
+                            ${color.text}
+                        </option>`
+                );
+
+            });
+
+
+            // Only one color in stock - select it automatically
+            if (data.colors.length === 1) {
+
+                $("#colorId").val(data.colors[0].value);
+
+            }
+
+
+            fillThicknesses(data.thicknesses);
+
+
+            // Only one color and one thickness - go straight to sizes
+            if (data.colors.length <= 1 &&
+                data.thicknesses.length === 1) {
+
+                $("#thickness").val(data.thicknesses[0]);
+
+                loadProductSizes();
+
+            }
+
+        }
+
+
+        async function loadThicknessOptions() {
+
+            const warehouseId =
+                $("#warehouseId").val();
+
+            const productNameId =
+                $("#productNameId").val();
+
+            const colorId =
+                $("#colorId").val();
+
+
+            $("#thickness")
+                .empty()
+                .append(`<option value="">Select Thickness</option>`);
+
+            resetSizes();
+
+            resetStock();
+
+
+            if (!warehouseId || !productNameId)
+                return;
+
+
+            const url =
+                `/Sales/GetStockOptions`
+                + `?warehouseId=${warehouseId}`
+                + `&productNameId=${productNameId}`
+                + (colorId
+                    ? `&colorId=${colorId}`
+                    : "");
+
+
+            const response =
+                await fetch(url);
+
+
+            if (!response.ok)
+                return;
+
+
+            const data =
+                await response.json();
+
+
+            fillThicknesses(data.thicknesses);
+
+
+            // Only one thickness for this color - select it automatically
+            if (data.thicknesses.length === 1) {
+
+                $("#thickness").val(data.thicknesses[0]);
+
+                loadProductSizes();
+
+            }
+
+        }
+
+
+        // =====================================================
+        // SELECTION FLOW
+        // Product / Warehouse -> Colors + Thicknesses
+        // Color -> Thicknesses
+        // Thickness -> Sizes
+        // =====================================================
+
+        $("#warehouseId, #productNameId")
+            .on("change", loadStockOptions);
+
+        $("#colorId")
+            .on("change", loadThicknessOptions);
+
+        $("#thickness")
             .on("change", loadProductSizes);
+
+        $("#productSize")
+            .on("change", resetStock);
 
 
         // =====================================================
@@ -1105,6 +1299,23 @@
             if (!productId) {
 
                 alert("Please select product.");
+                return;
+
+            }
+
+
+            // Color is required only when colors exist in stock
+            if ($("#colorId option").length > 1 && !colorId) {
+
+                alert("Please select color.");
+                return;
+
+            }
+
+
+            if (!thickness) {
+
+                alert("Please select thickness.");
                 return;
 
             }
