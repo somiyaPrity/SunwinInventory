@@ -74,10 +74,10 @@
             </small>
         </div>
 
-        <a asp-controller="Sales"
+        <a asp-controller="SalesReport"
            asp-action="Index"
            class="btn btn-outline-secondary">
-            <i class="fas fa-list"></i>
+            <i class="fas fa-chart-line"></i>
             Sales Report
         </a>
     </div>
@@ -117,6 +117,9 @@
                                type="datetime-local"
                                class="form-control" />
 
+                        <span asp-validation-for="SalesDate"
+                              class="text-danger"></span>
+
                     </div>
 
 
@@ -145,6 +148,9 @@
 
                         </select>
 
+                        <span asp-validation-for="CustomerId"
+                              class="text-danger"></span>
+
                     </div>
 
 
@@ -172,6 +178,9 @@
                             }
 
                         </select>
+
+                        <span asp-validation-for="WarehouseId"
+                              class="text-danger"></span>
 
                     </div>
 
@@ -1660,6 +1669,39 @@ $("#Discount, #Vat, #Ait, #CuttingCharge, #DeliveryCharge, #receiveAmount")
         // =====================================================
 
         $("#salesForm").submit(function (e) {
+
+            if (!$("#SalesDate").val()) {
+
+                e.preventDefault();
+
+                alert("Please select sales date.");
+
+                return;
+
+            }
+
+
+            if (!$("#customerId").val()) {
+
+                e.preventDefault();
+
+                alert("Please select customer.");
+
+                return;
+
+            }
+
+
+            if (!$("#warehouseId").val()) {
+
+                e.preventDefault();
+
+                alert("Please select warehouse.");
+
+                return;
+
+            }
+
 
             if (salesItems.length === 0) {
 

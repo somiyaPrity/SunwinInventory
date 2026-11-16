@@ -387,6 +387,8 @@ namespace SunwinInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SalesEntryDto model)
         {
+            UseFriendlySalesEntryMessages(model);
+
             if (!ModelState.IsValid)
             {
                 await LoadDropdowns();
@@ -428,6 +430,30 @@ namespace SunwinInventory.Controllers
                 return View(model);
             }
         }
+        private void UseFriendlySalesEntryMessages(SalesEntryDto model)
+        {
+            if (model.SalesDate == default)
+            {
+                ModelState.Remove(nameof(model.SalesDate));
+                ModelState.AddModelError(nameof(model.SalesDate),
+                    "Please select the sales date.");
+            }
+
+            if (model.CustomerId <= 0)
+            {
+                ModelState.Remove(nameof(model.CustomerId));
+                ModelState.AddModelError(nameof(model.CustomerId),
+                    "Please select a customer.");
+            }
+
+            if (model.WarehouseId <= 0)
+            {
+                ModelState.Remove(nameof(model.WarehouseId));
+                ModelState.AddModelError(nameof(model.WarehouseId),
+                    "Please select a warehouse.");
+            }
+        }
+
         //   [HttpPost]
         //   [ValidateAntiForgeryToken]
         //   public async Task<IActionResult> Create(SalesEntryDto model)
