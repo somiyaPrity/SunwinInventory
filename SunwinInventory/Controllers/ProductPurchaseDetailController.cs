@@ -9,6 +9,7 @@ using SunwinInventory.Models;
 using SunwinInventory.Services;
 using SunwinInventory.Services.Interfaces;
 using System;
+using System.Text.RegularExpressions;
 
 namespace SunwinInventory.Controllers
 {
@@ -448,11 +449,40 @@ namespace SunwinInventory.Controllers
 
                 int lastRow = ws.LastRowUsed()?.RowNumber() ?? 2;
 
+                var selectedShipment =
+                    await _shipmentService.GetByIdAsync(shipmentId);
+
+                if (selectedShipment == null)
+                {
+                    return BadRequest(
+                        "Selected shipment was not found.");
+                }
+
+                string selectedShipmentKey =
+                    NormalizeShipmentNo(selectedShipment.ShipmentNo);
+
                 for (int row = 3; row <= lastRow; row++)
                 {
                     // Skip blank product rows
                     if (string.IsNullOrWhiteSpace(ws.Cell(row, 3).GetString()))
                         continue;
+
+                    // B - Shipment no
+                    // The selected shipment must match the file, otherwise
+                    // every row would be silently saved under the wrong
+                    // shipment.
+                    string excelShipment =
+                        ws.Cell(row, 2).GetString().Trim();
+
+                    if (!string.IsNullOrWhiteSpace(excelShipment) &&
+                        NormalizeShipmentNo(excelShipment) != selectedShipmentKey)
+                    {
+                        return BadRequest(
+                            $"Excel row {row} belongs to shipment " +
+                            $"'{excelShipment}', but " +
+                            $"'{selectedShipment.ShipmentNo}' is selected. " +
+                            "Please select the matching shipment and upload again.");
+                    }
 
                     var dto = new ProductPurchaseDetailDto();
 
@@ -626,6 +656,23 @@ namespace SunwinInventory.Controllers
             }
 
             return Json(items);
+        }
+
+
+        private static string NormalizeShipmentNo(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return string.Empty;
+
+            var normalized = value.Trim().ToLowerInvariant();
+
+            // "Shipment No - 43", "Shipment-2" and "2" all compare as "43"/"2".
+            normalized = Regex.Replace(
+                normalized,
+                @"^\s*shipment(\s+no\.?)?\s*[-–—:]?\s*",
+                "");
+
+            return Regex.Replace(normalized, @"[^a-z0-9]", "");
         }
 
 
