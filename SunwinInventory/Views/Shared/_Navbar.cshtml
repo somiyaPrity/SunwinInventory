@@ -2,8 +2,67 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
-    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
-    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+
+    var controllerNames = new Dictionary<string, string>
+    {
+        ["Home"] = "Dashboard",
+        ["Warehouse"] = "Warehouse",
+        ["ProductCategory"] = "Product Category",
+        ["ProductName"] = "Product Name",
+        ["Supplier"] = "Supplier",
+        ["Shipment"] = "Shipment",
+        ["ProductPurchaseDetail"] = "Purchase",
+        ["Customer"] = "Customers",
+        ["Sales"] = "Sales",
+        ["CustomerPayment"] = "Customer Payments",
+        ["SalesReport"] = "Sales Report",
+        ["StockReport"] = "Stock Report",
+        ["Designation"] = "Designation",
+        ["Role"] = "Role",
+        ["User"] = "Users",
+        ["Account"] = "Account"
+    };
+
+    var actionNames = new Dictionary<string, string>
+    {
+        ["ProductPurchaseDetail/Create"] = "Purchase Entry",
+        ["ProductPurchaseDetail/Index"] = "Purchase Report",
+        ["ProductPurchaseDetail/Edit"] = "Edit Purchase",
+        ["Sales/Create"] = "Sales Entry",
+        ["Sales/Index"] = "Invoice Print",
+        ["Sales/Invoice"] = "Invoice Print",
+        ["Sales/DownloadInvoicePdf"] = "Invoice Print",
+        ["CustomerPayment/Index"] = "Customer Due Payment List",
+        ["CustomerPayment/CustomerDue"] = "Customer Due Statement",
+        ["CustomerPayment/Create"] = "Receive Customer Payment",
+        ["CustomerPayment/CustomerPayments"] = "Customer Payment History",
+        ["CustomerPayment/InvoicePayments"] = "Invoice Payment History",
+        ["CustomerPayment/DownloadCustomerStatement"] = "Customer Statement",
+        ["CustomerPayment/PaymentReceipt"] = "Payment Receipt",
+        ["CustomerPayment/DownloadPaymentReceipt"] = "Payment Receipt",
+        ["Customer/Create"] = "Add Customer",
+        ["Customer/Edit"] = "Edit Customer",
+        ["User/Create"] = "Create User",
+        ["User/Edit"] = "Edit User",
+        ["Account/Login"] = "Login",
+        ["Account/ChangePassword"] = "Change Password"
+    };
+
+    var controllerDisplay = controllerNames.TryGetValue(controller, out var mappedName)
+        ? mappedName
+        : controller;
+
+    var pageDisplay = actionNames.TryGetValue($"{controller}/{action}", out var mappedAction)
+        ? mappedAction
+        : action switch
+        {
+            "Index" => controllerDisplay,
+            "Create" => "Create " + controllerDisplay,
+            "Edit" => "Edit " + controllerDisplay,
+            _ => action
+        };
 
     var fullName = HttpContextAccessor.HttpContext?.Session.GetString("FullName") ?? "Guest";
     var userName = HttpContextAccessor.HttpContext?.Session.GetString("UserName") ?? "";
@@ -24,13 +83,13 @@
 
             <h5 class="mb-0 fw-bold">
 
-                @controller
+                @pageDisplay
 
             </h5>
 
             <small class="text-muted">
 
-                Home / @controller / @action
+                Home / @pageDisplay
 
             </small>
 
