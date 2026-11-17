@@ -52,6 +52,8 @@ namespace SunwinInventory.Controllers
 
         public async Task<IActionResult> Index(PurchaseReportFilterDto filter)
         {
+            ClampDateRange(filter);
+
             await LoadDropDowns();
 
             var list = await _purchaseService.GetPurchaseReportAsync(filter);
@@ -59,6 +61,16 @@ namespace SunwinInventory.Controllers
             ViewBag.Filter = filter;
 
             return View(list);
+        }
+
+        private static void ClampDateRange(PurchaseReportFilterDto filter)
+        {
+            if (filter.FromDate.HasValue &&
+                filter.ToDate.HasValue &&
+                filter.ToDate.Value.Date < filter.FromDate.Value.Date)
+            {
+                filter.ToDate = filter.FromDate;
+            }
         }
         //[HttpGet]
         //public async Task<IActionResult> ExportExcel()
@@ -178,6 +190,8 @@ namespace SunwinInventory.Controllers
         [HttpGet]
         public async Task<IActionResult> ExportExcel(PurchaseReportFilterDto filter)
         {
+            ClampDateRange(filter);
+
             // Get filtered data
             var list = await _purchaseService.GetPurchaseReportAsync(filter);
 

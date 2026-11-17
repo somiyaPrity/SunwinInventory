@@ -406,6 +406,14 @@
 
         @* <div class="purchase-report-table"> *@
 
+        @if (!Model.Any())
+        {
+            <p class="text-muted text-center py-4 mb-0">
+                No purchases found for the selected filters.
+            </p>
+        }
+        else
+        {
         <table class="table table-bordered table-striped table-hover" id="purchaseTable">
 
             <thead class="table-dark">
@@ -539,6 +547,7 @@
             </tfoot>
 
         </table>
+        }
 
     </div>
 

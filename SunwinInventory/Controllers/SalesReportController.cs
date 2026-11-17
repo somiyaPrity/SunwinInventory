@@ -125,6 +125,11 @@ namespace SunwinInventory.Controllers
                     i.DueAmount,
                     i.WarehouseId,
 
+                    i.Vat,
+                    i.Ait,
+                    i.CuttingCharge,
+                    i.DeliveryCharge,
+
                     c.CustomerId,
                     c.CustomerName,
                     c.Mobile,
@@ -167,12 +172,6 @@ namespace SunwinInventory.Controllers
 
             int? previousInvoiceId = null;
 
-            var invoiceLineTotals = data
-                .GroupBy(x => x.SalesInvoiceId)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Sum(x => x.LineTotal ?? 0));
-
             foreach (var group in data.GroupBy(x => x.InvoiceDate.Date))
             {
                 var day = new SalesReportDayDto
@@ -187,17 +186,13 @@ namespace SunwinInventory.Controllers
 
                     previousInvoiceId = item.SalesInvoiceId;
 
-                    // Decimal keeps the sign bit on zero, so a cancelled-out
-                    // calculation reaches Excel as "-0".
+                    // Taken from the invoice header so filtering by product
+                    // does not move excluded lines into this column.
                     var otherCharges =
-                        (item.TotalAmount ?? 0) -
-                        invoiceLineTotals[item.SalesInvoiceId] +
-                        (item.Discount ?? 0);
-
-                    if (otherCharges == 0m)
-                    {
-                        otherCharges = 0m;
-                    }
+                        (item.Vat ?? 0) +
+                        (item.Ait ?? 0) +
+                        item.CuttingCharge +
+                        item.DeliveryCharge;
 
                     var row = new SalesReportRowDto
                     {
