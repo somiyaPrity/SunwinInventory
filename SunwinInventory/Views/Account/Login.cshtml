@@ -1,4 +1,4 @@
-﻿@model SunwinInventory.DTOs.Account.LoginDto
+@model SunwinInventory.DTOs.Account.LoginDto
 
 @{
     Layout = null;
@@ -35,7 +35,7 @@
             --brand-dark: #1f2937;
             --brand-darker: #111827;
             --brand-accent: #ff8c00;
-            --page-bg: #f4f6f9;
+            --page-bg: #eef1f5;
             --text-muted: #6b7280;
         }
 
@@ -52,92 +52,121 @@
         }
 
         .login-shell {
+            position: relative;
             min-height: 100vh;
-            display: grid;
-            grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 24px;
+            overflow: hidden;
         }
 
-        /* ---------- Brand panel ---------- */
+            .login-shell::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background:
+                    radial-gradient(720px 420px at 8% -6%, rgba(255, 140, 0, .16), transparent 62%),
+                    radial-gradient(640px 420px at 100% 108%, rgba(31, 41, 55, .10), transparent 60%);
+                pointer-events: none;
+            }
 
-        .brand-panel {
+            .login-shell::after {
+                content: "";
+                position: absolute;
+                width: 560px;
+                height: 560px;
+                right: -180px;
+                bottom: -220px;
+                border-radius: 50%;
+                border: 1px solid rgba(31, 41, 55, .10);
+                box-shadow:
+                    0 0 0 60px rgba(31, 41, 55, .03),
+                    0 0 0 120px rgba(255, 140, 0, .04);
+                pointer-events: none;
+            }
+
+        /* ---------- Split login card ---------- */
+
+        .login-card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            min-width: 0;
+            max-width: min(960px, 100%);
+            display: grid;
+            grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+            background: #fff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 70px rgba(15, 23, 42, .16);
+        }
+
+        /* ---------- Card brand (photo) panel ---------- */
+
+        .card-brand {
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            gap: 40px;
-            padding: 56px;
+            gap: 32px;
+            padding: 44px 40px;
             color: #e5e7eb;
             background:
-                radial-gradient(1100px 520px at 12% -10%, rgba(255, 140, 0, .20), transparent 60%),
-                linear-gradient(160deg, var(--brand-darker) 0%, var(--brand-dark) 55%, #0f172a 100%);
+                radial-gradient(560px 300px at 0% 0%, rgba(255, 140, 0, .38), transparent 62%),
+                linear-gradient(165deg, rgba(17, 24, 39, .84) 0%, rgba(15, 23, 42, .92) 100%),
+                url('@Url.Content("~/images/warehouse-login.png")') center / cover no-repeat;
         }
 
-            .brand-panel::before,
-            .brand-panel::after {
+            .card-brand::after {
                 content: "";
                 position: absolute;
-                border-radius: 50%;
-                border: 1px solid rgba(255, 255, 255, .06);
-                pointer-events: none;
-            }
-
-            .brand-panel::before {
-                width: 520px;
-                height: 520px;
-                right: -180px;
-                top: -160px;
-            }
-
-            .brand-panel::after {
                 width: 340px;
                 height: 340px;
                 right: -120px;
                 bottom: -140px;
-                border-color: rgba(255, 140, 0, .18);
+                border-radius: 50%;
+                border: 1px solid rgba(255, 140, 0, .22);
+                pointer-events: none;
             }
 
-        .logo-card {
+        .card-logo {
+            position: relative;
             display: inline-flex;
             align-items: center;
             background: #fff;
-            border-radius: 18px;
-            padding: 18px 22px;
-            box-shadow: 0 18px 40px rgba(0, 0, 0, .35);
+            border-radius: 16px;
+            padding: 14px 18px;
+            box-shadow: 0 16px 34px rgba(0, 0, 0, .35);
             width: fit-content;
         }
 
-            .logo-card img {
-                width: 230px;
+            .card-logo img {
+                width: 180px;
                 max-width: 100%;
                 height: auto;
             }
 
-        .brand-title {
-            margin: 32px 0 8px;
-            font-size: 2rem;
+        .card-title {
+            position: relative;
+            margin: 26px 0 0;
+            font-size: 1.6rem;
             font-weight: 600;
             letter-spacing: -.02em;
             color: #fff;
         }
 
-        .brand-subtitle {
-            margin: 0;
-            color: #9ca3af;
-            font-size: .95rem;
-        }
-
-        .brand-points {
+        .card-points {
             position: relative;
             list-style: none;
-            margin: 0;
+            margin: 22px 0 0;
             padding: 0;
             display: grid;
-            gap: 20px;
-            max-width: 420px;
+            gap: 18px;
         }
 
-            .brand-points li {
+            .card-points li {
                 display: flex;
                 gap: 14px;
                 align-items: flex-start;
@@ -148,71 +177,64 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 44px;
-            height: 44px;
+            width: 42px;
+            height: 42px;
             border-radius: 12px;
-            background: rgba(255, 140, 0, .14);
+            background: rgba(255, 140, 0, .16);
+            border: 1px solid rgba(255, 140, 0, .35);
             color: #ffb457;
-            font-size: 1.15rem;
+            font-size: 1.1rem;
         }
 
-        .brand-points strong {
+        .card-points strong {
             display: block;
             color: #f3f4f6;
-            font-size: .95rem;
+            font-size: .92rem;
             font-weight: 600;
         }
 
-        .brand-points span {
-            color: #9ca3af;
-            font-size: .82rem;
-            line-height: 1.6;
+        .card-points span {
+            color: #b6bcc6;
+            font-size: .8rem;
+            line-height: 1.55;
         }
 
-        .brand-foot {
-            font-size: .78rem;
-            color: #6b7280;
+        .card-foot {
             position: relative;
+            font-size: .75rem;
+            color: #9aa1ac;
         }
 
-        /* ---------- Form panel ---------- */
+        /* ---------- Card form panel ---------- */
 
-        .form-panel {
-            display: grid;
-            place-items: center;
-            padding: 40px 24px;
-        }
-
-        .login-card {
-            width: 100%;
-            max-width: 420px;
-            background: #fff;
-            border: 1px solid #eef0f4;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 24px 60px rgba(15, 23, 42, .08);
+        .card-form {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 48px 44px;
         }
 
         .mobile-logo {
             display: none;
-            margin-bottom: 24px;
+            margin-bottom: 22px;
         }
 
             .mobile-logo img {
-                width: 190px;
+                width: 170px;
                 max-width: 100%;
                 height: auto;
             }
 
-        .login-card h2 {
+        .card-form h2 {
             font-size: 1.5rem;
             font-weight: 600;
             letter-spacing: -.01em;
             margin: 0 0 6px;
+            color: var(--brand-darker);
         }
 
         .login-subtitle {
-            margin: 0 0 24px;
+            margin: 0 0 26px;
             color: var(--text-muted);
             font-size: .88rem;
         }
@@ -224,63 +246,50 @@
             margin-bottom: 6px;
         }
 
-        .login-input .input-group-text {
+        .login-input {
+            border-radius: 999px;
+            border: 1px solid #f3b26a;
+            overflow: hidden;
             background: #fff;
-            border-right: 0;
-            border-color: #e5e7eb;
-            color: #9ca3af;
-            border-radius: 12px 0 0 12px;
-            padding-left: 14px;
-            padding-right: 10px;
+            transition: border-color .15s ease, box-shadow .15s ease;
         }
 
-        .login-input .form-control {
-            border-left: 0;
-            border-right: 0;
-            border-color: #e5e7eb;
-            padding: .7rem .75rem;
-            font-size: .9rem;
-            color: #1f2937;
-        }
-
-            .login-input .form-control:focus {
-                border-color: #e5e7eb;
+            .login-input .input-group-text,
+            .login-input .form-control,
+            .login-input .btn-toggle-password {
+                border: 0;
+                background: #fff;
                 box-shadow: none;
             }
 
-        .login-input .input-group-text,
-        .login-input .form-control {
-            transition: border-color .15s ease;
-        }
+            .login-input .input-group-text {
+                padding: .8rem .5rem .8rem 1.1rem;
+                color: #9ca3af;
+            }
 
-        .login-input:focus-within .input-group-text,
-        .login-input:focus-within .form-control {
-            border-color: rgba(255, 140, 0, .8);
-        }
+            .login-input .form-control {
+                padding: .8rem .4rem;
+                font-size: .9rem;
+                color: #1f2937;
+            }
 
-        .login-input {
-            border-radius: 12px;
-        }
+                .login-input .form-control::placeholder {
+                    color: #9ca3af;
+                }
+
+            .login-input .btn-toggle-password {
+                padding: 0 1.1rem 0 .5rem;
+                color: #9ca3af;
+            }
+
+                .login-input .btn-toggle-password:hover,
+                .login-input .btn-toggle-password:focus {
+                    color: #1f2937;
+                }
 
             .login-input:focus-within {
+                border-color: var(--brand-accent);
                 box-shadow: 0 0 0 4px rgba(255, 140, 0, .14);
-                border-radius: 12px;
-            }
-
-        .btn-toggle-password {
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-left: 0;
-            color: #9ca3af;
-            border-radius: 0 12px 12px 0;
-            padding: 0 14px;
-        }
-
-            .btn-toggle-password:hover,
-            .btn-toggle-password:focus {
-                background: #fff;
-                color: #1f2937;
-                box-shadow: none;
             }
 
         .btn-login {
@@ -289,9 +298,9 @@
             justify-content: center;
             gap: .5rem;
             width: 100%;
-            padding: .8rem 1rem;
+            padding: .9rem 1rem;
             border: 0;
-            border-radius: 12px;
+            border-radius: 999px;
             background: var(--brand-dark);
             color: #fff;
             font-size: .92rem;
@@ -313,6 +322,22 @@
                 box-shadow: 0 0 0 4px rgba(255, 140, 0, .28);
             }
 
+        .forgot-link {
+            display: block;
+            margin: 18px auto 0;
+            text-align: center;
+            font-size: .82rem;
+            font-weight: 500;
+            color: var(--brand-accent);
+            text-decoration: none;
+        }
+
+            .forgot-link:hover,
+            .forgot-link:focus {
+                color: #e07b00;
+                text-decoration: underline;
+            }
+
         .login-alert {
             border: 0;
             border-radius: 12px;
@@ -325,7 +350,7 @@
         }
 
         .login-help {
-            margin: 20px 0 0;
+            margin: 14px 0 0;
             text-align: center;
             font-size: .78rem;
             color: var(--text-muted);
@@ -333,11 +358,12 @@
 
         @@media (max-width: 991.98px) {
 
-            .login-shell {
+            .login-card {
                 grid-template-columns: minmax(0, 1fr);
+                max-width: min(460px, 100%);
             }
 
-            .brand-panel {
+            .card-brand {
                 display: none;
             }
 
@@ -345,24 +371,19 @@
                 display: block;
             }
 
-            .login-card {
-                padding: 32px 26px;
-                box-shadow: 0 18px 40px rgba(15, 23, 42, .09);
+            .card-form {
+                padding: 36px 30px;
             }
         }
 
         @@media (max-width: 575.98px) {
 
-            .form-panel {
+            .login-shell {
                 padding: 24px 16px;
-                align-content: start;
             }
 
-            .login-card {
-                border: 0;
-                box-shadow: none;
-                background: transparent;
-                padding: 16px 4px;
+            .card-form {
+                padding: 28px 22px;
             }
         }
 
@@ -374,88 +395,83 @@
 
     <div class="login-shell">
 
-        <!-- ===================================================== -->
-        <!-- BRAND PANEL -->
-        <!-- ===================================================== -->
+        <div class="login-card">
 
-        <aside class="brand-panel">
+            <!-- ===================================================== -->
+            <!-- CARD BRAND / PHOTO PANEL -->
+            <!-- ===================================================== -->
 
-            <div>
+            <aside class="card-brand">
 
-                <div class="logo-card">
+                <div>
 
-                    <img src="~/images/sunwin-logo.png"
-                         alt="Sunwin Ltd. — Plastic & Electrical Insulation" />
+                    <div class="card-logo">
+
+                        <img src="~/images/sunwin-logo.png"
+                             alt="Sunwin Ltd. — Plastic & Electrical Insulation" />
+
+                    </div>
+
+                    <h1 class="card-title">
+                        Inventory, under control
+                    </h1>
+
+                    <ul class="card-points">
+
+                        <li>
+
+                            <span class="point-icon">
+                                <i class="bi bi-box-seam"></i>
+                            </span>
+
+                            <div>
+                                <strong>Real-time inventory</strong>
+                                <span>Know what you have, where you have it.</span>
+                            </div>
+
+                        </li>
+
+                        <li>
+
+                            <span class="point-icon">
+                                <i class="bi bi-receipt"></i>
+                            </span>
+
+                            <div>
+                                <strong>Streamlined operations</strong>
+                                <span>Move faster with less manual work.</span>
+                            </div>
+
+                        </li>
+
+                        <li>
+
+                            <span class="point-icon">
+                                <i class="bi bi-graph-up-arrow"></i>
+                            </span>
+
+                            <div>
+                                <strong>Actionable insights</strong>
+                                <span>Turn your data into smarter decisions.</span>
+                            </div>
+
+                        </li>
+
+                    </ul>
 
                 </div>
 
-                <h1 class="brand-title">
-                    Inventory &amp; Sales ERP
-                </h1>
+                <div class="card-foot">
+                    &copy; @DateTime.Now.Year Sunwin Ltd. All rights reserved.
+                </div>
 
-                <p class="brand-subtitle">
-                    Plastic &amp; Electrical Insulation
-                </p>
+            </aside>
 
-            </div>
+            <!-- ===================================================== -->
+            <!-- CARD FORM PANEL -->
+            <!-- ===================================================== -->
 
-            <ul class="brand-points">
-
-                <li>
-
-                    <span class="point-icon">
-                        <i class="bi bi-box-seam"></i>
-                    </span>
-
-                    <div>
-                        <strong>Stock across every location</strong>
-                        <span>Live quantities and weights by warehouse, shipment and size.</span>
-                    </div>
-
-                </li>
-
-                <li>
-
-                    <span class="point-icon">
-                        <i class="bi bi-receipt"></i>
-                    </span>
-
-                    <div>
-                        <strong>Sales and collections</strong>
-                        <span>Invoice entry, customer dues and payment history in one place.</span>
-                    </div>
-
-                </li>
-
-                <li>
-
-                    <span class="point-icon">
-                        <i class="bi bi-graph-up-arrow"></i>
-                    </span>
-
-                    <div>
-                        <strong>Reports ready to share</strong>
-                        <span>Sales, stock and receivable reports exported to Excel.</span>
-                    </div>
-
-                </li>
-
-            </ul>
-
-            <div class="brand-foot">
-                &copy; @DateTime.Now.Year Sunwin Ltd. All rights reserved.
-            </div>
-
-        </aside>
-
-
-        <!-- ===================================================== -->
-        <!-- FORM PANEL -->
-        <!-- ===================================================== -->
-
-        <main class="form-panel">
-
-            <div class="login-card">
+            <main class="card-form">
 
                 <div class="mobile-logo">
 
@@ -587,13 +603,21 @@
 
                 </form>
 
-                <p class="login-help">
-                    Trouble signing in? Contact your system administrator.
+                <a href="#"
+                   id="forgotPassword"
+                   class="forgot-link">
+                    Forgot password?
+                </a>
+
+                <p class="login-help"
+                   id="loginHelp"
+                   hidden>
+                    Trouble signing in? Contact your system administrator to reset your password.
                 </p>
 
-            </div>
+            </main>
 
-        </main>
+        </div>
 
     </div>
 
@@ -605,24 +629,37 @@
 
             const input = document.getElementById('Password');
 
-            if (!toggle || !input) {
-                return;
+            if (toggle && input) {
+
+                toggle.addEventListener('click', function () {
+
+                    const show = input.type === 'password';
+
+                    input.type = show ? 'text' : 'password';
+
+                    toggle.innerHTML = show
+                        ? '<i class="bi bi-eye-slash"></i>'
+                        : '<i class="bi bi-eye"></i>';
+
+                    toggle.setAttribute(
+                        'aria-label',
+                        show ? 'Hide password' : 'Show password');
+                });
             }
 
-            toggle.addEventListener('click', function () {
+            const forgot = document.getElementById('forgotPassword');
 
-                const show = input.type === 'password';
+            const help = document.getElementById('loginHelp');
 
-                input.type = show ? 'text' : 'password';
+            if (forgot && help) {
 
-                toggle.innerHTML = show
-                    ? '<i class="bi bi-eye-slash"></i>'
-                    : '<i class="bi bi-eye"></i>';
+                forgot.addEventListener('click', function (e) {
 
-                toggle.setAttribute(
-                    'aria-label',
-                    show ? 'Hide password' : 'Show password');
-            });
+                    e.preventDefault();
+
+                    help.hidden = !help.hidden;
+                });
+            }
 
         })();
 
