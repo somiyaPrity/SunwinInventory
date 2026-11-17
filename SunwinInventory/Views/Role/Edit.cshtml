@@ -33,7 +33,8 @@
                     <label asp-for="RoleName"></label>
 
                     <input asp-for="RoleName"
-                           class="form-control" />
+                           class="form-control"
+                           readonly="@isAdministrator" />
 
                     <span asp-validation-for="RoleName" class="text-danger"></span>
 

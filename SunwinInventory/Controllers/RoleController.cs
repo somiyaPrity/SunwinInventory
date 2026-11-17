@@ -24,6 +24,14 @@ namespace SunwinInventory.Controllers
         public async Task<IActionResult> Index()
         {
             var roles = await _roleService.GetAllAsync();
+
+            ViewBag.AdministratorRoleId = roles
+                .FirstOrDefault(r => string.Equals(
+                    r.RoleName,
+                    MenuCatalog.AdministratorRole,
+                    StringComparison.OrdinalIgnoreCase))
+                ?.RoleId;
+
             return View(roles);
         }
 
@@ -97,28 +105,50 @@ namespace SunwinInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(RoleDto dto)
         {
+            bool isAdministrator =
+                await _permissionService.IsAdministratorAsync(dto.RoleId);
+
+            ViewBag.IsAdministrator = isAdministrator;
+
             if (!ModelState.IsValid)
             {
                 dto.Menus = MenuSelection.Parse(dto.Permissions);
-                ViewBag.IsAdministrator =
-                    await _permissionService.IsAdministratorAsync(dto.RoleId);
                 return View(dto);
+            }
+
+            if (isAdministrator)
+            {
+                var existing = await _roleService.GetByIdAsync(dto.RoleId);
+
+                if (existing != null &&
+                    !string.Equals(existing.RoleName, dto.RoleName, StringComparison.OrdinalIgnoreCase))
+                {
+                    ModelState.AddModelError(
+                        nameof(dto.RoleName),
+                        "The Administrator role name cannot be changed.");
+
+                    dto.Menus = MenuSelection.Parse(dto.Permissions);
+                    return View(dto);
+                }
+
+                dto.RoleName = existing?.RoleName ?? dto.RoleName;
             }
 
             if (await _roleService.ExistsAsync(dto.RoleName, dto.RoleId))
             {
                 ModelState.AddModelError("RoleName", "Role already exists.");
                 dto.Menus = MenuSelection.Parse(dto.Permissions);
-                ViewBag.IsAdministrator =
-                    await _permissionService.IsAdministratorAsync(dto.RoleId);
                 return View(dto);
             }
 
             await _roleService.UpdateAsync(dto);
 
-            await _permissionService.SaveRoleMenusAsync(
-                dto.RoleId,
-                MenuSelection.Parse(dto.Permissions));
+            if (!isAdministrator)
+            {
+                await _permissionService.SaveRoleMenusAsync(
+                    dto.RoleId,
+                    MenuSelection.Parse(dto.Permissions));
+            }
 
             TempData["Success"] = "Role updated successfully.";
 
@@ -132,6 +162,12 @@ namespace SunwinInventory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            if (await _permissionService.IsAdministratorAsync(id))
+            {
+                TempData["Error"] = "The Administrator role cannot be deleted.";
+                return RedirectToAction(nameof(Index));
+            }
+
             await _roleService.DeleteAsync(id);
 
             TempData["Success"] = "Role deleted successfully.";

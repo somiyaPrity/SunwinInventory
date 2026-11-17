@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Role";
+
+    int? administratorRoleId = ViewBag.AdministratorRoleId;
 }
 
 <div class="container-fluid">
@@ -106,20 +108,23 @@
 
                                 </a>
 
-                                <form asp-action="Delete"
-                                      asp-route-id="@item.RoleId"
-                                      method="post"
-                                      class="d-inline">
+                                @if (administratorRoleId != item.RoleId)
+                                {
+                                    <form asp-action="Delete"
+                                          asp-route-id="@item.RoleId"
+                                          method="post"
+                                          class="d-inline">
 
-                                    @Html.AntiForgeryToken()
+                                        @Html.AntiForgeryToken()
 
-                                    <button class="btn btn-danger btn-sm btnDelete">
+                                        <button class="btn btn-danger btn-sm btnDelete">
 
-                                        <i class="bi bi-trash"></i>
+                                            <i class="bi bi-trash"></i>
 
-                                    </button>
+                                        </button>
 
-                                </form>
+                                    </form>
+                                }
 
                             </td>
 

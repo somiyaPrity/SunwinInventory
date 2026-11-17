@@ -44,7 +44,6 @@ namespace SunwinInventory.Services
                 UserId = x.UserId,
                 FullName = x.FullName,
                 UserName = x.UserName,
-                Password = x.Password,
                 Email = x.Email,
                 Phone = x.Phone,
                 RoleId = x.RoleId,
@@ -76,7 +75,6 @@ namespace SunwinInventory.Services
                 UserId = x.UserId,
                 FullName = x.FullName,
                 UserName = x.UserName,
-                Password = x.Password,
                 Email = x.Email,
                 Phone = x.Phone,
                 RoleId = x.RoleId,
@@ -115,7 +113,12 @@ namespace SunwinInventory.Services
 
             user.FullName = dto.FullName;
             user.UserName = dto.UserName;
-            user.Password = dto.Password;
+
+            if (!string.IsNullOrWhiteSpace(dto.Password))
+            {
+                user.Password = dto.Password;
+            }
+
             user.Email = dto.Email;
             user.Phone = dto.Phone;
             user.RoleId = dto.RoleId;
