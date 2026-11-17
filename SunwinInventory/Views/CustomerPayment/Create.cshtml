@@ -347,7 +347,8 @@
 
                     <!-- Bank Name -->
 
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-4 mb-3"
+                         id="bankNameField">
 
                         <label asp-for="BankName"
                                class="form-label">
@@ -370,7 +371,8 @@
 
                     <!-- Transaction Code -->
 
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-4 mb-3"
+                         id="transactionCodeField">
 
                         <label asp-for="TransactionCode"
                                class="form-label">
@@ -608,6 +610,34 @@
                 }
 
             });
+
+
+            //==================================================
+            // BANK FIELDS (not required for Cash)
+            //==================================================
+
+            function toggleBankFields() {
+
+                var isCash =
+                    $("#PaymentMethod").val() === "Cash";
+
+                $("#bankNameField, #transactionCodeField")
+                    .toggle(!isCash);
+
+                if (isCash) {
+
+                    $("#bankName, #transactionCode")
+                        .val("")
+                        .removeClass("is-invalid");
+
+                    $("#bankNameField span.text-danger, #transactionCodeField span.text-danger")
+                        .text("");
+                }
+            }
+
+            $("#PaymentMethod").change(toggleBankFields);
+
+            toggleBankFields();
 
 
             //==================================================

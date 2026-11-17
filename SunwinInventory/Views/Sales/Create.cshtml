@@ -701,7 +701,8 @@
 
                     </div>
 
-                     <div class="col-md-4">
+                     <div class="col-md-4"
+                          id="bankNameField">
 
                         <label class="form-label">
                             Bank Name
@@ -713,7 +714,8 @@
                                class="form-control fw-bold" />
 
                     </div>
-                        <div class="col-md-4">
+                        <div class="col-md-4"
+                             id="transactionCodeField">
 
                         <label class="form-label">
                             Transection Code
@@ -1093,6 +1095,32 @@
 
         $("#productSize")
             .on("change", resetStock);
+
+
+        // =====================================================
+        // BANK FIELDS (not required for Cash)
+        // =====================================================
+
+        function toggleBankFields() {
+
+            const isCash =
+                $("#ReceiveMethod").val() === "Cash";
+
+            $("#bankNameField, #transactionCodeField")
+                .toggle(!isCash);
+
+            if (isCash) {
+
+                $("#bankName, #transactionCode")
+                    .val("")
+                    .removeClass("is-invalid");
+            }
+        }
+
+        $("#ReceiveMethod")
+            .on("change", toggleBankFields);
+
+        toggleBankFields();
 
 
         // =====================================================
