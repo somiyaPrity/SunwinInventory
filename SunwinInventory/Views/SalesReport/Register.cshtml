@@ -1,0 +1,236 @@
+@model SunwinInventory.DTOs.SalesReport.SalesRegisterDto
+
+@{
+    ViewData["Title"] = "Sales Register";
+
+    var customers = ViewBag.Customers as List<SelectListItem>
+        ?? new List<SelectListItem>();
+
+    var customerId = ViewBag.CustomerId?.ToString() ?? "";
+}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+
+            <h4 class="mb-1">
+                <i class="bi bi-journal-richtext"></i>
+                Sales Register
+            </h4>
+
+            <small class="text-muted">
+                @Model.FromDate.ToString("dd-MMM-yyyy")
+                &ndash; @Model.ToDate.ToString("dd-MMM-yyyy")
+            </small>
+
+        </div>
+
+        <a asp-action="ExportRegisterExcel"
+           asp-route-fromDate="@ViewBag.FromDate"
+           asp-route-toDate="@ViewBag.ToDate"
+           asp-route-customerId="@ViewBag.CustomerId"
+           class="btn btn-success">
+
+            <i class="bi bi-file-earmark-excel"></i>
+            Export Excel
+
+        </a>
+
+    </div>
+
+    <div class="card shadow-sm mb-3">
+
+        <div class="card-body">
+
+            <form asp-action="Register" method="get">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            From Date
+                        </label>
+
+                        <input type="date"
+                               name="fromDate"
+                               value="@ViewBag.FromDate"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            To Date
+                        </label>
+
+                        <input type="date"
+                               name="toDate"
+                               value="@ViewBag.ToDate"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Client
+                        </label>
+
+                        <select name="customerId"
+                                class="form-select"
+                                asp-items="customers">
+
+                            <option value="">All Clients</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+
+                            <i class="bi bi-funnel"></i>
+                            Filter
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-striped table-hover align-middle">
+
+                    <thead class="table-dark">
+
+                        <tr>
+                            <th rowspan="2">SL</th>
+                            <th rowspan="2">Date</th>
+                            <th rowspan="2">Memo No</th>
+                            <th rowspan="2">Client Name</th>
+                            <th rowspan="2">Saled Item</th>
+                            <th rowspan="2" class="text-end">Sales Amount</th>
+                            <th colspan="6" class="text-center">Net Payment</th>
+                            <th rowspan="2" class="text-end">Payment Amount</th>
+                            <th rowspan="2" class="text-end">Discount / Commission</th>
+                            <th rowspan="2" class="text-end">Due Amount</th>
+                            <th rowspan="2" class="text-end">Due Collection</th>
+                            <th rowspan="2" class="text-end">Net Due</th>
+                        </tr>
+
+                        <tr>
+                            <th class="text-end">Cash</th>
+                            <th class="text-end">Bank Account</th>
+                            <th class="text-end">Bkash</th>
+                            <th class="text-end">Nagad</th>
+                            <th class="text-end">Tap/Roket</th>
+                            <th class="text-end">Product Exchange</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model.Rows.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="17"
+                                    class="text-center text-muted py-4">
+
+                                    No sales found for the selected period.
+
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            int sl = 1;
+
+                            foreach (var row in Model.Rows)
+                            {
+                                <tr>
+                                    <td>@sl</td>
+                                    <td>@row.InvoiceDate.ToString("dd-MM-yyyy")</td>
+                                    <td>
+                                        <a asp-controller="Sales"
+                                           asp-action="Invoice"
+                                           asp-route-id="@row.SalesInvoiceId"
+                                           class="fw-bold text-decoration-none">
+                                            @row.InvoiceNo
+                                        </a>
+                                    </td>
+                                    <td>@row.CustomerName</td>
+                                    <td>@row.Items</td>
+                                    <td class="text-end">@row.SalesAmount.ToString("N2")</td>
+                                    <td class="text-end">@(row.Cash != 0 ? row.Cash.ToString("N2") : "")</td>
+                                    <td class="text-end">@(row.Bank != 0 ? row.Bank.ToString("N2") : "")</td>
+                                    <td class="text-end">@(row.Bkash != 0 ? row.Bkash.ToString("N2") : "")</td>
+                                    <td class="text-end">@(row.Nagad != 0 ? row.Nagad.ToString("N2") : "")</td>
+                                    <td class="text-end">@(row.TapRoket != 0 ? row.TapRoket.ToString("N2") : "")</td>
+                                    <td class="text-end">@(row.ProductExchange != 0 ? row.ProductExchange.ToString("N2") : "")</td>
+                                    <td class="text-end fw-bold">@row.PaymentAmount.ToString("N2")</td>
+                                    <td class="text-end">@(row.Discount != 0 ? row.Discount.ToString("N2") : "")</td>
+                                    <td class="text-end">@row.DueAmount.ToString("N2")</td>
+                                    <td class="text-end">@(row.DueCollection != 0 ? row.DueCollection.ToString("N2") : "")</td>
+                                    <td class="text-end fw-bold @(row.NetDue > 0 ? "text-danger" : "text-success")">
+                                        @row.NetDue.ToString("N2")
+                                    </td>
+                                </tr>
+
+                                sl++;
+                            }
+                        }
+
+                    </tbody>
+
+                    <tfoot>
+
+                        <tr class="table-secondary fw-bold">
+                            <td colspan="5">TOTAL</td>
+                            <td class="text-end">@Model.Totals.SalesAmount.ToString("N2")</td>
+                            <td class="text-end">@Model.Totals.Cash.ToString("N2")</td>
+                            <td class="text-end">@Model.Totals.Bank.ToString("N2")</td>
+                            <td class="text-end">@Model.Totals.Bkash.ToString("N2")</td>
+                            <td class="text-end">@Model.Totals.Nagad.ToString("N2")</td>
+                            <td class="text-end">@Model.Totals.TapRoket.ToString("N2")</td>
+                            <td class="text-end">@Model.Totals.ProductExchange.ToString("N2")</td>
+                            <td class="text-end">@Model.Totals.PaymentAmount.ToString("N2")</td>
+                            <td class="text-end">@Model.Totals.Discount.ToString("N2")</td>
+                            <td class="text-end">@Model.Totals.DueAmount.ToString("N2")</td>
+                            <td class="text-end">@Model.Totals.DueCollection.ToString("N2")</td>
+                            <td class="text-end">@Model.Totals.NetDue.ToString("N2")</td>
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+            <small class="text-muted">
+                Net Payment columns show the amount received at sale time by method.
+                Due Collection shows later installment payments; Net Due = Due Amount &minus; Due Collection.
+            </small>
+
+        </div>
+
+    </div>
+
+</div>

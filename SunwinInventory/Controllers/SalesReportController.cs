@@ -81,6 +81,360 @@ namespace SunwinInventory.Controllers
         }
 
         // =========================================================
+        // SALES REGISTER (client workbook format)
+        // =========================================================
+
+        [HttpGet]
+        public async Task<IActionResult> Register(
+            DateTime? fromDate,
+            DateTime? toDate,
+            int? customerId)
+        {
+            var from = fromDate?.Date ??
+                new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+
+            var to = toDate?.Date ?? DateTime.Today;
+
+            if (to < from)
+                to = from;
+
+            await LoadDropdowns();
+
+            ViewBag.FromDate = from.ToString("yyyy-MM-dd");
+            ViewBag.ToDate = to.ToString("yyyy-MM-dd");
+            ViewBag.CustomerId = customerId;
+
+            var model = await BuildRegisterAsync(from, to, customerId);
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportRegisterExcel(
+            DateTime? fromDate,
+            DateTime? toDate,
+            int? customerId)
+        {
+            var from = fromDate?.Date ??
+                new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+
+            var to = toDate?.Date ?? DateTime.Today;
+
+            if (to < from)
+                to = from;
+
+            var model = await BuildRegisterAsync(from, to, customerId);
+
+            var file = BuildRegisterWorkbook(model);
+
+            var fileName = $"Sales-Register-{from:yyyyMMdd}-{to:yyyyMMdd}.xlsx";
+
+            return File(
+                file,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName);
+        }
+
+        private async Task<SalesRegisterDto> BuildRegisterAsync(
+            DateTime start,
+            DateTime finish,
+            int? customerId)
+        {
+            var end = finish.AddDays(1);
+
+            var query =
+                from i in _context.SalesInvoices
+
+                join c in _context.Customers
+                    on i.CustomerId equals c.CustomerId
+
+                join h in _context.SalesHeaders
+                    on i.InvoiceNo equals h.InvoiceNo
+                    into headerGroup
+
+                from h in headerGroup.DefaultIfEmpty()
+
+                where i.InvoiceDate >= start && i.InvoiceDate < end
+
+                select new
+                {
+                    i.SalesInvoiceId,
+                    i.InvoiceNo,
+                    i.InvoiceDate,
+                    i.TotalAmount,
+                    i.Discount,
+                    i.CustomerId,
+                    c.CustomerName,
+                    ReceiveAmount = h != null ? h.ReceiveAmount : null,
+                    ReceiveMethod = h != null ? h.ReceiveMethod : i.ReceiveMethod
+                };
+
+            if (customerId.HasValue)
+                query = query.Where(x => x.CustomerId == customerId.Value);
+
+            var invoices = await query
+                .OrderBy(x => x.InvoiceDate)
+                .ThenBy(x => x.InvoiceNo)
+                .ToListAsync();
+
+            var ids = invoices.Select(x => x.SalesInvoiceId).ToList();
+
+            var items = await
+                (
+                    from d in _context.SalesDetails
+
+                    join p in _context.ProductNames
+                        on d.ProductNameId equals p.ProductNameId
+
+                    where ids.Contains(d.SalesInvoiceId)
+
+                    select new { d.SalesInvoiceId, p.Name }
+                )
+                .ToListAsync();
+
+            var itemMap = items
+                .GroupBy(x => x.SalesInvoiceId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => string.Join(", ",
+                        g.Select(x => x.Name).Distinct()));
+
+            var collections = await _context.CustomerPayments
+                .Where(x => ids.Contains(x.SalesInvoiceId))
+                .GroupBy(x => x.SalesInvoiceId)
+                .Select(g => new
+                {
+                    SalesInvoiceId = g.Key,
+                    Total = g.Sum(x => x.PaymentAmount)
+                })
+                .ToListAsync();
+
+            var collectionMap = collections
+                .ToDictionary(x => x.SalesInvoiceId, x => x.Total);
+
+            var model = new SalesRegisterDto
+            {
+                FromDate = start,
+                ToDate = finish
+            };
+
+            foreach (var inv in invoices)
+            {
+                var salesAmount = inv.TotalAmount ?? 0;
+                var received = inv.ReceiveAmount ?? 0;
+                var collected = collectionMap.TryGetValue(
+                    inv.SalesInvoiceId, out var col) ? col : 0;
+
+                var row = new SalesRegisterRowDto
+                {
+                    SalesInvoiceId = inv.SalesInvoiceId,
+                    InvoiceDate = inv.InvoiceDate,
+                    InvoiceNo = inv.InvoiceNo,
+                    CustomerName = inv.CustomerName,
+                    Items = itemMap.TryGetValue(
+                        inv.SalesInvoiceId, out var names) ? names : "",
+                    SalesAmount = salesAmount,
+                    PaymentAmount = received,
+                    Discount = inv.Discount ?? 0,
+                    DueAmount = salesAmount - received,
+                    DueCollection = collected,
+                    NetDue = salesAmount - received - collected
+                };
+
+                switch (NormalizeMethod(inv.ReceiveMethod))
+                {
+                    case "Bank":
+                        row.Bank = received;
+                        break;
+                    case "Bkash":
+                        row.Bkash = received;
+                        break;
+                    case "Nagad":
+                        row.Nagad = received;
+                        break;
+                    case "TapRoket":
+                        row.TapRoket = received;
+                        break;
+                    case "Exchange":
+                        row.ProductExchange = received;
+                        break;
+                    default:
+                        row.Cash = received;
+                        break;
+                }
+
+                model.Rows.Add(row);
+
+                model.Totals.SalesAmount += row.SalesAmount;
+                model.Totals.Cash += row.Cash;
+                model.Totals.Bank += row.Bank;
+                model.Totals.Bkash += row.Bkash;
+                model.Totals.Nagad += row.Nagad;
+                model.Totals.TapRoket += row.TapRoket;
+                model.Totals.ProductExchange += row.ProductExchange;
+                model.Totals.PaymentAmount += row.PaymentAmount;
+                model.Totals.Discount += row.Discount;
+                model.Totals.DueAmount += row.DueAmount;
+                model.Totals.DueCollection += row.DueCollection;
+                model.Totals.NetDue += row.NetDue;
+            }
+
+            return model;
+        }
+
+        private static string NormalizeMethod(string? method)
+        {
+            switch (method?.Trim().ToLowerInvariant())
+            {
+                case "bank":
+                case "cheque":
+                    return "Bank";
+                case "bkash":
+                    return "Bkash";
+                case "nagad":
+                    return "Nagad";
+                case "tap":
+                case "roket":
+                    return "TapRoket";
+                case "product exchange":
+                    return "Exchange";
+                default:
+                    return "Cash";
+            }
+        }
+
+        private static byte[] BuildRegisterWorkbook(SalesRegisterDto model)
+        {
+            using var workbook = new XLWorkbook();
+
+            var ws = workbook.Worksheets.Add("Sales Register");
+
+            const int lastColumn = 17;
+
+            ws.Cell(1, 1).Value = model.Title;
+            ws.Range(1, 1, 1, lastColumn).Merge();
+            ws.Cell(1, 1)
+                .Style.Font.SetBold()
+                .Font.SetFontSize(14)
+                .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+            // Totals above the headers, like the client workbook.
+            ws.Cell(2, 6).Value = model.Totals.SalesAmount;
+            ws.Cell(2, 7).Value = model.Totals.Cash;
+            ws.Cell(2, 8).Value = model.Totals.Bank;
+            ws.Cell(2, 9).Value = model.Totals.Bkash;
+            ws.Cell(2, 10).Value = model.Totals.Nagad;
+            ws.Cell(2, 11).Value = model.Totals.TapRoket;
+            ws.Cell(2, 12).Value = model.Totals.ProductExchange;
+            ws.Cell(2, 13).Value = model.Totals.PaymentAmount;
+            ws.Cell(2, 14).Value = model.Totals.Discount;
+            ws.Cell(2, 15).Value = model.Totals.DueAmount;
+            ws.Cell(2, 16).Value = model.Totals.DueCollection;
+            ws.Cell(2, 17).Value = model.Totals.NetDue;
+            ws.Range(2, 6, 2, lastColumn).Style.Font.SetBold();
+
+            var headers = new[]
+            {
+                "SL No", "Date", "Memo No", "Client Name", "Saled Item",
+                "Sales Amount", "Net Payment", "", "", "", "", "",
+                "Payment Amount", "Discount / Commission",
+                "Due Amount", "Due Collection", "Net Due"
+            };
+
+            for (int i = 0; i < headers.Length; i++)
+            {
+                var cell = ws.Cell(3, i + 1);
+                cell.Value = headers[i];
+                cell.Style.Font.SetBold();
+                cell.Style.Fill.SetBackgroundColor(XLColor.FromHtml("#D9D9D9"));
+                cell.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                cell.Style.Alignment.SetWrapText();
+            }
+
+            ws.Range(3, 7, 3, 12).Merge();
+
+            var subHeaders = new[]
+            {
+                "Cash", "Bank Account", "Bkash", "Nagad",
+                "Tap/Roket", "Product Exchange"
+            };
+
+            for (int i = 0; i < subHeaders.Length; i++)
+            {
+                var cell = ws.Cell(4, 7 + i);
+                cell.Value = subHeaders[i];
+                cell.Style.Font.SetBold();
+                cell.Style.Fill.SetBackgroundColor(XLColor.FromHtml("#D9D9D9"));
+                cell.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            }
+
+            ws.Range(3, 1, 4, lastColumn)
+                .Style.Border.SetBottomBorder(XLBorderStyleValues.Thin);
+
+            int rowIndex = 5;
+            int sl = 1;
+
+            foreach (var row in model.Rows)
+            {
+                ws.Cell(rowIndex, 1).Value = sl++;
+                ws.Cell(rowIndex, 2).Value = row.InvoiceDate;
+                ws.Cell(rowIndex, 3).Value = row.InvoiceNo;
+                ws.Cell(rowIndex, 4).Value = row.CustomerName;
+                ws.Cell(rowIndex, 5).Value = row.Items;
+                ws.Cell(rowIndex, 6).Value = row.SalesAmount;
+                ws.Cell(rowIndex, 7).Value = row.Cash;
+                ws.Cell(rowIndex, 8).Value = row.Bank;
+                ws.Cell(rowIndex, 9).Value = row.Bkash;
+                ws.Cell(rowIndex, 10).Value = row.Nagad;
+                ws.Cell(rowIndex, 11).Value = row.TapRoket;
+                ws.Cell(rowIndex, 12).Value = row.ProductExchange;
+                ws.Cell(rowIndex, 13).Value = row.PaymentAmount;
+                ws.Cell(rowIndex, 14).Value = row.Discount;
+                ws.Cell(rowIndex, 15).Value = row.DueAmount;
+                ws.Cell(rowIndex, 16).Value = row.DueCollection;
+                ws.Cell(rowIndex, 17).Value = row.NetDue;
+                rowIndex++;
+            }
+
+            ws.Cell(rowIndex, 5).Value = "TOTAL";
+            ws.Cell(rowIndex, 6).Value = model.Totals.SalesAmount;
+            ws.Cell(rowIndex, 7).Value = model.Totals.Cash;
+            ws.Cell(rowIndex, 8).Value = model.Totals.Bank;
+            ws.Cell(rowIndex, 9).Value = model.Totals.Bkash;
+            ws.Cell(rowIndex, 10).Value = model.Totals.Nagad;
+            ws.Cell(rowIndex, 11).Value = model.Totals.TapRoket;
+            ws.Cell(rowIndex, 12).Value = model.Totals.ProductExchange;
+            ws.Cell(rowIndex, 13).Value = model.Totals.PaymentAmount;
+            ws.Cell(rowIndex, 14).Value = model.Totals.Discount;
+            ws.Cell(rowIndex, 15).Value = model.Totals.DueAmount;
+            ws.Cell(rowIndex, 16).Value = model.Totals.DueCollection;
+            ws.Cell(rowIndex, 17).Value = model.Totals.NetDue;
+
+            ws.Range(rowIndex, 1, rowIndex, lastColumn)
+                .Style.Font.SetBold()
+                .Border.SetTopBorder(XLBorderStyleValues.Double);
+
+            ws.Column(2).Style.DateFormat.Format = "dd-MM-yyyy";
+            ws.Range(2, 6, rowIndex, lastColumn)
+                .Style.NumberFormat.Format = "#,##0.00";
+
+            ws.SheetView.FreezeRows(4);
+
+            ws.Column(1).Width = 7;
+            ws.Column(2).Width = 12;
+            ws.Column(3).Width = 12;
+            ws.Column(4).Width = 32;
+            ws.Column(5).Width = 30;
+            for (int col = 6; col <= lastColumn; col++)
+                ws.Column(col).Width = 14;
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+
+            return stream.ToArray();
+        }
+
+        // =========================================================
         // BUILD REPORT DATA
         // =========================================================
 

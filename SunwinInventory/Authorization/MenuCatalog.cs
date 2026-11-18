@@ -116,10 +116,14 @@ namespace SunwinInventory.Authorization
                     "Sales",
                     new[] { "Index", "Invoice", "DownloadInvoicePdf" }),
 
-                new("customer-due", "Customer Due Statement", "Sale",
+                new("customer-due", "Receivables", "Sale",
                     "bi-hourglass-split",
                     "CustomerPayment",
-                    new[] { "CustomerDue", "DownloadCustomerStatement" }),
+                    new[]
+                    {
+                        "CustomerDue", "CustomerLedger",
+                        "ExportReceivables", "DownloadCustomerStatement"
+                    }),
 
                 new("customer-due-payment", "Customer Due Payment List", "Sale",
                     "bi-cash-coin",
@@ -139,6 +143,11 @@ namespace SunwinInventory.Authorization
                 new("sales-report", "Sales Report", "REPORTS", "bi-bar-chart",
                     "SalesReport",
                     new[] { "Index", "ExportExcel" }),
+
+                new("sales-register", "Sales Register", "REPORTS",
+                    "bi-journal-richtext",
+                    "SalesReport",
+                    new[] { "Register", "ExportRegisterExcel" }),
 
                 new("stock-report", "Stock Report", "REPORTS",
                     "bi-clipboard-data",

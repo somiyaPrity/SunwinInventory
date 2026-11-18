@@ -35,6 +35,7 @@
     bool reportsVisible =
         CanView("purchase-report") ||
         CanView("sales-report") ||
+        CanView("sales-register") ||
         CanView("stock-report") ||
         CanView("fund-book");
 
@@ -252,7 +253,7 @@
                        asp-action="CustomerDue">
 
                         <i class="bi bi-hourglass-split me-2"></i>
-                        Customer Due Statement
+                        Receivables
 
                     </a>
                 </li>
@@ -297,11 +298,26 @@
                 <li>
                     <a asp-controller="SalesReport"
                        asp-action="Index"
-                       class="@(controller == "SalesReport" ? "active" : "")">
+                       class="@(controller == "SalesReport" && action == "Index" ? "active" : "")">
 
                         <i class="bi bi-bar-chart"></i>
 
                         <span>Sales Report</span>
+
+                    </a>
+                </li>
+            }
+
+            @if (CanView("sales-register"))
+            {
+                <li>
+                    <a asp-controller="SalesReport"
+                       asp-action="Register"
+                       class="@(controller == "SalesReport" && action == "Register" ? "active" : "")">
+
+                        <i class="bi bi-journal-richtext"></i>
+
+                        <span>Sales Register</span>
 
                     </a>
                 </li>

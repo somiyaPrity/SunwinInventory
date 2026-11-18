@@ -1,0 +1,219 @@
+@model SunwinInventory.DTOs.CustomerPayment.CustomerLedgerDto
+
+@{
+    ViewData["Title"] = "Receivables Ledger";
+}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+
+            <h4 class="mb-1">
+                <i class="bi bi-hourglass-split me-2"></i>
+                @Model.CustomerName
+            </h4>
+
+            <small class="text-muted">
+                @Model.CustomerCode
+                @if (!string.IsNullOrEmpty(Model.Mobile))
+                {
+                    <span>&middot; @Model.Mobile</span>
+                }
+                @if (!string.IsNullOrEmpty(Model.Address))
+                {
+                    <span>&middot; @Model.Address</span>
+                }
+            </small>
+
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <a asp-action="CustomerDue"
+               class="btn btn-outline-secondary">
+
+                <i class="bi bi-arrow-left"></i>
+                Receivables
+
+            </a>
+
+            <a asp-action="DownloadCustomerStatement"
+               asp-route-customerId="@Model.CustomerId"
+               target="_blank"
+               class="btn btn-danger">
+
+                <i class="bi bi-file-earmark-pdf"></i>
+                Statement PDF
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="row g-3 mb-3">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body py-3">
+                    <small class="text-muted d-block">Total Sales</small>
+                    <span class="fs-5 fw-bold">@Model.TotalSales.ToString("N2")</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body py-3">
+                    <small class="text-muted d-block">Received at Sale</small>
+                    <span class="fs-5 fw-bold">@Model.TotalReceived.ToString("N2")</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body py-3">
+                    <small class="text-muted d-block">Due Collections</small>
+                    <span class="fs-5 fw-bold">@Model.TotalCollections.ToString("N2")</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body py-3">
+                    <small class="text-muted d-block">Net Receivable</small>
+                    <span class="fs-5 fw-bold @(Model.NetReceivable > 0 ? "text-danger" : "text-success")">
+                        @Model.NetReceivable.ToString("N2")
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-striped table-hover align-middle">
+
+                    <thead class="table-dark">
+
+                        <tr>
+                            <th>Memo No</th>
+                            <th>Date</th>
+                            <th>Item</th>
+                            <th class="text-end">Sales Amount</th>
+                            <th class="text-end">Payment/TK</th>
+                            <th class="text-end">Discounts</th>
+                            <th class="text-end">Total Receivables</th>
+                            <th>Narration</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model.Rows.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="8"
+                                    class="text-center text-muted py-4">
+
+                                    No transactions found for this client.
+
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var row in Model.Rows)
+                            {
+                                <tr class="@(row.IsCollection ? "table-success" : row.IsOpening ? "table-warning" : "")">
+
+                                    <td>
+                                        @if (row.SalesInvoiceId.HasValue && !row.IsCollection)
+                                        {
+                                            <a asp-controller="Sales"
+                                               asp-action="Invoice"
+                                               asp-route-id="@row.SalesInvoiceId"
+                                               class="fw-bold text-decoration-none">
+                                                @row.MemoNo
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            @row.MemoNo
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @(row.Date.HasValue
+                                            ? row.Date.Value.ToString("dd-MM-yyyy")
+                                            : "")
+                                    </td>
+
+                                    <td>@row.Item</td>
+
+                                    <td class="text-end">
+                                        @(row.SalesAmount.HasValue
+                                            ? row.SalesAmount.Value.ToString("N2") : "")
+                                    </td>
+
+                                    <td class="text-end">
+                                        @(row.Payment.HasValue
+                                            ? row.Payment.Value.ToString("N2") : "")
+                                    </td>
+
+                                    <td class="text-end">
+                                        @(row.Discount.HasValue
+                                            ? row.Discount.Value.ToString("N2") : "")
+                                    </td>
+
+                                    <td class="text-end fw-bold @(row.ReceivableAmount < 0 ? "text-success" : "")">
+                                        @(row.ReceivableAmount < 0
+                                            ? $"({Math.Abs(row.ReceivableAmount):N2})"
+                                            : row.ReceivableAmount.ToString("N2"))
+                                    </td>
+
+                                    <td>@row.Narration</td>
+
+                                </tr>
+                            }
+                        }
+
+                    </tbody>
+
+                    <tfoot>
+
+                        <tr class="table-secondary fw-bold">
+                            <td colspan="3">TOTAL</td>
+                            <td class="text-end">@Model.TotalSales.ToString("N2")</td>
+                            <td class="text-end">@((Model.TotalReceived + Model.TotalCollections).ToString("N2"))</td>
+                            <td></td>
+                            <td class="text-end">@Model.NetReceivable.ToString("N2")</td>
+                            <td></td>
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+            <small class="text-muted">
+                Sale rows increase receivables; collection rows (green) reduce them.
+                Narration shows the payment method. Previous Due is included in Net Receivable.
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
