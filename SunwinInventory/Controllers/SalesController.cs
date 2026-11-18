@@ -424,7 +424,8 @@ namespace SunwinInventory.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Error"] = ex.Message;
+                TempData["Error"] =
+                    ex.InnerException?.Message ?? ex.Message;
 
                 await LoadDropdowns();
                 return View(model);

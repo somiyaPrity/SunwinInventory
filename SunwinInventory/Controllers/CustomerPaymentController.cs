@@ -152,7 +152,8 @@ namespace SunwinInventory.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Error"] = ex.Message;
+                TempData["Error"] =
+                    ex.InnerException?.Message ?? ex.Message;
 
                 await LoadCustomers();
                 return View(model);
@@ -300,7 +301,7 @@ namespace SunwinInventory.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] =
-                    ex.Message;
+                    ex.InnerException?.Message ?? ex.Message;
             }
 
             return RedirectToAction(nameof(Index));
