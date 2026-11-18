@@ -18,7 +18,15 @@ namespace SunwinInventory.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var today = DateTime.Today;
+            var offsetMinutes = 0;
+
+            if (Request.Cookies.TryGetValue("tz_offset", out var tzValue) &&
+                int.TryParse(tzValue, out var parsedOffset))
+            {
+                offsetMinutes = Math.Clamp(parsedOffset, -840, 840);
+            }
+
+            var today = DateTime.UtcNow.AddMinutes(-offsetMinutes).Date;
             var tomorrow = today.AddDays(1);
             var monthStart = new DateTime(today.Year, today.Month, 1);
             var trendStart = today.AddDays(-6);
@@ -50,7 +58,8 @@ namespace SunwinInventory.Controllers
 
                 TotalDue = await _context.SalesInvoices
                     .Where(x => (x.DueAmount ?? 0) > 0)
-                    .SumAsync(x => x.DueAmount ?? 0),
+                    .SumAsync(x => x.DueAmount ?? 0)
+                    + await _context.Customers.SumAsync(x => x.PreviousDue),
 
                 DueInvoiceCount = await _context.SalesInvoices
                     .CountAsync(x => (x.DueAmount ?? 0) > 0),
