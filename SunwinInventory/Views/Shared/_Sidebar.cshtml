@@ -37,6 +37,7 @@
         CanView("sales-report") ||
         CanView("sales-register") ||
         CanView("stock-report") ||
+        CanView("stock-movement") ||
         CanView("fund-book");
 
     bool administrativeVisible =
@@ -329,11 +330,28 @@
 
                     <a asp-controller="StockReport"
                        asp-action="Index"
-                       class="@(controller == "StockReport" ? "active" : "")">
+                       class="@(controller == "StockReport" && (action == "Index" || action == "ExportExcel") ? "active" : "")">
 
                         <i class="bi bi-clipboard-data"></i>
 
                         <span>Stock Report</span>
+
+                    </a>
+
+                </li>
+            }
+
+            @if (CanView("stock-movement"))
+            {
+                <li>
+
+                    <a asp-controller="StockReport"
+                       asp-action="Movement"
+                       class="@(controller == "StockReport" && action == "Movement" ? "active" : "")">
+
+                        <i class="bi bi-calendar3"></i>
+
+                        <span>Stock Movement</span>
 
                     </a>
 

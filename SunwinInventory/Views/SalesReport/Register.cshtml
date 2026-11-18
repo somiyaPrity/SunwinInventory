@@ -81,10 +81,19 @@
                         </label>
 
                         <select name="customerId"
-                                class="form-select"
-                                asp-items="customers">
+                                class="form-select">
 
                             <option value="">All Clients</option>
+
+                            @foreach (var customer in customers)
+                            {
+                                <option value="@customer.Value"
+                                        selected="@(customer.Value == customerId)">
+
+                                    @customer.Text
+
+                                </option>
+                            }
 
                         </select>
 

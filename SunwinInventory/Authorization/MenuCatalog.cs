@@ -154,6 +154,11 @@ namespace SunwinInventory.Authorization
                     "StockReport",
                     new[] { "Index", "ExportExcel" }),
 
+                new("stock-movement", "Stock Movement", "REPORTS",
+                    "bi-calendar3",
+                    "StockReport",
+                    new[] { "Movement", "ExportMovementExcel" }),
+
                 new("fund-book", "Fund Book", "REPORTS",
                     "bi-journal-text",
                     "Fund",
