@@ -38,7 +38,9 @@
         CanView("sales-register") ||
         CanView("stock-report") ||
         CanView("stock-movement") ||
-        CanView("fund-book");
+        CanView("fund-book") ||
+        CanView("income-statement") ||
+        CanView("balance-sheet");
 
     bool administrativeVisible =
         CanView("designation") ||
@@ -369,6 +371,40 @@
                         <i class="bi bi-journal-text"></i>
 
                         <span>Fund Book</span>
+
+                    </a>
+
+                </li>
+            }
+
+            @if (CanView("income-statement"))
+            {
+                <li>
+
+                    <a asp-controller="FinancialReport"
+                       asp-action="IncomeStatement"
+                       class="@(controller == "FinancialReport" && action == "IncomeStatement" ? "active" : "")">
+
+                        <i class="bi bi-graph-up-arrow"></i>
+
+                        <span>Income Statement</span>
+
+                    </a>
+
+                </li>
+            }
+
+            @if (CanView("balance-sheet"))
+            {
+                <li>
+
+                    <a asp-controller="FinancialReport"
+                       asp-action="BalanceSheet"
+                       class="@(controller == "FinancialReport" && action == "BalanceSheet" ? "active" : "")">
+
+                        <i class="bi bi-bank"></i>
+
+                        <span>Balance Sheet</span>
 
                     </a>
 

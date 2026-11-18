@@ -1,0 +1,315 @@
+@model SunwinInventory.DTOs.FinancialReport.IncomeStatementDto
+
+@{
+    ViewData["Title"] = "Income Statement";
+}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+
+            <h4 class="mb-1">
+                <i class="bi bi-graph-up-arrow"></i>
+                Income Statement
+            </h4>
+
+            <small class="text-muted">
+                @Model.FromDate.ToString("dd-MMM-yyyy")
+                &ndash; @Model.ToDate.ToString("dd-MMM-yyyy")
+            </small>
+
+        </div>
+
+        <a asp-action="ExportIncomeStatementExcel"
+           asp-route-fromDate="@ViewBag.FromDate"
+           asp-route-toDate="@ViewBag.ToDate"
+           class="btn btn-success">
+
+            <i class="bi bi-file-earmark-excel"></i>
+            Export Excel
+
+        </a>
+
+    </div>
+
+    <div class="card shadow-sm mb-3">
+
+        <div class="card-body">
+
+            <form asp-action="IncomeStatement" method="get">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            From Date
+                        </label>
+
+                        <input type="date"
+                               name="fromDate"
+                               value="@ViewBag.FromDate"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            To Date
+                        </label>
+
+                        <input type="date"
+                               name="toDate"
+                               value="@ViewBag.ToDate"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+
+                            <i class="bi bi-funnel"></i>
+                            Filter
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm mb-3">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered align-middle mb-0">
+
+                    <tbody>
+
+                        <tr>
+                            <td>Sales (@Model.InvoiceCount invoices, @Model.SoldQuantity.ToString("N0") pcs)</td>
+                            <td class="text-end" style="width: 220px;">@Model.Sales.ToString("N2")</td>
+                        </tr>
+
+                        <tr>
+                            <td>Less: Discount</td>
+                            <td class="text-end">@Model.Discount.ToString("N2")</td>
+                        </tr>
+
+                        <tr class="table-light fw-bold">
+                            <td>NET SALES</td>
+                            <td class="text-end">@Model.NetSales.ToString("N2")</td>
+                        </tr>
+
+                        <tr>
+                            <td>Less: Cost of Goods Sold</td>
+                            <td class="text-end">@Model.Cogs.ToString("N2")</td>
+                        </tr>
+
+                        <tr class="table-light fw-bold">
+                            <td>GROSS PROFIT</td>
+                            <td class="text-end">@Model.GrossProfit.ToString("N2")</td>
+                        </tr>
+
+                        <tr>
+                            <td>Add: Cutting &amp; Delivery Charges</td>
+                            <td class="text-end">@Model.CuttingDelivery.ToString("N2")</td>
+                        </tr>
+
+                        <tr>
+                            <td>Add: Other Income</td>
+                            <td class="text-end">@Model.OtherIncome.ToString("N2")</td>
+                        </tr>
+
+                        <tr>
+                            <td>Less: Operating Expenses</td>
+                            <td class="text-end">@Model.OperatingExpenses.ToString("N2")</td>
+                        </tr>
+
+                        <tr>
+                            <td>Less: Other Expenses</td>
+                            <td class="text-end">@Model.OtherExpenses.ToString("N2")</td>
+                        </tr>
+
+                        <tr class="fw-bold @(Model.NetProfit >= 0 ? "table-success" : "table-danger")">
+                            <td>NET PROFIT</td>
+                            <td class="text-end">@Model.NetProfit.ToString("N2")</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <small class="text-muted d-block mt-2">
+                VAT collected: @Model.Vat.ToString("N2") &middot;
+                AIT collected: @Model.Ait.ToString("N2")
+                (taxes payable, not income).
+                COGS uses landed purchase cost per PCS including TAX;
+                purchase payments in the Fund Book are not expensed again.
+            </small>
+
+            @if (Model.CostlessLineCount > 0)
+            {
+                <div class="alert alert-warning mt-2 mb-0 py-2">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    @Model.CostlessLineCount sold line(s) have no purchase cost recorded &mdash;
+                    their COGS is counted as 0.
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+    <div class="row g-3">
+
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header fw-bold">
+                    Other Income &amp; Expenses Detail
+                </div>
+
+                <div class="card-body">
+
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered table-striped table-hover align-middle mb-0">
+
+                            <thead class="table-dark">
+
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Head</th>
+                                    <th>Details</th>
+                                    <th>Account</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var row in Model.FundRows)
+                                {
+                                    <tr>
+                                        <td class="text-nowrap">@row.EntryDate.ToString("dd-MMM-yyyy")</td>
+                                        <td class="text-nowrap">@row.Head</td>
+                                        <td>@row.Details</td>
+                                        <td>@row.Account</td>
+                                        <td class="text-end @(row.Head == "Other Income" ? "text-success" : "text-danger")">
+                                            @row.Amount.ToString("N2")
+                                        </td>
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    @if (!Model.FundRows.Any())
+                    {
+                        <div class="text-center text-muted py-3">
+                            No other income or expense entries in this period.
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header fw-bold">
+                    Cost of Goods Sold By Product
+                </div>
+
+                <div class="card-body">
+
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered table-striped table-hover align-middle mb-0">
+
+                            <thead class="table-dark">
+
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-end">Quantity</th>
+                                    <th class="text-end">Weight (KG)</th>
+                                    <th class="text-end">Sales</th>
+                                    <th class="text-end">COGS</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var row in Model.CogsByProduct)
+                                {
+                                    <tr>
+                                        <td class="fw-bold text-nowrap">@row.ProductName</td>
+                                        <td class="text-end">@row.Quantity.ToString("N0")</td>
+                                        <td class="text-end">@row.WeightKg.ToString("N2")</td>
+                                        <td class="text-end">@row.SalesAmount.ToString("N2")</td>
+                                        <td class="text-end">@row.Cogs.ToString("N2")</td>
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                            @if (Model.CogsByProduct.Any())
+                            {
+                                <tfoot class="table-light fw-bold">
+
+                                    <tr>
+                                        <td class="text-end">TOTAL:</td>
+                                        <td class="text-end">@Model.SoldQuantity.ToString("N0")</td>
+                                        <td class="text-end">@Model.CogsByProduct.Sum(x => x.WeightKg).ToString("N2")</td>
+                                        <td class="text-end">@Model.Sales.ToString("N2")</td>
+                                        <td class="text-end">@Model.Cogs.ToString("N2")</td>
+                                    </tr>
+
+                                </tfoot>
+                            }
+
+                        </table>
+
+                    </div>
+
+                    @if (!Model.CogsByProduct.Any())
+                    {
+                        <div class="text-center text-muted py-3">
+                            No sales in this period.
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

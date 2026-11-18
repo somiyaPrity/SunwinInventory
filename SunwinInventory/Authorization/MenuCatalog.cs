@@ -171,6 +171,16 @@ namespace SunwinInventory.Authorization
                     new[] { "Create" },
                     new[] { "Edit", "SaveOpeningBalances" }),
 
+                new("income-statement", "Income Statement", "REPORTS",
+                    "bi-graph-up-arrow",
+                    "FinancialReport",
+                    new[] { "IncomeStatement", "ExportIncomeStatementExcel" }),
+
+                new("balance-sheet", "Balance Sheet", "REPORTS",
+                    "bi-bank",
+                    "FinancialReport",
+                    new[] { "BalanceSheet", "ExportBalanceSheetExcel" }),
+
                 new("designation", "Designation", "Administrative",
                     "bi-person-badge",
                     "Designation",

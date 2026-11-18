@@ -1,0 +1,189 @@
+@model SunwinInventory.DTOs.FinancialReport.BalanceSheetDto
+
+@{
+    ViewData["Title"] = "Balance Sheet";
+}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+
+            <h4 class="mb-1">
+                <i class="bi bi-bank"></i>
+                Balance Sheet
+            </h4>
+
+            <small class="text-muted">
+                As on @Model.AsOfDate.ToString("dd-MMM-yyyy")
+            </small>
+
+        </div>
+
+        <a asp-action="ExportBalanceSheetExcel"
+           asp-route-asOfDate="@ViewBag.AsOfDate"
+           class="btn btn-success">
+
+            <i class="bi bi-file-earmark-excel"></i>
+            Export Excel
+
+        </a>
+
+    </div>
+
+    <div class="card shadow-sm mb-3">
+
+        <div class="card-body">
+
+            <form asp-action="BalanceSheet" method="get">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            As Of Date
+                        </label>
+
+                        <input type="date"
+                               name="asOfDate"
+                               value="@ViewBag.AsOfDate"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+
+                            <i class="bi bi-funnel"></i>
+                            Filter
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered align-middle mb-0">
+
+                    <tbody>
+
+                        <tr class="table-dark">
+                            <th colspan="2">ASSETS</th>
+                        </tr>
+
+                        <tr>
+                            <td>Stock in Trade (at landed cost)</td>
+                            <td class="text-end" style="width: 220px;">@Model.StockValue.ToString("N2")</td>
+                        </tr>
+
+                        <tr>
+                            <td>Accounts Receivable</td>
+                            <td class="text-end">@Model.Receivables.ToString("N2")</td>
+                        </tr>
+
+                        <tr>
+                            <td>Cash in Hand</td>
+                            <td class="text-end">@Model.Cash.ToString("N2")</td>
+                        </tr>
+
+                        <tr>
+                            <td>Bank Balance</td>
+                            <td class="text-end">@Model.Bank.ToString("N2")</td>
+                        </tr>
+
+                        <tr>
+                            <td>Wallet Balance (Bkash/Nagad/Tap/Roket)</td>
+                            <td class="text-end">@Model.Wallet.ToString("N2")</td>
+                        </tr>
+
+                        <tr class="table-light fw-bold">
+                            <td>TOTAL ASSETS</td>
+                            <td class="text-end">@Model.TotalAssets.ToString("N2")</td>
+                        </tr>
+
+                        <tr class="table-dark">
+                            <th colspan="2">LIABILITIES</th>
+                        </tr>
+
+                        <tr>
+                            <td>VAT &amp; AIT Payable</td>
+                            <td class="text-end">@Model.VatAitPayable.ToString("N2")</td>
+                        </tr>
+
+                        <tr>
+                            <td>Accounts Payable (not tracked)</td>
+                            <td class="text-end">0.00</td>
+                        </tr>
+
+                        <tr class="table-light fw-bold">
+                            <td>TOTAL LIABILITIES</td>
+                            <td class="text-end">@Model.TotalLiabilities.ToString("N2")</td>
+                        </tr>
+
+                        <tr class="table-dark">
+                            <th colspan="2">EQUITY</th>
+                        </tr>
+
+                        <tr>
+                            <td>Retained Earnings (cumulative)</td>
+                            <td class="text-end @(Model.RetainedEarnings < 0 ? "text-danger" : "")">
+                                @Model.RetainedEarnings.ToString("N2")
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Opening Capital &amp; Unrecorded Financing (balancing figure)</td>
+                            <td class="text-end">@Model.BalancingFigure.ToString("N2")</td>
+                        </tr>
+
+                        <tr class="table-light fw-bold">
+                            <td>TOTAL EQUITY</td>
+                            <td class="text-end">@Model.TotalEquity.ToString("N2")</td>
+                        </tr>
+
+                        <tr class="table-success fw-bold">
+                            <td>TOTAL LIABILITIES &amp; EQUITY</td>
+                            <td class="text-end">@Model.TotalLiabilitiesAndEquity.ToString("N2")</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <small class="text-muted d-block mt-2">
+                Stock: @Model.StockQuantity.ToString("N0") pcs at landed purchase cost.
+                Receivables: @Model.DueCustomerCount customer(s) with due.
+                Cash/Bank/Wallet match the Fund Book closing balances on this date
+                (books start @Model.OpeningDate.ToString("dd-MMM-yyyy")).
+            </small>
+
+            <div class="alert alert-info mt-2 mb-0 py-2">
+                <i class="bi bi-info-circle"></i>
+                Supplier payables and opening capital are not recorded in the system yet,
+                so the balancing figure absorbs opening capital and unrecorded purchase
+                financing. VAT &amp; AIT are shown as payable until tax payments are tracked.
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
