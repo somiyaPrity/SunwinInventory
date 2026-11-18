@@ -145,6 +145,18 @@ namespace SunwinInventory.Authorization
                     "StockReport",
                     new[] { "Index", "ExportExcel" }),
 
+                new("fund-book", "Fund Book", "REPORTS",
+                    "bi-journal-text",
+                    "Fund",
+                    new[]
+                    {
+                        "Index", "Create", "Edit", "Delete",
+                        "ExportExcel", "OpeningBalances",
+                        "SaveOpeningBalances"
+                    },
+                    new[] { "Create" },
+                    new[] { "Edit", "SaveOpeningBalances" }),
+
                 new("designation", "Designation", "Administrative",
                     "bi-person-badge",
                     "Designation",

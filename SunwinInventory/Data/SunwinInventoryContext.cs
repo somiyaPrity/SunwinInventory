@@ -24,6 +24,10 @@ public partial class SunwinInventoryContext : DbContext
 
     public virtual DbSet<Designation> Designations { get; set; }
 
+    public virtual DbSet<FundEntry> FundEntries { get; set; }
+
+    public virtual DbSet<FundOpeningBalance> FundOpeningBalances { get; set; }
+
     public virtual DbSet<ProductCategory> ProductCategories { get; set; }
 
     public virtual DbSet<ProductName> ProductNames { get; set; }

@@ -35,7 +35,8 @@
     bool reportsVisible =
         CanView("purchase-report") ||
         CanView("sales-report") ||
-        CanView("stock-report");
+        CanView("stock-report") ||
+        CanView("fund-book");
 
     bool administrativeVisible =
         CanView("designation") ||
@@ -317,6 +318,23 @@
                         <i class="bi bi-clipboard-data"></i>
 
                         <span>Stock Report</span>
+
+                    </a>
+
+                </li>
+            }
+
+            @if (CanView("fund-book"))
+            {
+                <li>
+
+                    <a asp-controller="Fund"
+                       asp-action="Index"
+                       class="@(controller == "Fund" ? "active" : "")">
+
+                        <i class="bi bi-journal-text"></i>
+
+                        <span>Fund Book</span>
 
                     </a>
 

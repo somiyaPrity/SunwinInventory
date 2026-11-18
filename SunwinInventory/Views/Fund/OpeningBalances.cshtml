@@ -1,0 +1,102 @@
+@model List<SunwinInventory.DTOs.Fund.FundOpeningBalanceDto>
+
+@{
+    ViewData["Title"] = "Opening Balances";
+}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+            <h4>
+                <i class="bi bi-sliders"></i>
+                Opening Balances
+            </h4>
+
+            <small class="text-muted">
+                Starting cash, bank and wallet positions for the fund book
+            </small>
+        </div>
+
+        <a asp-action="Index"
+           class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i>
+            Back to Fund Book
+        </a>
+
+    </div>
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <form asp-action="SaveOpeningBalances" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered align-middle">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>Account</th>
+                                <th>Opening Date</th>
+                                <th style="width:250px;">Amount (TK)</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @for (var i = 0; i < Model.Count; i++)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @Model[i].Account
+                                        <input type="hidden"
+                                               name="[@i].FundOpeningBalanceId"
+                                               value="@Model[i].FundOpeningBalanceId" />
+                                        <input type="hidden"
+                                               name="[@i].Account"
+                                               value="@Model[i].Account" />
+                                        <input type="hidden"
+                                               name="[@i].OpeningDate"
+                                               value="@Model[i].OpeningDate.ToString("yyyy-MM-dd")" />
+                                    </td>
+
+                                    <td>
+                                        @Model[i].OpeningDate.ToString("dd-MMM-yyyy")
+                                    </td>
+
+                                    <td>
+                                        <input type="number"
+                                               step="0.01"
+                                               name="[@i].Amount"
+                                               value="@Model[i].Amount"
+                                               class="form-control" />
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    <i class="bi bi-check-circle"></i>
+                    Save Opening Balances
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

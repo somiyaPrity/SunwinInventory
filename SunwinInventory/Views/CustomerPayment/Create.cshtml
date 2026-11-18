@@ -340,6 +340,10 @@
                                 Roket
                             </option>
 
+                            <option value="Product Exchange">
+                                Product Exchange
+                            </option>
+
                         </select>
 
                     </div>
@@ -613,18 +617,20 @@
 
 
             //==================================================
-            // BANK FIELDS (not required for Cash)
+            // BANK FIELDS (only for Bank / Cheque)
             //==================================================
 
             function toggleBankFields() {
 
-                var isCash =
-                    $("#PaymentMethod").val() === "Cash";
+                var method = $("#PaymentMethod").val();
+
+                var isBank =
+                    method === "Bank" || method === "Cheque";
 
                 $("#bankNameField, #transactionCodeField")
-                    .toggle(!isCash);
+                    .toggle(isBank);
 
-                if (isCash) {
+                if (!isBank) {
 
                     $("#bankName, #transactionCode")
                         .val("")

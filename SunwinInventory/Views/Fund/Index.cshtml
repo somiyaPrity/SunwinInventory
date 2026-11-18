@@ -1,0 +1,292 @@
+@model SunwinInventory.DTOs.Fund.FundBookDto
+
+@{
+    ViewData["Title"] = "Fund Book";
+
+    var fromDate = (DateTime)ViewBag.FromDate;
+    var toDate = (DateTime)ViewBag.ToDate;
+}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+            <h4>
+                <i class="bi bi-journal-text"></i>
+                Fund Book
+            </h4>
+
+            <small class="text-muted">
+                Cash, bank and wallet movements with running balance
+            </small>
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <a asp-action="OpeningBalances"
+               class="btn btn-outline-secondary">
+                <i class="bi bi-sliders"></i>
+                Opening Balances
+            </a>
+
+            <a asp-action="ExportExcel"
+               asp-route-fromDate="@fromDate.ToString("yyyy-MM-dd")"
+               asp-route-toDate="@toDate.ToString("yyyy-MM-dd")"
+               class="btn btn-success">
+                <i class="bi bi-file-earmark-excel"></i>
+                Export Excel
+            </a>
+
+            <a asp-action="Create"
+               class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i>
+                New Entry
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- FILTERS -->
+
+    <div class="card shadow-sm mb-3">
+
+        <div class="card-body">
+
+            <form asp-action="Index" method="get">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-3">
+                        <label class="form-label">From Date</label>
+                        <input type="date"
+                               name="fromDate"
+                               value="@fromDate.ToString("yyyy-MM-dd")"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">To Date</label>
+                        <input type="date"
+                               name="toDate"
+                               value="@toDate.ToString("yyyy-MM-dd")"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+                            <i class="bi bi-funnel"></i>
+                            Apply Filter
+                        </button>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- OPENING SUMMARY -->
+
+    <div class="row g-3 mb-3">
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body py-2">
+                    <small class="text-muted">
+                        Opening Cash (@Model.OpeningDate.ToString("dd-MMM-yyyy"))
+                    </small>
+                    <div class="fw-bold">@Model.OpeningCash.ToString("N2")</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body py-2">
+                    <small class="text-muted">Opening Bank</small>
+                    <div class="fw-bold">@Model.OpeningBank.ToString("N2")</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body py-2">
+                    <small class="text-muted">Opening Wallet (bKash/Nagad/Tap/Roket)</small>
+                    <div class="fw-bold">@Model.OpeningWallet.ToString("N2")</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BOOK TABLE -->
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-sm align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th rowspan="2" class="align-middle">Date</th>
+                            <th rowspan="2" class="align-middle">Details</th>
+                            <th colspan="4" class="text-center">Income</th>
+                            <th rowspan="2" class="align-middle text-end">Bank Deposit</th>
+                            <th rowspan="2" class="align-middle text-end">Cost of Purchase</th>
+                            <th rowspan="2" class="align-middle text-end">Expense</th>
+                            <th colspan="3" class="text-center">Balance</th>
+                            <th rowspan="2" class="align-middle text-center"></th>
+                        </tr>
+
+                        <tr>
+                            <th class="text-end">Cash</th>
+                            <th class="text-end">Bank</th>
+                            <th class="text-end">Wallet</th>
+                            <th class="text-end">Exchange</th>
+                            <th class="text-end">Cash</th>
+                            <th class="text-end">Bank</th>
+                            <th class="text-end">Wallet</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model.Rows.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="13"
+                                    class="text-center text-muted py-4">
+                                    No fund movements found for the selected period.
+                                </td>
+                            </tr>
+                        }
+
+                        @foreach (var row in Model.Rows)
+                        {
+                            <tr>
+
+                                <td class="text-nowrap">
+                                    @row.Date.ToString("dd-MMM-yyyy")
+                                </td>
+
+                                <td>@row.Details</td>
+
+                                <td class="text-end">
+                                    @(row.CashIncome > 0 ? row.CashIncome.ToString("N2") : "")
+                                </td>
+
+                                <td class="text-end">
+                                    @(row.BankIncome > 0 ? row.BankIncome.ToString("N2") : "")
+                                </td>
+
+                                <td class="text-end">
+                                    @(row.WalletIncome > 0 ? row.WalletIncome.ToString("N2") : "")
+                                </td>
+
+                                <td class="text-end">
+                                    @(row.ExchangeAmount > 0 ? row.ExchangeAmount.ToString("N2") : "")
+                                </td>
+
+                                <td class="text-end">
+                                    @(row.BankDeposit > 0 ? row.BankDeposit.ToString("N2") : "")
+                                </td>
+
+                                <td class="text-end">
+                                    @(row.PurchaseCost > 0 ? row.PurchaseCost.ToString("N2") : "")
+                                </td>
+
+                                <td class="text-end">
+                                    @(row.Expense > 0 ? row.Expense.ToString("N2") : "")
+                                </td>
+
+                                <td class="text-end fw-bold">
+                                    @row.CashBalance.ToString("N2")
+                                </td>
+
+                                <td class="text-end fw-bold">
+                                    @row.BankBalance.ToString("N2")
+                                </td>
+
+                                <td class="text-end fw-bold">
+                                    @row.WalletBalance.ToString("N2")
+                                </td>
+
+                                <td class="text-center text-nowrap">
+
+                                    @if (row.FundEntryId.HasValue)
+                                    {
+                                        <a asp-action="Edit"
+                                           asp-route-id="@row.FundEntryId"
+                                           class="btn btn-outline-primary btn-sm py-0"
+                                           title="Edit entry">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+
+                                        <form asp-action="Delete"
+                                              asp-route-id="@row.FundEntryId"
+                                              method="post"
+                                              class="d-inline"
+                                              onsubmit="return confirm('Delete this fund entry?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit"
+                                                    class="btn btn-outline-danger btn-sm py-0"
+                                                    title="Delete entry">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    }
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                    <tfoot class="table-light fw-bold">
+
+                        <tr>
+                            <td colspan="2" class="text-end">TOTAL</td>
+
+                            <td class="text-end">@Model.TotalCashIncome.ToString("N2")</td>
+                            <td class="text-end">@Model.TotalBankIncome.ToString("N2")</td>
+                            <td class="text-end">@Model.TotalWalletIncome.ToString("N2")</td>
+                            <td class="text-end">@Model.TotalExchange.ToString("N2")</td>
+                            <td class="text-end">@Model.TotalBankDeposit.ToString("N2")</td>
+                            <td class="text-end">@Model.TotalPurchaseCost.ToString("N2")</td>
+                            <td class="text-end">@Model.TotalExpense.ToString("N2")</td>
+
+                            <td class="text-end">@Model.ClosingCash.ToString("N2")</td>
+                            <td class="text-end">@Model.ClosingBank.ToString("N2")</td>
+                            <td class="text-end">@Model.ClosingWallet.ToString("N2")</td>
+
+                            <td></td>
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+            <small class="text-muted">
+                Product Exchange is shown for reference only and does not affect cash, bank or wallet balances.
+                Balance columns show the closing position after each movement.
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
