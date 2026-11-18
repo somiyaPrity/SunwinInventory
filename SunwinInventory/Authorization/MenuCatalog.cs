@@ -135,6 +135,28 @@ namespace SunwinInventory.Authorization
                     },
                     new[] { "Create" }),
 
+                new("fund-book", "Fund Book", "Accounts",
+                    "bi-journal-text",
+                    "Fund",
+                    new[]
+                    {
+                        "Index", "Create", "Edit", "Delete",
+                        "ExportExcel", "OpeningBalances",
+                        "SaveOpeningBalances"
+                    },
+                    new[] { "Create" },
+                    new[] { "Edit", "SaveOpeningBalances" }),
+
+                new("income-statement", "Income Statement", "Accounts",
+                    "bi-graph-up-arrow",
+                    "FinancialReport",
+                    new[] { "IncomeStatement", "ExportIncomeStatementExcel" }),
+
+                new("balance-sheet", "Balance Sheet", "Accounts",
+                    "bi-bank",
+                    "FinancialReport",
+                    new[] { "BalanceSheet", "ExportBalanceSheetExcel" }),
+
                 new("purchase-report", "Purchase Report", "REPORTS",
                     "bi-receipt",
                     "ProductPurchaseDetail",
@@ -158,28 +180,6 @@ namespace SunwinInventory.Authorization
                     "bi-calendar3",
                     "StockReport",
                     new[] { "Movement", "ExportMovementExcel" }),
-
-                new("fund-book", "Fund Book", "REPORTS",
-                    "bi-journal-text",
-                    "Fund",
-                    new[]
-                    {
-                        "Index", "Create", "Edit", "Delete",
-                        "ExportExcel", "OpeningBalances",
-                        "SaveOpeningBalances"
-                    },
-                    new[] { "Create" },
-                    new[] { "Edit", "SaveOpeningBalances" }),
-
-                new("income-statement", "Income Statement", "REPORTS",
-                    "bi-graph-up-arrow",
-                    "FinancialReport",
-                    new[] { "IncomeStatement", "ExportIncomeStatementExcel" }),
-
-                new("balance-sheet", "Balance Sheet", "REPORTS",
-                    "bi-bank",
-                    "FinancialReport",
-                    new[] { "BalanceSheet", "ExportBalanceSheetExcel" }),
 
                 new("designation", "Designation", "Administrative",
                     "bi-person-badge",
@@ -205,7 +205,7 @@ namespace SunwinInventory.Authorization
             };
 
         public static IEnumerable<string> GroupOrder =>
-            new[] { "MASTER SETUP", "Sale", "REPORTS", "Administrative" };
+            new[] { "MASTER SETUP", "Sale", "Accounts", "REPORTS", "Administrative" };
 
         public static MenuDefinition? Find(string key)
         {
