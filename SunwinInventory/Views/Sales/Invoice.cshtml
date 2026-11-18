@@ -1,0 +1,371 @@
+@model SunwinInventory.Models.SalesInvoice
+
+@{
+    ViewData["Title"] = "Sales Invoice";
+
+    var customer = ViewBag.Customer as SunwinInventory.Models.Customer;
+    var warehouse = ViewBag.Warehouse as SunwinInventory.Models.Warehouse;
+
+    var details = ViewBag.Details as System.Collections.IEnumerable
+        ?? Enumerable.Empty<object>();
+}
+
+<style>
+    @@media print {
+        .sidebar, .topbar, #loader, .invoice-actions {
+            display: none !important;
+        }
+
+        .main-content {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .invoice-card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+    }
+</style>
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-3 invoice-actions">
+
+        <div>
+            <h4>
+                <i class="bi bi-receipt"></i>
+                Sales Invoice
+            </h4>
+
+            <small class="text-muted">
+                @Model.InvoiceNo
+            </small>
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <a asp-action="Index"
+               class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i>
+                Back to List
+            </a>
+
+            <a asp-action="DownloadInvoicePdf"
+               asp-route-id="@Model.SalesInvoiceId"
+               target="_blank"
+               class="btn btn-danger">
+                <i class="bi bi-file-earmark-pdf"></i>
+                Download PDF
+            </a>
+
+            <button type="button"
+                    class="btn btn-primary"
+                    onclick="window.print()">
+                <i class="bi bi-printer"></i>
+                Print
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm invoice-card">
+
+        <div class="card-body p-4">
+
+            <!-- HEADER -->
+
+            <div class="text-center mb-3">
+
+                <img src="~/images/sunwin-logo.png"
+                     alt="Sunwin"
+                     style="max-height:60px;"
+                     class="mb-2" />
+
+                <h5 class="fw-bold mb-0">SALES INVOICE</h5>
+
+            </div>
+
+            <div class="row mb-4">
+
+                <div class="col-sm-6">
+
+                    <div>
+                        <strong>Invoice No:</strong>
+                        @Model.InvoiceNo
+                    </div>
+
+                    <div>
+                        <strong>Invoice Date:</strong>
+                        @Model.InvoiceDate.ToString("dd-MMM-yyyy")
+                    </div>
+
+                    @if (warehouse != null)
+                    {
+                        <div>
+                            <strong>Warehouse:</strong>
+                            @warehouse.WarehouseName
+                        </div>
+                    }
+
+                </div>
+
+                <div class="col-sm-6 text-sm-end">
+
+                    @if (customer != null)
+                    {
+                        <div>
+                            <strong>Customer:</strong>
+                            @customer.CustomerName
+                        </div>
+
+                        if (!string.IsNullOrWhiteSpace(customer.CustomerCode))
+                        {
+                            <div>
+                                <strong>Customer Code:</strong>
+                                @customer.CustomerCode
+                            </div>
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(customer.Mobile))
+                        {
+                            <div>
+                                <strong>Mobile:</strong>
+                                @customer.Mobile
+                            </div>
+                        }
+                    }
+
+                </div>
+
+            </div>
+
+            <!-- ITEMS -->
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th class="text-center" style="width:60px;">Sl No.</th>
+                            <th>Description of goods</th>
+                            <th class="text-center" style="width:100px;">Quantity</th>
+                            <th class="text-end" style="width:120px;">Rate</th>
+                            <th class="text-end" style="width:130px;">Amount</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @{
+                            int sl = 1;
+                        }
+
+                        @foreach (dynamic item in details)
+                        {
+                            <tr>
+
+                                <td class="text-center">@sl</td>
+
+                                <td>
+
+                                    <div class="fw-bold">@item.ProductName</div>
+
+                                    @if (!string.IsNullOrWhiteSpace((string)item.ColorName))
+                                    {
+                                        <small class="text-muted d-block">
+                                            Color: @item.ColorName
+                                        </small>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace((string)item.ProductSize))
+                                    {
+                                        <small class="text-muted d-block">
+                                            Size: @item.ProductSize
+                                        </small>
+                                    }
+
+                                    @if (item.Thickness != null)
+                                    {
+                                        <small class="text-muted d-block">
+                                            Thickness: @(((decimal?)item.Thickness)?.ToString("0.##"))
+                                        </small>
+                                    }
+
+                                </td>
+
+                                <td class="text-center">
+                                    @(((int?)item.Quantity ?? 0).ToString("0.##"))
+                                </td>
+
+                                <td class="text-end">
+                                    @(((decimal?)item.UnitPrice ?? 0).ToString("N2"))
+                                </td>
+
+                                <td class="text-end">
+                                    @(((decimal?)item.LineTotal ?? 0).ToString("N2"))
+                                </td>
+
+                            </tr>
+
+                            sl++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- TOTALS -->
+
+            <div class="row justify-content-end mt-3">
+
+                <div class="col-md-5 col-lg-4">
+
+                    <table class="table table-sm mb-0">
+
+                        <tbody>
+
+                            <tr>
+                                <td class="text-end border-0">Total Amount</td>
+                                <td class="text-end border-0" style="width:130px;">
+                                    @((Model.TotalAmount ?? 0).ToString("N2"))
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="text-end border-0">Cutting Charge</td>
+                                <td class="text-end border-0">
+                                    @Model.CuttingCharge.ToString("N2")
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="text-end border-0">Delivery Charge</td>
+                                <td class="text-end border-0">
+                                    @Model.DeliveryCharge.ToString("N2")
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="text-end border-0">Discount</td>
+                                <td class="text-end border-0">
+                                    @((Model.Discount ?? 0).ToString("N2"))
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="text-end border-0">VAT</td>
+                                <td class="text-end border-0">
+                                    @((Model.Vat ?? 0).ToString("N2"))
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="text-end border-0">AIT</td>
+                                <td class="text-end border-0">
+                                    @((Model.Ait ?? 0).ToString("N2"))
+                                </td>
+                            </tr>
+
+                            <tr class="border-top">
+                                <td class="text-end fw-bold">Grand Total</td>
+                                <td class="text-end fw-bold">
+                                    @((Model.TotalAmount ?? 0).ToString("N2"))
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="text-end border-0">Paid Amount</td>
+                                <td class="text-end border-0">
+                                    @((Model.PaidAmount ?? 0).ToString("N2"))
+                                </td>
+                            </tr>
+
+                            <tr class="border-top">
+                                <td class="text-end fw-bold">Due Amount</td>
+                                <td class="text-end fw-bold">
+                                    @((Model.DueAmount ?? 0).ToString("N2"))
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            <!-- PAYMENT INFO -->
+
+            <div class="mt-3">
+
+                @if (!string.IsNullOrWhiteSpace(Model.ReceiveMethod))
+                {
+                    <div>
+                        <strong>Receive Method:</strong>
+                        @Model.ReceiveMethod
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.BankName))
+                {
+                    <div>
+                        <strong>Bank Name:</strong>
+                        @Model.BankName
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.TransectionCode))
+                {
+                    <div>
+                        <strong>Transaction Code:</strong>
+                        @Model.TransectionCode
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.Remarks))
+                {
+                    <div>
+                        <strong>Remarks:</strong>
+                        @Model.Remarks
+                    </div>
+                }
+
+            </div>
+
+            <!-- SIGNATURES -->
+
+            <div class="row mt-5 pt-4">
+
+                <div class="col-6 text-center">
+                    <div class="border-top border-dark mx-auto pt-2"
+                         style="max-width:200px;">
+                        Customer Signature
+                    </div>
+                </div>
+
+                <div class="col-6 text-center">
+                    <div class="border-top border-dark mx-auto pt-2"
+                         style="max-width:200px;">
+                        Authorized Signature
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="text-center text-muted small mt-4">
+                This is a computer generated invoice.
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
