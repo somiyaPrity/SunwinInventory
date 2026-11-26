@@ -8,10 +8,14 @@ namespace SunwinInventory.Services
     public class AccountService : IAccountService
     {
         private readonly IAccountRepository _repository;
+        private readonly IRoleRepository _roleRepository;
 
-        public AccountService(IAccountRepository repository)
+        public AccountService(
+            IAccountRepository repository,
+            IRoleRepository roleRepository)
         {
             _repository = repository;
+            _roleRepository = roleRepository;
         }
 
         public async Task<User?> LoginAsync(LoginDto dto)
@@ -25,6 +29,11 @@ namespace SunwinInventory.Services
                 return null;
 
             if (user.IsLocked)
+                return null;
+
+            var role = await _roleRepository.GetByIdAsync(user.RoleId);
+
+            if (role == null || !role.IsActive)
                 return null;
 
             if (user.Password != dto.Password)

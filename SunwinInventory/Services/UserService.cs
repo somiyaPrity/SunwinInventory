@@ -1,4 +1,5 @@
-﻿using SunwinInventory.DTOs.User;
+﻿using Microsoft.AspNetCore.Http;
+using SunwinInventory.DTOs.User;
 using SunwinInventory.Models;
 using SunwinInventory.Repositories.Interfaces;
 using SunwinInventory.Services.Interfaces;
@@ -11,18 +12,25 @@ namespace SunwinInventory.Services
         private readonly IRoleRepository _roleRepository;
         private readonly IDesignationRepository _designationRepository;
         private readonly IWarehouseRepository _warehouseRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public UserService(
             IUserRepository userRepository,
             IRoleRepository roleRepository,
             IDesignationRepository designationRepository,
-            IWarehouseRepository warehouseRepository)
+            IWarehouseRepository warehouseRepository,
+            IHttpContextAccessor httpContextAccessor)
         {
             _userRepository = userRepository;
             _roleRepository = roleRepository;
             _designationRepository = designationRepository;
             _warehouseRepository = warehouseRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
+
+        private string CurrentUserName =>
+            _httpContextAccessor.HttpContext?
+                .Session.GetString("UserName") ?? "System";
 
         public async Task<List<UserDto>> GetAllAsync()
         {
@@ -36,7 +44,6 @@ namespace SunwinInventory.Services
                 UserId = x.UserId,
                 FullName = x.FullName,
                 UserName = x.UserName,
-                Password = x.Password,
                 Email = x.Email,
                 Phone = x.Phone,
                 RoleId = x.RoleId,
@@ -68,7 +75,6 @@ namespace SunwinInventory.Services
                 UserId = x.UserId,
                 FullName = x.FullName,
                 UserName = x.UserName,
-                Password = x.Password,
                 Email = x.Email,
                 Phone = x.Phone,
                 RoleId = x.RoleId,
@@ -91,7 +97,7 @@ namespace SunwinInventory.Services
                 DesignationId = dto.DesignationId,
                 WarehouseId = dto.WarehouseId,
                 IsActive = dto.IsActive,
-                CreatedBy = "Admin",
+                CreatedBy = CurrentUserName,
                 CreatedDate = DateTime.Now
             };
 
@@ -107,14 +113,19 @@ namespace SunwinInventory.Services
 
             user.FullName = dto.FullName;
             user.UserName = dto.UserName;
-            user.Password = dto.Password;
+
+            if (!string.IsNullOrWhiteSpace(dto.Password))
+            {
+                user.Password = dto.Password;
+            }
+
             user.Email = dto.Email;
             user.Phone = dto.Phone;
             user.RoleId = dto.RoleId;
             user.DesignationId = dto.DesignationId;
             user.WarehouseId = dto.WarehouseId;
             user.IsActive = dto.IsActive;
-            user.UpdatedBy = "Admin";
+            user.UpdatedBy = CurrentUserName;
             user.UpdatedDate = DateTime.Now;
 
             await _userRepository.UpdateAsync(user);

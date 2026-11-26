@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<SunwinInventory.DTOs.CustomerPayment.CustomerDueDto>
 
 @{
-    ViewData["Title"] = "Customer Due Statement";
+    ViewData["Title"] = "Receivables";
 }
 
 <div class="container-fluid">
@@ -10,14 +10,24 @@
 
         <h4>
             <i class="bi bi-hourglass-split me-2"></i>
-            Customer Due Statement
+            Receivables
         </h4>
 
-        <div>
+        <div class="d-flex align-items-center gap-3">
+
             <span class="badge bg-danger fs-6">
                 Customers With Due:
                 @Model.Count()
             </span>
+
+            <a asp-action="ExportReceivables"
+               class="btn btn-success">
+
+                <i class="bi bi-file-earmark-excel"></i>
+                Export Excel
+
+            </a>
+
         </div>
 
     </div>
@@ -85,7 +95,12 @@
                                 </td>
 
                                 <td class="fw-bold">
-                                    @item.CustomerName
+                                    <a asp-action="CustomerLedger"
+                                       asp-route-customerId="@item.CustomerId"
+                                       class="text-decoration-none"
+                                       title="Open client ledger">
+                                        @item.CustomerName
+                                    </a>
                                 </td>
 
                                 <td>
@@ -117,6 +132,15 @@
                                 </td>
 
                                 <td>
+
+                                    <a asp-action="CustomerLedger"
+                                       asp-route-customerId="@item.CustomerId"
+                                       class="btn btn-primary btn-sm"
+                                       title="Client Ledger">
+
+                                        <i class="bi bi-journal-text"></i>
+
+                                    </a>
 
                                     <a asp-action="CustomerPayments"
                                        asp-route-customerId="@item.CustomerId"
@@ -174,6 +198,8 @@
 
                             <th></th>
 
+                            <th></th>
+
                         </tr>
 
                     </tfoot>
@@ -205,6 +231,14 @@
                 ordering: true,
 
                 searching: true,
+
+                language: {
+
+                    emptyTable: "No customers with due balance.",
+
+                    zeroRecords: "No matching customers found."
+
+                },
 
                 columnDefs: [
                     {

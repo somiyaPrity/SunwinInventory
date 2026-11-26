@@ -117,6 +117,10 @@
 
     <script>
 
+        document.cookie =
+            "tz_offset=" + new Date().getTimezoneOffset() +
+            "; path=/; max-age=31536000; SameSite=Lax";
+
         $.ajaxSetup({
             cache: false
         });

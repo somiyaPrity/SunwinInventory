@@ -1,0 +1,488 @@
+@model IEnumerable<SunwinInventory.DTOs.Sales.InvoiceListDto>
+
+@{
+    ViewData["Title"] = "Invoice Print";
+
+    var customers = ViewBag.Customers as List<SelectListItem>
+        ?? new List<SelectListItem>();
+}
+
+<div class="container-fluid">
+
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+
+            <h4>
+                <i class="bi bi-printer"></i>
+                Invoice List
+            </h4>
+
+            <small class="text-muted">
+                Print and download sales invoices
+            </small>
+
+        </div>
+
+        <a asp-action="Create"
+           class="btn btn-primary">
+
+            <i class="bi bi-plus-circle"></i>
+            New Sale
+
+        </a>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- FILTERS -->
+    <!-- ===================================================== -->
+
+    <div class="card shadow-sm mb-3">
+
+        <div class="card-body">
+
+            <form asp-action="Index"
+                  method="get">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            Invoice No
+                        </label>
+
+                        <input type="text"
+                               name="invoiceNo"
+                               value="@ViewBag.InvoiceNo"
+                               class="form-control"
+                               placeholder="INV-..." />
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            From Date
+                        </label>
+
+                        <input type="date"
+                               name="fromDate"
+                               value="@ViewBag.FromDate"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            To Date
+                        </label>
+
+                        <input type="date"
+                               name="toDate"
+                               value="@ViewBag.ToDate"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            Customer
+                        </label>
+
+                        <select name="customerId"
+                                class="form-select">
+
+                            <option value="">
+                                All Customers
+                            </option>
+
+                            @foreach (var customer in customers)
+                            {
+                                <option value="@customer.Value"
+                                        selected="@(customer.Value == (ViewBag.CustomerId?.ToString() ?? ""))">
+
+                                    @customer.Text
+
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            Status
+                        </label>
+
+                        <select name="status"
+                                class="form-select">
+
+                            <option value=""
+                                    selected="@(string.IsNullOrEmpty(ViewBag.Status as string))">
+                                All
+                            </option>
+
+                            <option value="paid"
+                                    selected="@(ViewBag.Status == "paid")">
+                                Fully Paid
+                            </option>
+
+                            <option value="partial"
+                                    selected="@(ViewBag.Status == "partial")">
+                                Partial
+                            </option>
+
+                            <option value="due"
+                                    selected="@(ViewBag.Status == "due")">
+                                Due
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <div class="d-flex gap-2 align-items-end">
+
+                            <button type="submit"
+                                    class="btn btn-primary flex-fill text-nowrap"
+                                    title="Search">
+
+                                <i class="bi bi-search"></i>
+
+                            </button>
+
+                            <a asp-action="Index"
+                               class="btn btn-outline-secondary flex-fill text-nowrap">
+
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                                Reset
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- SUMMARY CARDS -->
+    <!-- ===================================================== -->
+
+    <div class="row mb-3">
+
+        <div class="col-md-3">
+
+            <div class="card border-primary shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Total Invoices
+                    </small>
+
+                    <h4 class="text-primary">
+                        @Model.Count()
+                    </h4>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card border-info shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Total Sales
+                    </small>
+
+                    <h4 class="text-info">
+                        ৳ @Model.Sum(x => x.TotalAmount).ToString("N2")
+                    </h4>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card border-success shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Total Paid
+                    </small>
+
+                    <h4 class="text-success">
+                        ৳ @Model.Sum(x => x.PaidAmount).ToString("N2")
+                    </h4>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card border-danger shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Total Due
+                    </small>
+
+                    <h4 class="text-danger">
+                        ৳ @Model.Sum(x => x.DueAmount).ToString("N2")
+                    </h4>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- INVOICE TABLE -->
+    <!-- ===================================================== -->
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table id="invoiceTable"
+                       class="table table-bordered table-striped table-hover">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th>SL</th>
+
+                            <th>Invoice No</th>
+
+                            <th>Date</th>
+
+                            <th>Customer</th>
+
+                            <th>Warehouse</th>
+
+                            <th class="text-center">
+                                Items
+                            </th>
+
+                            <th class="text-end">
+                                Total
+                            </th>
+
+                            <th class="text-end">
+                                Paid
+                            </th>
+
+                            <th class="text-end">
+                                Due
+                            </th>
+
+                            <th>
+                                Method
+                            </th>
+
+                            <th class="text-center" width="120">
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td class="sl-no"></td>
+
+                                <td>
+
+                                    <a asp-action="Invoice"
+                                       asp-route-id="@item.SalesInvoiceId"
+                                       class="fw-bold text-decoration-none">
+
+                                        @item.InvoiceNo
+
+                                    </a>
+
+                                </td>
+
+                                <td data-order="@item.InvoiceDate.ToString("yyyy-MM-dd")">
+                                    @item.InvoiceDate.ToString("dd-MMM-yyyy")
+                                </td>
+
+                                <td>
+                                    @item.CustomerName
+                                </td>
+
+                                <td>
+                                    @item.WarehouseName
+                                </td>
+
+                                <td class="text-center">
+                                    @item.ItemCount
+                                </td>
+
+                                <td class="text-end">
+                                    @item.TotalAmount.ToString("N2")
+                                </td>
+
+                                <td class="text-end">
+                                    @item.PaidAmount.ToString("N2")
+                                </td>
+
+                                <td class="text-end">
+
+                                    @if (item.DueAmount > 0)
+                                    {
+                                        <span class="text-danger fw-bold">
+                                            @item.DueAmount.ToString("N2")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-success fw-bold">
+                                            0.00
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td>
+                                    @item.ReceiveMethod
+                                </td>
+
+                                <td class="text-center text-nowrap">
+
+                                    <a asp-action="DownloadInvoicePdf"
+                                       asp-route-id="@item.SalesInvoiceId"
+                                       target="_blank"
+                                       class="btn btn-danger btn-sm"
+                                       title="Print / Download PDF">
+
+                                        <i class="bi bi-file-earmark-pdf"></i>
+
+                                    </a>
+
+                                    <a asp-controller="CustomerPayment"
+                                       asp-action="InvoicePayments"
+                                       asp-route-salesInvoiceId="@item.SalesInvoiceId"
+                                       class="btn btn-info btn-sm"
+                                       title="Payment History">
+
+                                        <i class="bi bi-eye"></i>
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <script>
+
+        $(document).ready(function () {
+
+            var table = $("#invoiceTable").DataTable({
+
+                pageLength: 25,
+
+                lengthMenu: [10, 25, 50, 100],
+
+                scrollX: true,
+
+                order: [[2, "desc"]],
+
+                columnDefs: [
+                    {
+                        targets: "_all",
+                        className: "text-nowrap"
+                    },
+                    {
+                        targets: 0,
+                        orderable: false
+                    },
+                    {
+                        targets: 10,
+                        orderable: false
+                    }
+                ],
+
+                drawCallback: function () {
+
+                    var api = this.api();
+
+                    api.column(0, { page: "current" })
+                        .nodes()
+                        .each(function (cell, index) {
+
+                            var start = api.page.info().start;
+
+                            $(cell).html(start + index + 1);
+                        });
+                }
+
+            });
+
+        });
+
+    </script>
+
+}

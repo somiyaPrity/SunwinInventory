@@ -1,4 +1,4 @@
-﻿@model SunwinInventory.DTOs.Role.RoleDto
+@model SunwinInventory.DTOs.Role.RoleDto
 
 @{
     ViewData["Title"] = "Create Role";
@@ -51,6 +51,25 @@
 
                 </div>
 
+                <hr />
+
+                <h5 class="mb-1">
+
+                    <i class="bi bi-shield-check"></i>
+
+                    Menu Permissions
+
+                </h5>
+
+                <p class="text-muted small mb-3">
+
+                    Choose which menus this role can open. Create, Edit and
+                    Delete control the matching actions inside each menu.
+
+                </p>
+
+                <partial name="_MenuPermissions" model="Model.Menus" />
+
                 <button class="btn btn-primary">
 
                     Save
@@ -75,5 +94,7 @@
 @section Scripts {
 
     <partial name="_ValidationScriptsPartial" />
+
+    <partial name="_MenuPermissionsScript" />
 
 }

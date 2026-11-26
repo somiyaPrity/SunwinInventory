@@ -51,6 +51,7 @@ namespace SunwinInventory.Controllers
         //        "Home");
         //}
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginDto dto)
         {
             if (!ModelState.IsValid)

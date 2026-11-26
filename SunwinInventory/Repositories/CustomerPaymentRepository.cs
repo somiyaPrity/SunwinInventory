@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using SunwinInventory.Data;
 using SunwinInventory.DTOs.CustomerPayment;
 using SunwinInventory.Models;
@@ -9,12 +10,19 @@ namespace SunwinInventory.Repositories
     public class CustomerPaymentRepository : ICustomerPaymentRepository
     {
         private readonly SunwinInventoryContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public CustomerPaymentRepository(
-            SunwinInventoryContext context)
+            SunwinInventoryContext context,
+            IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
+
+        private string CurrentUserName =>
+            _httpContextAccessor.HttpContext?
+                .Session.GetString("UserName") ?? "System";
 
         //=====================================================
         // GET ALL PAYMENTS
@@ -107,7 +115,7 @@ namespace SunwinInventory.Repositories
 
                     Remarks = model.Remarks,
 
-                    CreatedBy = "Admin",
+                    CreatedBy = CurrentUserName,
 
                     CreatedDate = DateTime.Now
                 };
@@ -124,7 +132,7 @@ namespace SunwinInventory.Repositories
 
                 invoice.DueAmount = newDue;
 
-                invoice.UpdatedBy = "Admin";
+                invoice.UpdatedBy = CurrentUserName;
 
                 invoice.UpdatedDate = DateTime.Now;
 
@@ -250,7 +258,7 @@ namespace SunwinInventory.Repositories
                     Remarks =
                         model.Remarks,
 
-                    CreatedBy = "Admin",
+                    CreatedBy = CurrentUserName,
 
                     CreatedDate =
                         DateTime.Now
@@ -274,7 +282,7 @@ namespace SunwinInventory.Repositories
 
                 invoice.DueAmount = newDue;
 
-                invoice.UpdatedBy = "Admin";
+                invoice.UpdatedBy = CurrentUserName;
 
                 invoice.UpdatedDate =
                     DateTime.Now;
@@ -561,7 +569,7 @@ namespace SunwinInventory.Repositories
                         newDue;
 
                     invoice.UpdatedBy =
-                        "Admin";
+                        CurrentUserName;
 
                     invoice.UpdatedDate =
                         DateTime.Now;

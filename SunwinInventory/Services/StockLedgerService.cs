@@ -24,5 +24,15 @@ namespace SunwinInventory.Services
 
             await _repository.CreateAsync(entity);
         }
+
+        public async Task<StockLedger?> GetByPurchaseDetailIdAsync(int purchaseDetailId)
+        {
+            return await _repository.GetByPurchaseDetailIdAsync(purchaseDetailId);
+        }
+
+        public async Task UpdateAsync(StockLedger entity)
+        {
+            await _repository.UpdateAsync(entity);
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿@model SunwinInventory.DTOs.Account.LoginDto
+@model SunwinInventory.DTOs.Account.LoginDto
 
 @{
     Layout = null;
@@ -6,102 +6,672 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
 
 <head>
 
     <meta charset="utf-8" />
 
-    <title>Sunwin ERP Login</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
 
-    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <title>Login | SUNWIN ERP</title>
 
-    <link href="~/lib/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Bootstrap -->
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+          rel="stylesheet" />
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+          rel="stylesheet" />
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet" />
+
+    <style>
+
+        :root {
+            --brand-dark: #1f2937;
+            --brand-darker: #111827;
+            --brand-accent: #ff8c00;
+            --page-bg: #eef1f5;
+            --text-muted: #6b7280;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: var(--page-bg);
+            color: #1f2937;
+        }
+
+        .login-shell {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 24px;
+            overflow: hidden;
+        }
+
+            .login-shell::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background:
+                    radial-gradient(720px 420px at 8% -6%, rgba(255, 140, 0, .16), transparent 62%),
+                    radial-gradient(640px 420px at 100% 108%, rgba(31, 41, 55, .10), transparent 60%);
+                pointer-events: none;
+            }
+
+            .login-shell::after {
+                content: "";
+                position: absolute;
+                width: 560px;
+                height: 560px;
+                right: -180px;
+                bottom: -220px;
+                border-radius: 50%;
+                border: 1px solid rgba(31, 41, 55, .10);
+                box-shadow:
+                    0 0 0 60px rgba(31, 41, 55, .03),
+                    0 0 0 120px rgba(255, 140, 0, .04);
+                pointer-events: none;
+            }
+
+        /* ---------- Split login card ---------- */
+
+        .login-card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            min-width: 0;
+            max-width: min(960px, 100%);
+            display: grid;
+            grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+            background: #fff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 70px rgba(15, 23, 42, .16);
+        }
+
+        /* ---------- Card brand (photo) panel ---------- */
+
+        .card-brand {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 32px;
+            padding: 44px 40px;
+            color: #e5e7eb;
+            background:
+                radial-gradient(560px 300px at 0% 0%, rgba(255, 140, 0, .38), transparent 62%),
+                linear-gradient(165deg, rgba(17, 24, 39, .84) 0%, rgba(15, 23, 42, .92) 100%),
+                url('@Url.Content("~/images/warehouse-login.png")') center / cover no-repeat;
+        }
+
+            .card-brand::after {
+                content: "";
+                position: absolute;
+                width: 340px;
+                height: 340px;
+                right: -120px;
+                bottom: -140px;
+                border-radius: 50%;
+                border: 1px solid rgba(255, 140, 0, .22);
+                pointer-events: none;
+            }
+
+        .card-logo {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            background: #fff;
+            border-radius: 16px;
+            padding: 14px 18px;
+            box-shadow: 0 16px 34px rgba(0, 0, 0, .35);
+            width: fit-content;
+        }
+
+            .card-logo img {
+                width: 180px;
+                max-width: 100%;
+                height: auto;
+            }
+
+        .card-title {
+            position: relative;
+            margin: 26px 0 0;
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: -.02em;
+            color: #fff;
+        }
+
+        .card-points {
+            position: relative;
+            list-style: none;
+            margin: 22px 0 0;
+            padding: 0;
+            display: grid;
+            gap: 18px;
+        }
+
+            .card-points li {
+                display: flex;
+                gap: 14px;
+                align-items: flex-start;
+            }
+
+        .point-icon {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(255, 140, 0, .16);
+            border: 1px solid rgba(255, 140, 0, .35);
+            color: #ffb457;
+            font-size: 1.1rem;
+        }
+
+        .card-points strong {
+            display: block;
+            color: #f3f4f6;
+            font-size: .92rem;
+            font-weight: 600;
+        }
+
+        .card-points span {
+            color: #b6bcc6;
+            font-size: .8rem;
+            line-height: 1.55;
+        }
+
+        .card-foot {
+            position: relative;
+            font-size: .75rem;
+            color: #9aa1ac;
+        }
+
+        /* ---------- Card form panel ---------- */
+
+        .card-form {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 48px 44px;
+        }
+
+        .mobile-logo {
+            display: none;
+            margin-bottom: 22px;
+        }
+
+            .mobile-logo img {
+                width: 170px;
+                max-width: 100%;
+                height: auto;
+            }
+
+        .card-form h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -.01em;
+            margin: 0 0 6px;
+            color: var(--brand-darker);
+        }
+
+        .login-subtitle {
+            margin: 0 0 26px;
+            color: var(--text-muted);
+            font-size: .88rem;
+        }
+
+        .form-label {
+            font-size: .85rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .login-input {
+            border-radius: 999px;
+            border: 1px solid #f3b26a;
+            overflow: hidden;
+            background: #fff;
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+
+            .login-input .input-group-text,
+            .login-input .form-control,
+            .login-input .btn-toggle-password {
+                border: 0;
+                background: #fff;
+                box-shadow: none;
+            }
+
+            .login-input .input-group-text {
+                padding: .8rem .5rem .8rem 1.1rem;
+                color: #9ca3af;
+            }
+
+            .login-input .form-control {
+                padding: .8rem .4rem;
+                font-size: .9rem;
+                color: #1f2937;
+            }
+
+                .login-input .form-control::placeholder {
+                    color: #9ca3af;
+                }
+
+            .login-input .btn-toggle-password {
+                padding: 0 1.1rem 0 .5rem;
+                color: #9ca3af;
+            }
+
+                .login-input .btn-toggle-password:hover,
+                .login-input .btn-toggle-password:focus {
+                    color: #1f2937;
+                }
+
+            .login-input:focus-within {
+                border-color: var(--brand-accent);
+                box-shadow: 0 0 0 4px rgba(255, 140, 0, .14);
+            }
+
+        .btn-login {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            width: 100%;
+            padding: .9rem 1rem;
+            border: 0;
+            border-radius: 999px;
+            background: var(--brand-dark);
+            color: #fff;
+            font-size: .92rem;
+            font-weight: 600;
+            letter-spacing: .01em;
+            transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
+        }
+
+            .btn-login:hover,
+            .btn-login:focus-visible {
+                background: var(--brand-darker);
+                color: #fff;
+                transform: translateY(-1px);
+                box-shadow: 0 12px 24px rgba(17, 24, 39, .18);
+            }
+
+            .btn-login:focus-visible {
+                outline: 0;
+                box-shadow: 0 0 0 4px rgba(255, 140, 0, .28);
+            }
+
+        .forgot-link {
+            display: block;
+            margin: 18px auto 0;
+            text-align: center;
+            font-size: .82rem;
+            font-weight: 500;
+            color: var(--brand-accent);
+            text-decoration: none;
+        }
+
+            .forgot-link:hover,
+            .forgot-link:focus {
+                color: #e07b00;
+                text-decoration: underline;
+            }
+
+        .login-alert {
+            border: 0;
+            border-radius: 12px;
+            font-size: .85rem;
+        }
+
+        .field-validation-error {
+            display: block;
+            margin-top: 6px;
+        }
+
+        .login-help {
+            margin: 14px 0 0;
+            text-align: center;
+            font-size: .78rem;
+            color: var(--text-muted);
+        }
+
+        @@media (max-width: 991.98px) {
+
+            .login-card {
+                grid-template-columns: minmax(0, 1fr);
+                max-width: min(460px, 100%);
+            }
+
+            .card-brand {
+                display: none;
+            }
+
+            .mobile-logo {
+                display: block;
+            }
+
+            .card-form {
+                padding: 36px 30px;
+            }
+        }
+
+        @@media (max-width: 575.98px) {
+
+            .login-shell {
+                padding: 24px 16px;
+            }
+
+            .card-form {
+                padding: 28px 22px;
+            }
+        }
+
+    </style>
 
 </head>
 
-<body class="bg-light">
+<body>
 
-    <div class="container">
+    <div class="login-shell">
 
-        <div class="row vh-100 justify-content-center align-items-center">
+        <div class="login-card">
 
-            <div class="col-md-4">
+            <!-- ===================================================== -->
+            <!-- CARD BRAND / PHOTO PANEL -->
+            <!-- ===================================================== -->
 
-                <div class="card shadow">
+            <aside class="card-brand">
 
-                    <div class="card-body p-4">
+                <div>
 
-                        <h3 class="text-center mb-4">
+                    <div class="card-logo">
 
-                            Sunwin ERP
-
-                        </h3>
-
-                        @if (ViewBag.Error != null)
-                        {
-                            <div class="alert alert-danger">
-
-                                @ViewBag.Error
-
-                            </div>
-                        }
-                        @if (TempData["Success"] != null)
-                        {
-                            <div class="alert alert-success">
-
-                                @TempData["Success"]
-
-                            </div>
-                        }
-
-                        @if (TempData["Error"] != null)
-                        {
-                            <div class="alert alert-danger">
-
-                                @TempData["Error"]
-
-                            </div>
-                        }
-                        <form asp-action="Login">
-
-                            <div class="mb-3">
-
-                                <label>User Name</label>
-
-                                <input asp-for="UserName" class="form-control" />
-
-                            </div>
-
-                            <div class="mb-3">
-
-                                <label>Password</label>
-
-                                <input asp-for="Password"
-                                       type="password"
-                                       class="form-control" />
-
-                            </div>
-
-                            <button class="btn btn-primary w-100">
-
-                                <i class="bi bi-box-arrow-in-right"></i>
-
-                                Login
-
-                            </button>
-
-                        </form>
+                        <img src="~/images/sunwin-logo.png"
+                             alt="Sunwin Ltd. — Plastic & Electrical Insulation" />
 
                     </div>
 
+                    <h1 class="card-title">
+                        Inventory, under control
+                    </h1>
+
+                    <ul class="card-points">
+
+                        <li>
+
+                            <span class="point-icon">
+                                <i class="bi bi-box-seam"></i>
+                            </span>
+
+                            <div>
+                                <strong>Real-time inventory</strong>
+                                <span>Know what you have, where you have it.</span>
+                            </div>
+
+                        </li>
+
+                        <li>
+
+                            <span class="point-icon">
+                                <i class="bi bi-receipt"></i>
+                            </span>
+
+                            <div>
+                                <strong>Streamlined operations</strong>
+                                <span>Move faster with less manual work.</span>
+                            </div>
+
+                        </li>
+
+                        <li>
+
+                            <span class="point-icon">
+                                <i class="bi bi-graph-up-arrow"></i>
+                            </span>
+
+                            <div>
+                                <strong>Actionable insights</strong>
+                                <span>Turn your data into smarter decisions.</span>
+                            </div>
+
+                        </li>
+
+                    </ul>
+
                 </div>
 
-            </div>
+                <div class="card-foot">
+                    &copy; @DateTime.Now.Year Sunwin Ltd. All rights reserved.
+                </div>
+
+            </aside>
+
+            <!-- ===================================================== -->
+            <!-- CARD FORM PANEL -->
+            <!-- ===================================================== -->
+
+            <main class="card-form">
+
+                <div class="mobile-logo">
+
+                    <img src="~/images/sunwin-logo.png"
+                         alt="Sunwin Ltd." />
+
+                </div>
+
+                <h2>Welcome back</h2>
+
+                <p class="login-subtitle">
+                    Sign in to continue to your dashboard.
+                </p>
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger login-alert" role="alert">
+
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+                        @ViewBag.Error
+
+                    </div>
+                }
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success login-alert" role="alert">
+
+                        <i class="bi bi-check-circle-fill me-2"></i>
+
+                        @TempData["Success"]
+
+                    </div>
+                }
+
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger login-alert" role="alert">
+
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+                        @TempData["Error"]
+
+                    </div>
+                }
+
+                <form asp-action="Login">
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="text-danger small mb-3">
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label asp-for="UserName"
+                               class="form-label">
+
+                            User Name
+
+                        </label>
+
+                        <div class="input-group login-input">
+
+                            <span class="input-group-text">
+                                <i class="bi bi-person"></i>
+                            </span>
+
+                            <input asp-for="UserName"
+                                   class="form-control"
+                                   placeholder="Enter your user name"
+                                   autocomplete="username"
+                                   autofocus />
+
+                        </div>
+
+                        <span asp-validation-for="UserName"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <label asp-for="Password"
+                               class="form-label">
+
+                            Password
+
+                        </label>
+
+                        <div class="input-group login-input">
+
+                            <span class="input-group-text">
+                                <i class="bi bi-lock"></i>
+                            </span>
+
+                            <input asp-for="Password"
+                                   type="password"
+                                   class="form-control"
+                                   placeholder="Enter your password"
+                                   autocomplete="current-password" />
+
+                            <button type="button"
+                                    class="btn btn-toggle-password"
+                                    id="togglePassword"
+                                    aria-label="Show password"
+                                    tabindex="-1">
+
+                                <i class="bi bi-eye"></i>
+
+                            </button>
+
+                        </div>
+
+                        <span asp-validation-for="Password"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+                    <button type="submit"
+                            class="btn-login">
+
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        Sign In
+
+                    </button>
+
+                </form>
+
+                <a href="#"
+                   id="forgotPassword"
+                   class="forgot-link">
+                    Forgot password?
+                </a>
+
+                <p class="login-help"
+                   id="loginHelp"
+                   hidden>
+                    Trouble signing in? Contact your system administrator to reset your password.
+                </p>
+
+            </main>
 
         </div>
 
     </div>
+
+    <script>
+
+        (function () {
+
+            const toggle = document.getElementById('togglePassword');
+
+            const input = document.getElementById('Password');
+
+            if (toggle && input) {
+
+                toggle.addEventListener('click', function () {
+
+                    const show = input.type === 'password';
+
+                    input.type = show ? 'text' : 'password';
+
+                    toggle.innerHTML = show
+                        ? '<i class="bi bi-eye-slash"></i>'
+                        : '<i class="bi bi-eye"></i>';
+
+                    toggle.setAttribute(
+                        'aria-label',
+                        show ? 'Hide password' : 'Show password');
+                });
+            }
+
+            const forgot = document.getElementById('forgotPassword');
+
+            const help = document.getElementById('loginHelp');
+
+            if (forgot && help) {
+
+                forgot.addEventListener('click', function (e) {
+
+                    e.preventDefault();
+
+                    help.hidden = !help.hidden;
+                });
+            }
+
+        })();
+
+    </script>
+
+    <script>
+
+        document.cookie =
+            "tz_offset=" + new Date().getTimezoneOffset() +
+            "; path=/; max-age=31536000; SameSite=Lax";
+
+    </script>
 
 </body>
 

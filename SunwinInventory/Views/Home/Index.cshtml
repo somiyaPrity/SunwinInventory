@@ -1,105 +1,79 @@
-﻿@{
+@model SunwinInventory.DTOs.Dashboard.DashboardDto
+
+@{
     ViewData["Title"] = "Dashboard";
+
+    var fullName = Context.Session.GetString("FullName") ?? "User";
 }
 
 <div class="container-fluid">
 
-    <div class="row mb-4">
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
 
-        <div class="col-md-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-            <div class="card dashboard-card border-0 shadow-sm">
+        <div>
 
-                <div class="card-body">
+            <h4 class="mb-1">
+                <i class="bi bi-speedometer2"></i>
+                Dashboard
+            </h4>
 
-                    <div class="d-flex justify-content-between">
-
-                        <div>
-
-                            <h6 class="text-muted">
-                                Total Products
-                            </h6>
-
-                            <h2 class="fw-bold">
-                                150
-                            </h2>
-
-                        </div>
-
-                        <div class="fs-1 text-primary">
-
-                            <i class="bi bi-box-seam"></i>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
+            <small class="text-muted">
+                Welcome back, @fullName
+                &middot; @Model.TotalProducts product(s)
+                &middot; @Model.TotalCustomers customer(s)
+                &middot; @Model.TotalWarehouses warehouse(s)
+            </small>
 
         </div>
 
-        <div class="col-md-3">
+        <a asp-controller="Sales"
+           asp-action="Create"
+           class="btn btn-primary">
 
-            <div class="card dashboard-card border-0 shadow-sm">
+            <i class="bi bi-cart-plus"></i>
+            New Sale
 
-                <div class="card-body">
+        </a>
 
-                    <div class="d-flex justify-content-between">
+    </div>
 
-                        <div>
 
-                            <h6 class="text-muted">
-                                Warehouses
-                            </h6>
+    <!-- ===================================================== -->
+    <!-- KPI CARDS -->
+    <!-- ===================================================== -->
 
-                            <h2 class="fw-bold">
-                                4
-                            </h2>
+    <div class="row g-3 mb-4">
 
-                        </div>
+        <div class="col-sm-6 col-xl-3">
 
-                        <div class="fs-1 text-success">
-
-                            <i class="bi bi-building"></i>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-3">
-
-            <div class="card dashboard-card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm h-100">
 
                 <div class="card-body">
 
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex justify-content-between align-items-start">
 
                         <div>
 
-                            <h6 class="text-muted">
+                            <small class="text-muted">
                                 Today's Sales
-                            </h6>
+                            </small>
 
-                            <h2 class="fw-bold">
+                            <h4 class="fw-bold mb-0">
+                                ৳ @Model.TodaySales.ToString("N2")
+                            </h4>
 
-                                ৳25,000
-
-                            </h2>
+                            <small class="text-muted">
+                                @Model.TodayInvoiceCount invoice(s)
+                            </small>
 
                         </div>
 
-                        <div class="fs-1 text-warning">
-
+                        <div class="fs-2 text-primary">
                             <i class="bi bi-cart-check"></i>
-
                         </div>
 
                     </div>
@@ -110,34 +84,104 @@
 
         </div>
 
-        <div class="col-md-3">
+        <div class="col-sm-6 col-xl-3">
 
-            <div class="card dashboard-card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm h-100">
 
                 <div class="card-body">
 
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex justify-content-between align-items-start">
 
                         <div>
 
-                            <h6 class="text-muted">
+                            <small class="text-muted">
+                                This Month Sales
+                            </small>
 
-                                Low Stock
+                            <h4 class="fw-bold mb-0">
+                                ৳ @Model.MonthSales.ToString("N2")
+                            </h4>
 
-                            </h6>
-
-                            <h2 class="fw-bold text-danger">
-
-                                12
-
-                            </h2>
+                            <small class="text-muted">
+                                @Model.MonthInvoiceCount invoice(s)
+                            </small>
 
                         </div>
 
-                        <div class="fs-1 text-danger">
+                        <div class="fs-2 text-success">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
 
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-start">
+
+                        <div>
+
+                            <small class="text-muted">
+                                Total Receivable
+                            </small>
+
+                            <h4 class="fw-bold text-warning mb-0">
+                                ৳ @Model.TotalDue.ToString("N2")
+                            </h4>
+
+                            <small class="text-muted">
+                                @Model.DueInvoiceCount due invoice(s)
+                            </small>
+
+                        </div>
+
+                        <div class="fs-2 text-warning">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-start">
+
+                        <div>
+
+                            <small class="text-muted">
+                                Low Stock Items
+                            </small>
+
+                            <h4 class="fw-bold text-danger mb-0">
+                                @Model.LowStockCount
+                            </h4>
+
+                            <small class="text-muted">
+                                at or below @Model.LowStockThreshold units
+                            </small>
+
+                        </div>
+
+                        <div class="fs-2 text-danger">
                             <i class="bi bi-exclamation-triangle"></i>
-
                         </div>
 
                     </div>
@@ -150,83 +194,28 @@
 
     </div>
 
-    <div class="row">
 
-        <div class="col-md-8">
+    <!-- ===================================================== -->
+    <!-- SALES TREND + QUICK ACTIONS -->
+    <!-- ===================================================== -->
 
-            <div class="card dashboard-card shadow-sm border-0">
+    <div class="row g-3 mb-4">
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm h-100">
 
                 <div class="card-header bg-white">
 
-                    <h5 class="mb-0">
-
-                        Recent Sales
-
-                    </h5>
+                    <h6 class="mb-0">
+                        Sales - Last 7 Days
+                    </h6>
 
                 </div>
 
                 <div class="card-body">
 
-                    <table class="table table-hover">
-
-                        <thead>
-
-                            <tr>
-
-                                <th>Invoice</th>
-
-                                <th>Customer</th>
-
-                                <th>Amount</th>
-
-                                <th>Date</th>
-
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            <tr>
-
-                                <td>INV-001</td>
-
-                                <td>ABC Traders</td>
-
-                                <td>৳5,000</td>
-
-                                <td>Today</td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td>INV-002</td>
-
-                                <td>XYZ Store</td>
-
-                                <td>৳8,500</td>
-
-                                <td>Today</td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td>INV-003</td>
-
-                                <td>Rahman Enterprise</td>
-
-                                <td>৳3,200</td>
-
-                                <td>Today</td>
-
-                            </tr>
-
-                        </tbody>
-
-                    </table>
+                    <canvas id="salesTrendChart" height="110"></canvas>
 
                 </div>
 
@@ -234,55 +223,273 @@
 
         </div>
 
-        <div class="col-md-4">
+        <div class="col-lg-4">
 
-            <div class="card dashboard-card shadow-sm border-0">
+            <div class="card border-0 shadow-sm h-100">
 
                 <div class="card-header bg-white">
 
-                    <h5 class="mb-0">
-
+                    <h6 class="mb-0">
                         Quick Menu
-
-                    </h5>
+                    </h6>
 
                 </div>
 
                 <div class="card-body d-grid gap-2">
 
-                    <a asp-controller="Warehouse"
+                    <a asp-controller="Sales"
                        asp-action="Create"
                        class="btn btn-primary">
 
-                        <i class="bi bi-building-add"></i>
-
-                        Add Warehouse
+                        <i class="bi bi-cart-check"></i>
+                        New Sale
 
                     </a>
 
-                    <button class="btn btn-success">
-
-                        <i class="bi bi-box-seam"></i>
-
-                        Add Product
-
-                    </button>
-
-                    <button class="btn btn-warning">
+                    <a asp-controller="ProductPurchaseDetail"
+                       asp-action="Create"
+                       class="btn btn-success">
 
                         <i class="bi bi-cart-plus"></i>
-
                         New Purchase
 
-                    </button>
+                    </a>
 
-                    <button class="btn btn-danger">
+                    <a asp-controller="ProductName"
+                       asp-action="Create"
+                       class="btn btn-info text-white">
 
-                        <i class="bi bi-cart-check"></i>
+                        <i class="bi bi-box-seam"></i>
+                        Add Product
 
-                        New Sale
+                    </a>
 
-                    </button>
+                    <a asp-controller="Customer"
+                       asp-action="Create"
+                       class="btn btn-warning">
+
+                        <i class="bi bi-people"></i>
+                        Add Customer
+
+                    </a>
+
+                    <a asp-controller="Sales"
+                       asp-action="Index"
+                       class="btn btn-outline-secondary">
+
+                        <i class="bi bi-printer"></i>
+                        Invoice Print
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- RECENT SALES + LOW STOCK -->
+    <!-- ===================================================== -->
+
+    <div class="row g-3">
+
+        <div class="col-lg-7">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+
+                    <h6 class="mb-0">
+                        Recent Sales
+                    </h6>
+
+                    <a asp-controller="Sales"
+                       asp-action="Index"
+                       class="btn btn-sm btn-outline-secondary">
+
+                        View All
+
+                    </a>
+
+                </div>
+
+                <div class="card-body p-0">
+
+                    @if (Model.RecentInvoices.Count == 0)
+                    {
+                        <p class="text-muted text-center py-4 mb-0">
+                            No sales yet.
+                        </p>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+
+                            <table class="table table-hover mb-0">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>Invoice</th>
+
+                                        <th>Customer</th>
+
+                                        <th>Date</th>
+
+                                        <th class="text-end">Total</th>
+
+                                        <th class="text-end">Due</th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    @foreach (var invoice in Model.RecentInvoices)
+                                    {
+                                        <tr>
+
+                                            <td>
+
+                                                <a asp-controller="Sales"
+                                                   asp-action="DownloadInvoicePdf"
+                                                   asp-route-id="@invoice.SalesInvoiceId"
+                                                   target="_blank"
+                                                   class="fw-bold text-decoration-none">
+
+                                                    @invoice.InvoiceNo
+
+                                                </a>
+
+                                            </td>
+
+                                            <td>
+                                                @invoice.CustomerName
+                                            </td>
+
+                                            <td>
+                                                @invoice.InvoiceDate.ToString("dd-MMM-yyyy")
+                                            </td>
+
+                                            <td class="text-end">
+                                                @invoice.TotalAmount.ToString("N2")
+                                            </td>
+
+                                            <td class="text-end">
+
+                                                @if (invoice.DueAmount > 0)
+                                                {
+                                                    <span class="badge bg-danger">
+                                                        @invoice.DueAmount.ToString("N2")
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">
+                                                        Paid
+                                                    </span>
+                                                }
+
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-5">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-header bg-white">
+
+                    <h6 class="mb-0">
+                        Low Stock
+                        <span class="badge bg-danger ms-1">
+                            @Model.LowStockCount
+                        </span>
+                    </h6>
+
+                </div>
+
+                <div class="card-body p-0">
+
+                    @if (Model.LowStockItems.Count == 0)
+                    {
+                        <p class="text-muted text-center py-4 mb-0">
+                            No low stock products.
+                        </p>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+
+                            <table class="table table-hover mb-0">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>Product</th>
+
+                                        <th>Color</th>
+
+                                        <th class="text-end">Qty</th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    @foreach (var item in Model.LowStockItems)
+                                    {
+                                        <tr>
+
+                                            <td>
+                                                @item.ProductName
+                                            </td>
+
+                                            <td>
+                                                @(item.ColorName ?? "-")
+                                            </td>
+
+                                            <td class="text-end">
+
+                                                <span class="badge @(item.AvailableQty <= 0 ? "bg-danger" : "bg-warning text-dark")">
+
+                                                    @item.AvailableQty
+
+                                                </span>
+
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+                    }
 
                 </div>
 
@@ -293,3 +500,69 @@
     </div>
 
 </div>
+
+
+@section Scripts {
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+
+    <script>
+
+        const trendLabels = @Html.Raw(Json.Serialize(Model.SalesTrend.Select(x => x.Date.ToString("dd MMM"))));
+
+        const trendValues = @Html.Raw(Json.Serialize(Model.SalesTrend.Select(x => x.Amount)));
+
+        new Chart(
+            document.getElementById("salesTrendChart"),
+            {
+                type: "bar",
+
+                data: {
+                    labels: trendLabels,
+
+                    datasets: [
+                        {
+                            label: "Sales (৳)",
+
+                            data: trendValues,
+
+                            backgroundColor: "rgba(13, 110, 253, 0.6)",
+
+                            borderColor: "rgba(13, 110, 253, 1)",
+
+                            borderWidth: 1,
+
+                            borderRadius: 4
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+
+                            ticks: {
+                                callback: function (value) {
+                                    return "৳" + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+    </script>
+
+}

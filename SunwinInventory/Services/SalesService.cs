@@ -93,6 +93,15 @@ namespace SunwinInventory.Services
                 if (totalAmount < 0)
                     totalAmount = 0;
 
+                if (model.ReceiveAmount < 0)
+                    throw new InvalidOperationException(
+                        "Receive amount cannot be negative.");
+
+                if (model.ReceiveAmount > totalAmount)
+                    throw new InvalidOperationException(
+                        $"Receive amount ({model.ReceiveAmount:N2}) " +
+                        $"cannot exceed total amount ({totalAmount:N2}).");
+
                 decimal dueAmount =
                     totalAmount - model.ReceiveAmount;
 
@@ -349,6 +358,11 @@ namespace SunwinInventory.Services
                 await transaction.CommitAsync();
 
                 return invoice.SalesInvoiceId;
+            }
+            catch (InvalidOperationException)
+            {
+                await transaction.RollbackAsync();
+                throw;
             }
             catch
             {

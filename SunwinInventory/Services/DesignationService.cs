@@ -1,4 +1,5 @@
-﻿using SunwinInventory.DTOs.Designation;
+﻿using Microsoft.AspNetCore.Http;
+using SunwinInventory.DTOs.Designation;
 using SunwinInventory.Models;
 using SunwinInventory.Repositories.Interfaces;
 using SunwinInventory.Services.Interfaces;
@@ -8,11 +9,19 @@ namespace SunwinInventory.Services
     public class DesignationService : IDesignationService
     {
         private readonly IDesignationRepository _repository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public DesignationService(IDesignationRepository repository)
+        public DesignationService(
+            IDesignationRepository repository,
+            IHttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
+            _httpContextAccessor = httpContextAccessor;
         }
+
+        private string CurrentUserName =>
+            _httpContextAccessor.HttpContext?
+                .Session.GetString("UserName") ?? "System";
 
         public async Task<List<DesignationDto>> GetAllAsync()
         {
@@ -60,7 +69,7 @@ namespace SunwinInventory.Services
                 DesignationName = dto.DesignationName,
                 ReportTo = dto.ReportTo,
                 IsActive = dto.IsActive,
-                CreatedBy = "Admin",
+                CreatedBy = CurrentUserName,
                 CreatedDate = DateTime.Now
             };
 
@@ -77,7 +86,7 @@ namespace SunwinInventory.Services
             entity.DesignationName = dto.DesignationName;
             entity.ReportTo = dto.ReportTo;
             entity.IsActive = dto.IsActive;
-            entity.UpdatedBy = "Admin";
+            entity.UpdatedBy = CurrentUserName;
             entity.UpdatedDate = DateTime.Now;
 
             await _repository.UpdateAsync(entity);

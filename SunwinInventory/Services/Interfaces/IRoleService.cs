@@ -8,7 +8,7 @@ namespace SunwinInventory.Services.Interfaces
 
         Task<RoleDto?> GetByIdAsync(int id);
 
-        Task CreateAsync(RoleDto dto);
+        Task<int> CreateAsync(RoleDto dto);
 
         Task UpdateAsync(RoleDto dto);
 

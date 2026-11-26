@@ -6,7 +6,6 @@
     var customers = ViewBag.Customers as List<SelectListItem>;
     var warehouses = ViewBag.Warehouses as List<SelectListItem>;
     var products = ViewBag.Products as List<SelectListItem>;
-    var colors = ViewBag.Colors as List<SelectListItem>;
 }
 @if (TempData["Success"] != null)
 {
@@ -35,7 +34,24 @@
         </button>
 
     </div>
-}@if (TempData["SalesInvoiceId"] != null)
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm"
+         role="alert">
+
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+        <strong>@TempData["Error"]</strong>
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+}
+@if (TempData["SalesInvoiceId"] != null)
 {
     <script>
         window.open(
@@ -58,10 +74,10 @@
             </small>
         </div>
 
-        <a asp-controller="Sales"
+        <a asp-controller="SalesReport"
            asp-action="Index"
            class="btn btn-outline-secondary">
-            <i class="fas fa-list"></i>
+            <i class="fas fa-chart-line"></i>
             Sales Report
         </a>
     </div>
@@ -101,6 +117,9 @@
                                type="datetime-local"
                                class="form-control" />
 
+                        <span asp-validation-for="SalesDate"
+                              class="text-danger"></span>
+
                     </div>
 
 
@@ -129,6 +148,9 @@
 
                         </select>
 
+                        <span asp-validation-for="CustomerId"
+                              class="text-danger"></span>
+
                     </div>
 
 
@@ -156,6 +178,9 @@
                             }
 
                         </select>
+
+                        <span asp-validation-for="WarehouseId"
+                              class="text-danger"></span>
 
                     </div>
 
@@ -251,13 +276,6 @@
                                 Select Color
                             </option>
 
-                            @foreach (var item in colors ?? new())
-                            {
-                                <option value="@item.Value">
-                                    @item.Text
-                                </option>
-                            }
-
                         </select>
 
                     </div>
@@ -271,11 +289,14 @@
                             Thickness
                         </label>
 
-                        <input type="number"
-                               id="thickness"
-                               class="form-control"
-                               step="0.01"
-                               placeholder="Thickness" />
+                        <select id="thickness"
+                                class="form-select">
+
+                            <option value="">
+                                Select Thickness
+                            </option>
+
+                        </select>
 
                     </div>
 
@@ -676,11 +697,16 @@
                             <option value="Roket">
                                 Roket
                             </option>
+
+                            <option value="Product Exchange">
+                                Product Exchange
+                            </option>
                         </select>
 
                     </div>
 
-                     <div class="col-md-4">
+                     <div class="col-md-4"
+                          id="bankNameField">
 
                         <label class="form-label">
                             Bank Name
@@ -692,7 +718,8 @@
                                class="form-control fw-bold" />
 
                     </div>
-                        <div class="col-md-4">
+                        <div class="col-md-4"
+                             id="transactionCodeField">
 
                         <label class="form-label">
                             Transection Code
@@ -871,8 +898,235 @@
         }
 
 
-        $("#warehouseId, #productNameId, #colorId, #thickness")
+        // =====================================================
+        // STOCK OPTIONS - COLORS & THICKNESSES
+        // =====================================================
+
+        function fillThicknesses(thicknesses) {
+
+            const $thickness = $("#thickness");
+
+            $thickness.empty();
+
+            $thickness.append(
+                `<option value="">Select Thickness</option>`
+            );
+
+            thicknesses.forEach(t => {
+
+                $thickness.append(
+                    `<option value="${t}">${Number(t)}</option>`
+                );
+
+            });
+
+        }
+
+
+        function resetSizes() {
+
+            $("#productSize")
+                .empty()
+                .append(`<option value="">Select Size</option>`);
+
+        }
+
+
+        function resetStock() {
+
+            stockData = [];
+
+            $("#stockTableBody").empty();
+
+        }
+
+
+        async function loadStockOptions() {
+
+            const warehouseId =
+                $("#warehouseId").val();
+
+            const productNameId =
+                $("#productNameId").val();
+
+
+            $("#colorId")
+                .empty()
+                .append(`<option value="">Select Color</option>`);
+
+            $("#thickness")
+                .empty()
+                .append(`<option value="">Select Thickness</option>`);
+
+            resetSizes();
+
+            resetStock();
+
+
+            if (!warehouseId || !productNameId)
+                return;
+
+
+            const url =
+                `/Sales/GetStockOptions`
+                + `?warehouseId=${warehouseId}`
+                + `&productNameId=${productNameId}`;
+
+
+            const response =
+                await fetch(url);
+
+
+            if (!response.ok)
+                return;
+
+
+            const data =
+                await response.json();
+
+
+            data.colors.forEach(color => {
+
+                $("#colorId").append(
+                    `<option value="${color.value}">
+                            ${color.text}
+                        </option>`
+                );
+
+            });
+
+
+            // Only one color in stock - select it automatically
+            if (data.colors.length === 1) {
+
+                $("#colorId").val(data.colors[0].value);
+
+            }
+
+
+            fillThicknesses(data.thicknesses);
+
+
+            // Only one color and one thickness - go straight to sizes
+            if (data.colors.length <= 1 &&
+                data.thicknesses.length === 1) {
+
+                $("#thickness").val(data.thicknesses[0]);
+
+                loadProductSizes();
+
+            }
+
+        }
+
+
+        async function loadThicknessOptions() {
+
+            const warehouseId =
+                $("#warehouseId").val();
+
+            const productNameId =
+                $("#productNameId").val();
+
+            const colorId =
+                $("#colorId").val();
+
+
+            $("#thickness")
+                .empty()
+                .append(`<option value="">Select Thickness</option>`);
+
+            resetSizes();
+
+            resetStock();
+
+
+            if (!warehouseId || !productNameId)
+                return;
+
+
+            const url =
+                `/Sales/GetStockOptions`
+                + `?warehouseId=${warehouseId}`
+                + `&productNameId=${productNameId}`
+                + (colorId
+                    ? `&colorId=${colorId}`
+                    : "");
+
+
+            const response =
+                await fetch(url);
+
+
+            if (!response.ok)
+                return;
+
+
+            const data =
+                await response.json();
+
+
+            fillThicknesses(data.thicknesses);
+
+
+            // Only one thickness for this color - select it automatically
+            if (data.thicknesses.length === 1) {
+
+                $("#thickness").val(data.thicknesses[0]);
+
+                loadProductSizes();
+
+            }
+
+        }
+
+
+        // =====================================================
+        // SELECTION FLOW
+        // Product / Warehouse -> Colors + Thicknesses
+        // Color -> Thicknesses
+        // Thickness -> Sizes
+        // =====================================================
+
+        $("#warehouseId, #productNameId")
+            .on("change", loadStockOptions);
+
+        $("#colorId")
+            .on("change", loadThicknessOptions);
+
+        $("#thickness")
             .on("change", loadProductSizes);
+
+        $("#productSize")
+            .on("change", resetStock);
+
+
+        // =====================================================
+        // BANK FIELDS (only for Bank / Cheque)
+        // =====================================================
+
+        function toggleBankFields() {
+
+            const method = $("#ReceiveMethod").val();
+
+            const isBank =
+                method === "Bank" || method === "Cheque";
+
+            $("#bankNameField, #transactionCodeField")
+                .toggle(isBank);
+
+            if (!isBank) {
+
+                $("#bankName, #transactionCode")
+                    .val("")
+                    .removeClass("is-invalid");
+            }
+        }
+
+        $("#ReceiveMethod")
+            .on("change", toggleBankFields);
+
+        toggleBankFields();
 
 
         // =====================================================
@@ -1088,6 +1342,23 @@
             if (!productId) {
 
                 alert("Please select product.");
+                return;
+
+            }
+
+
+            // Color is required only when colors exist in stock
+            if ($("#colorId option").length > 1 && !colorId) {
+
+                alert("Please select color.");
+                return;
+
+            }
+
+
+            if (!thickness) {
+
+                alert("Please select thickness.");
                 return;
 
             }
@@ -1433,11 +1704,73 @@ $("#Discount, #Vat, #Ait, #CuttingCharge, #DeliveryCharge, #receiveAmount")
 
         $("#salesForm").submit(function (e) {
 
+            if (!$("#SalesDate").val()) {
+
+                e.preventDefault();
+
+                alert("Please select sales date.");
+
+                return;
+
+            }
+
+
+            if (!$("#customerId").val()) {
+
+                e.preventDefault();
+
+                alert("Please select customer.");
+
+                return;
+
+            }
+
+
+            if (!$("#warehouseId").val()) {
+
+                e.preventDefault();
+
+                alert("Please select warehouse.");
+
+                return;
+
+            }
+
+
             if (salesItems.length === 0) {
 
                 e.preventDefault();
 
                 alert("Please add at least one product.");
+
+                return;
+
+            }
+
+
+            const total =
+                parseFloat($("#grandTotal").val()) || 0;
+
+            const received =
+                parseFloat($("#receiveAmount").val()) || 0;
+
+
+            if (received < 0) {
+
+                e.preventDefault();
+
+                alert("Receive amount cannot be negative.");
+
+                return;
+
+            }
+
+
+            if (received > total) {
+
+                e.preventDefault();
+
+                alert("Receive amount cannot exceed total amount.");
 
                 return;
 

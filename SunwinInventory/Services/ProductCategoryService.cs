@@ -1,4 +1,5 @@
-﻿using SunwinInventory.DTOs.ProductCategory;
+﻿using Microsoft.AspNetCore.Http;
+using SunwinInventory.DTOs.ProductCategory;
 using SunwinInventory.Models;
 using SunwinInventory.Repositories.Interfaces;
 using SunwinInventory.Services.Interfaces;
@@ -8,11 +9,19 @@ namespace SunwinInventory.Services.Implementations
     public class ProductCategoryService : IProductCategoryService
     {
         private readonly IProductCategoryRepository _repository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ProductCategoryService(IProductCategoryRepository repository)
+        public ProductCategoryService(
+            IProductCategoryRepository repository,
+            IHttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
+            _httpContextAccessor = httpContextAccessor;
         }
+
+        private string CurrentUserName =>
+            _httpContextAccessor.HttpContext?
+                .Session.GetString("UserName") ?? "System";
 
         public async Task<List<ProductCategoryDto>> GetAllAsync()
         {
@@ -58,7 +67,7 @@ namespace SunwinInventory.Services.Implementations
                 CategoryName = dto.CategoryName,
                 Description = dto.Description,
                 IsActive = dto.IsActive,
-                CreatedBy = "Admin",   // Later replace with logged-in user
+                CreatedBy = CurrentUserName,
                 CreatedDate = DateTime.Now
             };
 
@@ -75,7 +84,7 @@ namespace SunwinInventory.Services.Implementations
             entity.CategoryName = dto.CategoryName;
             entity.Description = dto.Description;
             entity.IsActive = dto.IsActive;
-            entity.UpdatedBy = "Admin"; // Later replace with logged-in user
+            entity.UpdatedBy = CurrentUserName;
             entity.UpdatedDate = DateTime.Now;
 
             await _repository.UpdateAsync(entity);

@@ -1,0 +1,574 @@
+@model SunwinInventory.DTOs.SalesReport.SalesReportDto
+
+@{
+    ViewData["Title"] = "Sales Report";
+
+    var customers = ViewBag.Customers as List<SelectListItem>
+        ?? new List<SelectListItem>();
+
+    var products = ViewBag.Products as List<SelectListItem>
+        ?? new List<SelectListItem>();
+
+    var warehouses = ViewBag.Warehouses as List<SelectListItem>
+        ?? new List<SelectListItem>();
+
+    var customerId = ViewBag.CustomerId?.ToString() ?? "";
+
+    var productNameId = ViewBag.ProductNameId?.ToString() ?? "";
+
+    var warehouseId = ViewBag.WarehouseId?.ToString() ?? "";
+}
+
+<div class="container-fluid">
+
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+
+            <h4 class="mb-1">
+                <i class="bi bi-bar-chart"></i>
+                Sales Report
+            </h4>
+
+            <small class="text-muted">
+                @Model.Title
+            </small>
+
+        </div>
+
+        <a asp-action="ExportExcel"
+           asp-route-fromDate="@ViewBag.FromDate"
+           asp-route-toDate="@ViewBag.ToDate"
+           asp-route-customerId="@ViewBag.CustomerId"
+           asp-route-productNameId="@ViewBag.ProductNameId"
+           asp-route-warehouseId="@ViewBag.WarehouseId"
+           class="btn btn-success">
+
+            <i class="bi bi-file-earmark-excel"></i>
+            Export Excel
+
+        </a>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- FILTERS -->
+    <!-- ===================================================== -->
+
+    <div class="card shadow-sm mb-3">
+
+        <div class="card-body">
+
+            <form asp-action="Index"
+                  method="get">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            From Date
+                        </label>
+
+                        <input type="date"
+                               name="fromDate"
+                               value="@ViewBag.FromDate"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            To Date
+                        </label>
+
+                        <input type="date"
+                               name="toDate"
+                               value="@ViewBag.ToDate"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            Customer
+                        </label>
+
+                        <select name="customerId"
+                                class="form-select">
+
+                            <option value="">
+                                All Customers
+                            </option>
+
+                            @foreach (var customer in customers)
+                            {
+                                <option value="@customer.Value"
+                                        selected="@(customer.Value == customerId)">
+
+                                    @customer.Text
+
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            Product
+                        </label>
+
+                        <select name="productNameId"
+                                class="form-select">
+
+                            <option value="">
+                                All Products
+                            </option>
+
+                            @foreach (var product in products)
+                            {
+                                <option value="@product.Value"
+                                        selected="@(product.Value == productNameId)">
+
+                                    @product.Text
+
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            Warehouse
+                        </label>
+
+                        <select name="warehouseId"
+                                class="form-select">
+
+                            <option value="">
+                                All Warehouses
+                            </option>
+
+                            @foreach (var warehouse in warehouses)
+                            {
+                                <option value="@warehouse.Value"
+                                        selected="@(warehouse.Value == warehouseId)">
+
+                                    @warehouse.Text
+
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <div class="d-flex gap-2 align-items-end">
+
+                            <button type="submit"
+                                    class="btn btn-primary flex-fill text-nowrap"
+                                    title="Search">
+
+                                <i class="bi bi-search"></i>
+
+                            </button>
+
+                            <a asp-action="Index"
+                               class="btn btn-outline-secondary flex-fill text-nowrap">
+
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                                Reset
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- SUMMARY CARDS -->
+    <!-- ===================================================== -->
+
+    <div class="row g-3 mb-3">
+
+        <div class="col-6 col-md-4 col-xl-2">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Invoices
+                    </small>
+
+                    <h5 class="fw-bold mb-0">
+                        @Model.InvoiceCount
+                    </h5>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-6 col-md-4 col-xl-2">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Quantity
+                    </small>
+
+                    <h5 class="fw-bold mb-0">
+                        @Model.Totals.Quantity.ToString("N0")
+                    </h5>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-6 col-md-4 col-xl-2">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Weight (KG)
+                    </small>
+
+                    <h5 class="fw-bold mb-0">
+                        @Model.Totals.WeightKg.ToString("N2")
+                    </h5>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-6 col-md-4 col-xl-2">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Sales (TK)
+                    </small>
+
+                    <h5 class="fw-bold text-primary mb-0">
+                        @Model.Totals.Taka.ToString("N2")
+                    </h5>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-6 col-md-4 col-xl-2">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Paid (TK)
+                    </small>
+
+                    <h5 class="fw-bold text-success mb-0">
+                        @Model.Totals.Paid.ToString("N2")
+                    </h5>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-6 col-md-4 col-xl-2">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Dues (TK)
+                    </small>
+
+                    <h5 class="fw-bold text-danger mb-0">
+                        @Model.Totals.Due.ToString("N2")
+                    </h5>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- REPORT TABLE -->
+    <!-- ===================================================== -->
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            @if (Model.Days.Count == 0)
+            {
+                <p class="text-muted text-center py-4 mb-0">
+                    No sales found for the selected filters.
+                </p>
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-sm table-bordered table-hover align-middle mb-0">
+
+                        <thead class="table-dark">
+
+                            <tr>
+
+                                <th>Date</th>
+                                <th>Memo No</th>
+                                <th>Client Name</th>
+                                <th>Mobile</th>
+                                <th>Sales Man</th>
+                                <th>Product</th>
+                                <th>Colour</th>
+                                <th class="text-center">Thickness</th>
+                                <th>Size</th>
+                                <th class="text-end">Qty</th>
+                                <th class="text-end">Wt (LBS)</th>
+                                <th class="text-end">Wt (KG)</th>
+                                <th class="text-end">LBS/TK</th>
+                                <th class="text-end">KG/TK</th>
+                                <th class="text-end">Discount</th>
+                                <th class="text-end">Taka</th>
+                                <th class="text-end">Other Charges</th>
+                                <th class="text-end">Paid</th>
+                                <th class="text-end">Dues</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var day in Model.Days)
+                            {
+                                foreach (var row in day.Rows)
+                                {
+                                    <tr>
+
+                                        <td class="text-nowrap">
+                                            @row.InvoiceDate.ToString("dd-MMM-yyyy")
+                                        </td>
+
+                                        <td>
+                                            <a asp-controller="Sales"
+                                               asp-action="DownloadInvoicePdf"
+                                               asp-route-id="@row.SalesInvoiceId"
+                                               target="_blank"
+                                               class="text-decoration-none">
+                                                @row.InvoiceNo
+                                            </a>
+                                        </td>
+
+                                        <td>@row.CustomerName</td>
+
+                                        <td>@row.CustomerMobile</td>
+
+                                        <td>@row.SalesMan</td>
+
+                                        <td>@row.ProductName</td>
+
+                                        <td>@row.ColorName</td>
+
+                                        <td class="text-center">
+                                            @row.Thickness?.ToString("0.##")
+                                        </td>
+
+                                        <td>@row.ProductSize</td>
+
+                                        <td class="text-end">
+                                            @row.Quantity.ToString("N0")
+                                        </td>
+
+                                        <td class="text-end">
+                                            @row.WeightLbs.ToString("N2")
+                                        </td>
+
+                                        <td class="text-end">
+                                            @row.WeightKg.ToString("N2")
+                                        </td>
+
+                                        <td class="text-end">
+                                            @(row.LbsRate?.ToString("N2"))
+                                        </td>
+
+                                        <td class="text-end">
+                                            @(row.KgRate?.ToString("N2"))
+                                        </td>
+
+                                        <td class="text-end">
+                                            @(row.Discount?.ToString("N2"))
+                                        </td>
+
+                                        <td class="text-end fw-semibold">
+                                            @row.LineTotal.ToString("N2")
+                                        </td>
+
+                                        <td class="text-end">
+                                            @(row.OtherCharges?.ToString("N2"))
+                                        </td>
+
+                                        <td class="text-end">
+                                            @(row.Paid?.ToString("N2"))
+                                        </td>
+
+                                        <td class="text-end text-danger">
+                                            @(row.Due?.ToString("N2"))
+                                        </td>
+
+                                    </tr>
+                                }
+
+                                <tr class="table-secondary fw-bold">
+
+                                    <td colspan="9" class="text-end">
+                                        @day.Date.ToString("dd-MMM-yyyy") Total
+                                    </td>
+
+                                    <td class="text-end">
+                                        @day.Totals.Quantity.ToString("N0")
+                                    </td>
+
+                                    <td class="text-end">
+                                        @day.Totals.WeightLbs.ToString("N2")
+                                    </td>
+
+                                    <td class="text-end">
+                                        @day.Totals.WeightKg.ToString("N2")
+                                    </td>
+
+                                    <td></td>
+
+                                    <td></td>
+
+                                    <td class="text-end">
+                                        @day.Totals.Discount.ToString("N2")
+                                    </td>
+
+                                    <td class="text-end">
+                                        @day.Totals.Taka.ToString("N2")
+                                    </td>
+
+                                    <td class="text-end">
+                                        @day.Totals.OtherCharges.ToString("N2")
+                                    </td>
+
+                                    <td class="text-end">
+                                        @day.Totals.Paid.ToString("N2")
+                                    </td>
+
+                                    <td class="text-end">
+                                        @day.Totals.Due.ToString("N2")
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                        <tfoot>
+
+                            <tr class="table-dark fw-bold">
+
+                                <td colspan="9" class="text-end">
+                                    GRAND TOTAL
+                                </td>
+
+                                <td class="text-end">
+                                    @Model.Totals.Quantity.ToString("N0")
+                                </td>
+
+                                <td class="text-end">
+                                    @Model.Totals.WeightLbs.ToString("N2")
+                                </td>
+
+                                <td class="text-end">
+                                    @Model.Totals.WeightKg.ToString("N2")
+                                </td>
+
+                                <td></td>
+
+                                <td></td>
+
+                                <td class="text-end">
+                                    @Model.Totals.Discount.ToString("N2")
+                                </td>
+
+                                <td class="text-end">
+                                    @Model.Totals.Taka.ToString("N2")
+                                </td>
+
+                                <td class="text-end">
+                                    @Model.Totals.OtherCharges.ToString("N2")
+                                </td>
+
+                                <td class="text-end">
+                                    @Model.Totals.Paid.ToString("N2")
+                                </td>
+
+                                <td class="text-end">
+                                    @Model.Totals.Due.ToString("N2")
+                                </td>
+
+                            </tr>
+
+                        </tfoot>
+
+                    </table>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>

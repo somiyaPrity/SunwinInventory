@@ -9,6 +9,7 @@ using SunwinInventory.Models;
 using SunwinInventory.Services;
 using SunwinInventory.Services.Interfaces;
 using System;
+using System.Text.RegularExpressions;
 
 namespace SunwinInventory.Controllers
 {
@@ -21,13 +22,15 @@ namespace SunwinInventory.Controllers
         private readonly IProductNameService _productNameService;
         private readonly ILookupService _lookupService;
         private readonly IStockLedgerService _stockLedgerService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         public ProductPurchaseDetailController(
             IProductPurchaseDetailService purchaseService,
             IShipmentService shipmentService,
             ISupplierService supplierService,
             IWarehouseService warehouseService,
             IProductNameService productNameService,
-            ILookupService lookupService, IStockLedgerService stockLedgerService)
+            ILookupService lookupService, IStockLedgerService stockLedgerService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _purchaseService = purchaseService;
             _shipmentService = shipmentService;
@@ -36,7 +39,12 @@ namespace SunwinInventory.Controllers
             _productNameService = productNameService;
             _lookupService = lookupService;
             _stockLedgerService = stockLedgerService;
+            _httpContextAccessor = httpContextAccessor;
         }
+
+        private string CurrentUserName =>
+            _httpContextAccessor.HttpContext?
+                .Session.GetString("UserName") ?? "System";
 
         //=====================================================
         // INDEX
@@ -44,6 +52,8 @@ namespace SunwinInventory.Controllers
 
         public async Task<IActionResult> Index(PurchaseReportFilterDto filter)
         {
+            ClampDateRange(filter);
+
             await LoadDropDowns();
 
             var list = await _purchaseService.GetPurchaseReportAsync(filter);
@@ -51,6 +61,16 @@ namespace SunwinInventory.Controllers
             ViewBag.Filter = filter;
 
             return View(list);
+        }
+
+        private static void ClampDateRange(PurchaseReportFilterDto filter)
+        {
+            if (filter.FromDate.HasValue &&
+                filter.ToDate.HasValue &&
+                filter.ToDate.Value.Date < filter.FromDate.Value.Date)
+            {
+                filter.ToDate = filter.FromDate;
+            }
         }
         //[HttpGet]
         //public async Task<IActionResult> ExportExcel()
@@ -170,6 +190,8 @@ namespace SunwinInventory.Controllers
         [HttpGet]
         public async Task<IActionResult> ExportExcel(PurchaseReportFilterDto filter)
         {
+            ClampDateRange(filter);
+
             // Get filtered data
             var list = await _purchaseService.GetPurchaseReportAsync(filter);
 
@@ -366,6 +388,8 @@ namespace SunwinInventory.Controllers
 
                     CostPricePerPieceTk = item.CostPricePerPieceTk,
 
+                    CostPricePerPieceRmb = item.CostPricePcsRmb,
+
                     CostPriceKgRmb = item.CostPriceKgRmb,
                     CostPriceLbsRmb = item.CostPriceLbsRmb,
 
@@ -417,210 +441,259 @@ namespace SunwinInventory.Controllers
             var items = new List<ProductPurchaseDetailDto>();
 
             using var stream = file.OpenReadStream();
-            using var workbook = new XLWorkbook(stream);
 
-            var ws = workbook.Worksheet(1);
+            XLWorkbook workbook;
 
-            int lastRow = ws.LastRowUsed().RowNumber();
-
-            for (int row = 3; row <= lastRow; row++)
+            try
             {
-                // Skip blank product rows
-                if (string.IsNullOrWhiteSpace(ws.Cell(row, 3).GetString()))
-                    continue;
+                workbook = new XLWorkbook(stream);
+            }
+            catch
+            {
+                return BadRequest(
+                    "Unable to read the Excel file. " +
+                    "Please upload the client Purchase format file.");
+            }
 
-                var dto = new ProductPurchaseDetailDto();
+            using (workbook)
+            {
+                var ws = workbook.Worksheet(1);
 
-                // =========================================
-                // HEADER VALUES
-                // =========================================
+                // Client Purchase format: headers on row 2, data from row 3
+                if (!ws.Cell(2, 3).GetString()
+                        .Contains("Product Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    return BadRequest(
+                        "Invalid Excel format. " +
+                        "Please upload the client Purchase format file.");
+                }
 
-                dto.ShipmentId = shipmentId;
-                dto.SupplierId = supplierId;
-                dto.WarehouseId = warehouseId;
+                int lastRow = ws.LastRowUsed()?.RowNumber() ?? 2;
 
+                var selectedShipment =
+                    await _shipmentService.GetByIdAsync(shipmentId);
 
-                // =========================================
-                // BASIC PRODUCT INFORMATION
-                // =========================================
+                if (selectedShipment == null)
+                {
+                    return BadRequest(
+                        "Selected shipment was not found.");
+                }
 
-                // C - Product Name
-                dto.ProductName =
-                    ws.Cell(row, 3)
-                      .GetString()
-                      .Trim();
+                string selectedShipmentKey =
+                    NormalizeShipmentNo(selectedShipment.ShipmentNo);
 
-                // D - Color
-                dto.ColorName =
-                    ws.Cell(row, 4)
-                      .GetString()
-                      .Trim();
+                for (int row = 3; row <= lastRow; row++)
+                {
+                    // Skip blank product rows
+                    if (string.IsNullOrWhiteSpace(ws.Cell(row, 3).GetString()))
+                        continue;
 
-                // E - Thickness
-                dto.Thickness =
-                    GetDecimal(ws, row, 5);
+                    // B - Shipment no
+                    // The selected shipment must match the file, otherwise
+                    // every row would be silently saved under the wrong
+                    // shipment.
+                    string excelShipment =
+                        ws.Cell(row, 2).GetString().Trim();
 
-                // F - Product Size
-                dto.ProductSize =
-                    ws.Cell(row, 6)
-                      .GetString()
-                      .Trim();
+                    if (!string.IsNullOrWhiteSpace(excelShipment) &&
+                        NormalizeShipmentNo(excelShipment) != selectedShipmentKey)
+                    {
+                        return BadRequest(
+                            $"Excel row {row} belongs to shipment " +
+                            $"'{excelShipment}', but " +
+                            $"'{selectedShipment.ShipmentNo}' is selected. " +
+                            "Please select the matching shipment and upload again.");
+                    }
 
+                    var dto = new ProductPurchaseDetailDto();
 
-                // =========================================
-                // QUANTITY / WEIGHT
-                // =========================================
+                    // =========================================
+                    // HEADER VALUES
+                    // =========================================
 
-                // G - Initial Quantity
-                dto.InitialQuantity =
-                    (int)GetDecimal(ws, row, 7);
-
-                // H - Weight KG / PCS
-                dto.UnitWeightKg =
-                    GetDecimal(ws, row, 8);
-
-                // I - Total Weight KG
-                dto.TotalWeightKg =
-                    GetDecimal(ws, row, 9);
-
-
-                // =========================================
-                // PRICE INFORMATION
-                // =========================================
-
-                // J - Unit Price TK
-                dto.UnitPriceTk =
-                    GetDecimal(ws, row, 10);
-
-                // K - Unit Price RMB
-                dto.UnitPriceRmb =
-                    GetDecimal(ws, row, 11);
+                    dto.ShipmentId = shipmentId;
+                    dto.SupplierId = supplierId;
+                    dto.WarehouseId = warehouseId;
 
 
-                // =========================================
-                // EXCHANGE RATE
-                // =========================================
-                // Excel does not have a separate Exchange Rate
-                // column.
-                //
-                // J = K * ExchangeRate
-                //
-                // Therefore:
-                // ExchangeRate = UnitPriceTk / UnitPriceRmb
+                    // =========================================
+                    // PRODUCT INFORMATION
+                    // The client template has no color column.
+                    // =========================================
 
-                dto.ExchangeRate =
-                    dto.UnitPriceRmb != 0
-                        ? dto.UnitPriceTk / dto.UnitPriceRmb
-                        : 0;
+                    // C - Product Name
+                    dto.ProductName =
+                        ws.Cell(row, 3)
+                          .GetString()
+                          .Trim();
 
+                    dto.ColorId = 0;
+                    dto.ColorName = "";
 
-                // =========================================
-                // TAX / COST
-                // =========================================
+                    // D - Thickness (MM)
+                    dto.Thickness =
+                        GetDecimal(ws, row, 4);
 
-                // L - Tax / KG
-                dto.ImportTaxPerKgTk =
-                    GetDecimal(ws, row, 12);
-
-                // M - Price / KG including TAX
-                dto.CostPriceKgTk =
-                    GetDecimal(ws, row, 13);
-
-                // N - Price / LBS including TAX
-                dto.CostPriceLbsTk =
-                    GetDecimal(ws, row, 14);
+                    // E - Size (MM)
+                    dto.ProductSize =
+                        ws.Cell(row, 5)
+                          .GetString()
+                          .Trim();
 
 
-                // =========================================
-                // COST PER PIECE
-                // =========================================
-                // Excel Y contains Cost Price per PCS (TK)
-                //
-                // Y = column 25
+                    // =========================================
+                    // QUANTITY / WEIGHT
+                    // =========================================
 
-                dto.CostPricePerPieceTk =
-                    GetDecimal(ws, row, 25);
+                    // F - Initial Quantity
+                    dto.InitialQuantity =
+                        (int)GetDecimal(ws, row, 6);
 
+                    // G - Weight KG / PCS
+                    dto.UnitWeightKg =
+                        GetDecimal(ws, row, 7);
 
-                // =========================================
-                // RMB COST VALUES
-                // =========================================
-
-                // Cost KG RMB
-                dto.CostPriceKgRmb =
-                    dto.ExchangeRate != 0
-                        ? dto.CostPriceKgTk / dto.ExchangeRate
-                        : 0;
-
-                // Cost LBS RMB
-                dto.CostPriceLbsRmb =
-                    dto.ExchangeRate != 0
-                        ? dto.CostPriceLbsTk / dto.ExchangeRate
-                        : 0;
-
-                // Cost PCS RMB
-                dto.CostPricePcsRmb =
-                    dto.ExchangeRate != 0
-                        ? dto.CostPricePerPieceTk / dto.ExchangeRate
-                        : 0;
+                    // H - Total Weight KG
+                    dto.TotalWeightKg =
+                        GetDecimal(ws, row, 8);
 
 
-                // =========================================
-                // TOTAL AMOUNTS
-                // =========================================
+                    // =========================================
+                    // PRICE INFORMATION
+                    // =========================================
 
-                // O - Total Amount Without TAX (TK)
-                dto.TotalAmountWithoutTaxTk =
-                    GetDecimal(ws, row, 15);
+                    // I - Unit Price TK
+                    dto.UnitPriceTk =
+                        GetDecimal(ws, row, 9);
 
-                // P - Total Amount (RMB)
-                dto.TotalAmountWithoutTaxRmb =
-                    GetDecimal(ws, row, 16);
+                    // J - Transaction Rate
+                    dto.ExchangeRate =
+                        GetDecimal(ws, row, 10);
 
-                // Q - TOTAL INCLUDING TAX (TK)
-                // THIS IS THE IMPORTANT ONE
-                dto.TotalAmountIncludingTaxTk =
-                    GetDecimal(ws, row, 17);
+                    // K - Unit Price RMB
+                    dto.UnitPriceRmb =
+                        GetDecimal(ws, row, 11);
 
-                // R - Total Including TAX (RMB)
-                dto.TotalAmountIncludingTaxRmb =
-                    GetDecimal(ws, row, 18);
-
-
-                // =========================================
-                // LOOKUP PRODUCT / COLOR IDS
-                // =========================================
-
-                dto.ProductNameId =
-                    await _lookupService
-                        .GetProductIdAsync(dto.ProductName)
-                    ?? 0;
-
-                dto.ColorId =
-                    await _lookupService
-                        .GetColorIdAsync(dto.ColorName)
-                    ?? 0;
+                    if (dto.ExchangeRate <= 0 &&
+                        dto.UnitPriceRmb != 0)
+                    {
+                        dto.ExchangeRate =
+                            dto.UnitPriceTk / dto.UnitPriceRmb;
+                    }
 
 
-                // =========================================
-                // DEBUG
-                // =========================================
+                    // =========================================
+                    // TAX / COST
+                    // =========================================
 
-                Console.WriteLine(
-                    $"Row: {row} | " +
-                    $"Product: {dto.ProductName} | " +
-                    $"Weight: {dto.TotalWeightKg} | " +
-                    $"UnitPriceTK: {dto.UnitPriceTk} | " +
-                    $"TaxTK: {dto.ImportTaxPerKgTk} | " +
-                    $"TotalWithoutTax: {dto.TotalAmountWithoutTaxTk} | " +
-                    $"TotalWithTax(Q): {dto.TotalAmountIncludingTaxTk}"
-                );
+                    // L - Tax / KG (TK)
+                    dto.ImportTaxPerKgTk =
+                        GetDecimal(ws, row, 12);
+
+                    // M - Cost Price / KG including TAX (TK)
+                    dto.CostPriceKgTk =
+                        GetDecimal(ws, row, 13);
+
+                    // N - Cost Price / LBS including TAX (TK)
+                    dto.CostPriceLbsTk =
+                        GetDecimal(ws, row, 14);
+
+                    // O - Cost Price / PCS including TAX (TK)
+                    dto.CostPricePerPieceTk =
+                        GetDecimal(ws, row, 15);
 
 
-                items.Add(dto);
+                    // =========================================
+                    // TOTAL AMOUNTS
+                    // =========================================
+
+                    // P - Total amount without TAX (TK)
+                    dto.TotalAmountWithoutTaxTk =
+                        GetDecimal(ws, row, 16);
+
+                    // Q - Total amount (RMB)
+                    dto.TotalAmountWithoutTaxRmb =
+                        GetDecimal(ws, row, 17);
+
+                    // R - Total including TAX (TK)
+                    dto.TotalAmountIncludingTaxTk =
+                        GetDecimal(ws, row, 18);
+
+                    // S - Total including TAX (RMB)
+                    dto.TotalAmountIncludingTaxRmb =
+                        GetDecimal(ws, row, 19);
+
+
+                    // =========================================
+                    // RMB CONVERSIONS
+                    // =========================================
+
+                    decimal rate = dto.ExchangeRate ?? 0;
+
+                    dto.ImportTaxPerKgRmb =
+                        rate != 0
+                            ? (dto.ImportTaxPerKgTk ?? 0) / rate
+                            : 0;
+
+                    dto.CostPriceKgRmb =
+                        rate != 0
+                            ? (dto.CostPriceKgTk ?? 0) / rate
+                            : 0;
+
+                    dto.CostPriceLbsRmb =
+                        rate != 0
+                            ? (dto.CostPriceLbsTk ?? 0) / rate
+                            : 0;
+
+                    decimal costPerPieceRmb =
+                        rate != 0
+                            ? (dto.CostPricePerPieceTk ?? 0) / rate
+                            : 0;
+
+                    dto.CostPricePerPieceRmb = costPerPieceRmb;
+                    dto.CostPricePcsRmb = costPerPieceRmb;
+
+
+                    // =========================================
+                    // LOOKUP PRODUCT ID
+                    // =========================================
+
+                    dto.ProductNameId =
+                        await _lookupService
+                            .GetProductIdAsync(dto.ProductName)
+                        ?? 0;
+
+                    if (dto.ProductNameId == 0)
+                    {
+                        return BadRequest(
+                            $"Product '{dto.ProductName}' " +
+                            $"(Excel row {row}) was not found. " +
+                            "Please add it to Product Names first.");
+                    }
+
+
+                    items.Add(dto);
+                }
             }
 
             return Json(items);
+        }
+
+
+        private static string NormalizeShipmentNo(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return string.Empty;
+
+            var normalized = value.Trim().ToLowerInvariant();
+
+            // "Shipment No - 43", "Shipment-2" and "2" all compare as "43"/"2".
+            normalized = Regex.Replace(
+                normalized,
+                @"^\s*shipment(\s+no\.?)?\s*[-–—:]?\s*",
+                "");
+
+            return Regex.Replace(normalized, @"[^a-z0-9]", "");
         }
 
 
@@ -700,6 +773,8 @@ namespace SunwinInventory.Controllers
                     CostPriceLbsTk = item.CostPriceLbsTk,
                     CostPricePerPieceTk = item.CostPricePerPieceTk,
 
+                    CostPricePerPieceRmb = item.CostPricePcsRmb,
+
                     CostPriceKgRmb = item.CostPriceKgRmb,
                     CostPriceLbsRmb = item.CostPriceLbsRmb,
 
@@ -713,6 +788,24 @@ namespace SunwinInventory.Controllers
                 };
 
                 await _purchaseService.CreateAsync(entity);
+
+                await _stockLedgerService.CreateAsync(new StockLedger
+                {
+                    PurchaseDetailId = entity.PurchaseDetailId,
+
+                    WarehouseId = entity.WarehouseId,
+
+                    ProductNameId = entity.ProductNameId,
+
+                    ColorId = entity.ColorId,
+
+                    AvailableQty = entity.InitialQuantity,
+
+                    AvailableWeight = entity.TotalWeightKg ?? 0,
+                    UnitCost = entity.CostPriceKgTk ?? 0,
+
+                    PurchaseDate = entity.CreatedDate
+                });
             }
 
             TempData["Success"] = "Excel Purchase Saved Successfully.";
@@ -790,7 +883,12 @@ namespace SunwinInventory.Controllers
             if (entity == null)
                 return NotFound();
 
-            // Update editable fields only
+            int previousQuantity = entity.InitialQuantity;
+            decimal previousWeight = entity.TotalWeightKg ?? 0;
+
+            // Update only the fields posted by the Edit view.
+            // Rates, taxes and cost columns are not on the form, so they
+            // keep their stored values.
             entity.ShipmentId = model.ShipmentId;
             entity.SupplierId = model.SupplierId;
             entity.WarehouseId = model.WarehouseId;
@@ -803,38 +901,97 @@ namespace SunwinInventory.Controllers
 
             entity.InitialQuantity = model.InitialQuantity;
 
-            entity.UnitWeightKg = model.UnitWeightKg;
             entity.TotalWeightKg = model.TotalWeightKg;
 
-            entity.ExchangeRate = model.ExchangeRate;
-
             entity.UnitPriceTk = model.UnitPriceTk;
-            entity.UnitPriceRmb = model.UnitPriceRmb;
 
-            entity.ImportTaxPerKgTk = model.ImportTaxPerKgTk;
-            entity.ImportTaxPerKgRmb = model.ImportTaxPerKgRmb;
-
-            entity.CostPriceKgTk = model.CostPriceKgTk;
-            entity.CostPriceLbsTk = model.CostPriceLbsTk;
-            entity.CostPricePerPieceTk = model.CostPricePerPieceTk;
-
-            entity.CostPriceKgRmb = model.CostPriceKgRmb;
-            entity.CostPriceLbsRmb = model.CostPriceLbsRmb;
-            entity.CostPricePerPieceRmb = model.CostPricePerPieceRmb;
-
-            entity.TotalAmountWithoutTaxTk = model.TotalAmountWithoutTaxTk;
             entity.TotalAmountIncludingTaxTk = model.TotalAmountIncludingTaxTk;
-
-            entity.TotalAmountWithoutTaxRmb = model.TotalAmountWithoutTaxRmb;
-            entity.TotalAmountIncludingTaxRmb = model.TotalAmountIncludingTaxRmb;
 
             entity.Remarks = model.Remarks;
 
+            // =========================================
+            // SYNC STOCK LEDGER
+            // =========================================
+
+            var ledger =
+                await _stockLedgerService
+                    .GetByPurchaseDetailIdAsync(entity.PurchaseDetailId);
+
+            int newAvailableQty = 0;
+            decimal newAvailableWeight = 0;
+
+            if (ledger != null)
+            {
+                newAvailableQty =
+                    ledger.AvailableQty +
+                    (entity.InitialQuantity - previousQuantity);
+
+                newAvailableWeight =
+                    ledger.AvailableWeight +
+                    ((entity.TotalWeightKg ?? 0) - previousWeight);
+
+                if (newAvailableQty < 0)
+                {
+                    TempData["Error"] =
+                        $"Quantity cannot be reduced below " +
+                        $"{previousQuantity - ledger.AvailableQty}, " +
+                        "which is already sold.";
+
+                    await LoadDropDowns();
+
+                    return View(model);
+                }
+
+                if (newAvailableWeight < 0)
+                {
+                    TempData["Error"] =
+                        $"Total weight cannot be reduced below " +
+                        $"{previousWeight - ledger.AvailableWeight:0.####} KG, " +
+                        "which is already sold.";
+
+                    await LoadDropDowns();
+
+                    return View(model);
+                }
+            }
+
             // Preserve CreatedDate and CreatedBy
             entity.UpdatedDate = DateTime.Now;
-            entity.UpdatedBy = "Admin"; // Replace with logged-in username
+            entity.UpdatedBy = CurrentUserName;
 
             await _purchaseService.UpdateAsync(entity);
+
+            if (ledger == null)
+            {
+                await _stockLedgerService.CreateAsync(new StockLedger
+                {
+                    PurchaseDetailId = entity.PurchaseDetailId,
+
+                    WarehouseId = entity.WarehouseId,
+
+                    ProductNameId = entity.ProductNameId,
+
+                    ColorId = entity.ColorId,
+
+                    AvailableQty = entity.InitialQuantity,
+
+                    AvailableWeight = entity.TotalWeightKg ?? 0,
+                    UnitCost = entity.CostPriceKgTk ?? 0,
+
+                    PurchaseDate = entity.CreatedDate
+                });
+            }
+            else
+            {
+                ledger.WarehouseId = entity.WarehouseId;
+                ledger.ProductNameId = entity.ProductNameId;
+                ledger.ColorId = entity.ColorId;
+
+                ledger.AvailableQty = newAvailableQty;
+                ledger.AvailableWeight = newAvailableWeight;
+
+                await _stockLedgerService.UpdateAsync(ledger);
+            }
 
             TempData["Success"] = "Purchase updated successfully.";
 
@@ -847,6 +1004,33 @@ namespace SunwinInventory.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
+            var entity = await _purchaseService.GetEntityByIdAsync(id);
+
+            if (entity == null)
+            {
+                TempData["Error"] = "Purchase not found.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            var ledger = await _stockLedgerService
+                .GetByPurchaseDetailIdAsync(id);
+
+            if (ledger != null)
+            {
+                int soldQty = entity.InitialQuantity - ledger.AvailableQty;
+
+                if (soldQty > 0)
+                {
+                    TempData["Error"] =
+                        $"This purchase cannot be deleted. " +
+                        $"{soldQty} of {entity.InitialQuantity} " +
+                        "unit(s) have already been sold.";
+
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+
             await _purchaseService.DeleteAsync(id);
 
             TempData["Success"] = "Purchase deleted successfully.";

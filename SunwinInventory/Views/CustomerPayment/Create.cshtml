@@ -340,6 +340,10 @@
                                 Roket
                             </option>
 
+                            <option value="Product Exchange">
+                                Product Exchange
+                            </option>
+
                         </select>
 
                     </div>
@@ -347,7 +351,8 @@
 
                     <!-- Bank Name -->
 
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-4 mb-3"
+                         id="bankNameField">
 
                         <label asp-for="BankName"
                                class="form-label">
@@ -370,7 +375,8 @@
 
                     <!-- Transaction Code -->
 
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-4 mb-3"
+                         id="transactionCodeField">
 
                         <label asp-for="TransactionCode"
                                class="form-label">
@@ -608,6 +614,36 @@
                 }
 
             });
+
+
+            //==================================================
+            // BANK FIELDS (only for Bank / Cheque)
+            //==================================================
+
+            function toggleBankFields() {
+
+                var method = $("#PaymentMethod").val();
+
+                var isBank =
+                    method === "Bank" || method === "Cheque";
+
+                $("#bankNameField, #transactionCodeField")
+                    .toggle(isBank);
+
+                if (!isBank) {
+
+                    $("#bankName, #transactionCode")
+                        .val("")
+                        .removeClass("is-invalid");
+
+                    $("#bankNameField span.text-danger, #transactionCodeField span.text-danger")
+                        .text("");
+                }
+            }
+
+            $("#PaymentMethod").change(toggleBankFields);
+
+            toggleBankFields();
 
 
             //==================================================

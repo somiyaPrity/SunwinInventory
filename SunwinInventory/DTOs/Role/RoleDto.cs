@@ -22,5 +22,9 @@ namespace SunwinInventory.DTOs.Role
         public string? UpdatedBy { get; set; }
 
         public DateTime? UpdatedDate { get; set; }
+
+        public List<MenuAccessDto> Menus { get; set; } = new();
+
+        public List<string> Permissions { get; set; } = new();
     }
 }

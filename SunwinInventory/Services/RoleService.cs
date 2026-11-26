@@ -1,4 +1,5 @@
-﻿using SunwinInventory.DTOs.Role;
+﻿using Microsoft.AspNetCore.Http;
+using SunwinInventory.DTOs.Role;
 using SunwinInventory.Models;
 using SunwinInventory.Repositories.Interfaces;
 using SunwinInventory.Services.Interfaces;
@@ -8,11 +9,19 @@ namespace SunwinInventory.Services
     public class RoleService : IRoleService
     {
         private readonly IRoleRepository _repository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public RoleService(IRoleRepository repository)
+        public RoleService(
+            IRoleRepository repository,
+            IHttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
+            _httpContextAccessor = httpContextAccessor;
         }
+
+        private string CurrentUserName =>
+            _httpContextAccessor.HttpContext?
+                .Session.GetString("UserName") ?? "System";
 
         public async Task<List<RoleDto>> GetAllAsync()
         {
@@ -51,18 +60,20 @@ namespace SunwinInventory.Services
             };
         }
 
-        public async Task CreateAsync(RoleDto dto)
+        public async Task<int> CreateAsync(RoleDto dto)
         {
             var role = new Role
             {
                 RoleName = dto.RoleName,
                 Description = dto.Description,
                 IsActive = dto.IsActive,
-                CreatedBy = "Admin",
+                CreatedBy = CurrentUserName,
                 CreatedDate = DateTime.Now
             };
 
             await _repository.AddAsync(role);
+
+            return role.RoleId;
         }
 
         public async Task UpdateAsync(RoleDto dto)
@@ -75,7 +86,7 @@ namespace SunwinInventory.Services
             role.RoleName = dto.RoleName;
             role.Description = dto.Description;
             role.IsActive = dto.IsActive;
-            role.UpdatedBy = "Admin";
+            role.UpdatedBy = CurrentUserName;
             role.UpdatedDate = DateTime.Now;
 
             await _repository.UpdateAsync(role);

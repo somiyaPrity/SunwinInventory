@@ -1,0 +1,319 @@
+@model SunwinInventory.DTOs.StockReport.StockMovementDto
+
+@{
+    ViewData["Title"] = "Stock Movement";
+
+    var products = ViewBag.Products as List<SelectListItem>
+        ?? new List<SelectListItem>();
+
+    var warehouses = ViewBag.Warehouses as List<SelectListItem>
+        ?? new List<SelectListItem>();
+
+    var productNameId = ViewBag.ProductNameId?.ToString() ?? "";
+
+    var warehouseId = ViewBag.WarehouseId?.ToString() ?? "";
+}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+
+            <h4 class="mb-1">
+                <i class="bi bi-calendar3"></i>
+                Stock Movement
+            </h4>
+
+            <small class="text-muted">
+                @Model.MonthStart.ToString("MMMM yyyy")
+            </small>
+
+        </div>
+
+        <a asp-action="ExportMovementExcel"
+           asp-route-month="@ViewBag.MonthValue"
+           asp-route-productNameId="@ViewBag.ProductNameId"
+           asp-route-warehouseId="@ViewBag.WarehouseId"
+           class="btn btn-success">
+
+            <i class="bi bi-file-earmark-excel"></i>
+            Export Excel
+
+        </a>
+
+    </div>
+
+    <div class="card shadow-sm mb-3">
+
+        <div class="card-body">
+
+            <form asp-action="Movement" method="get">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            Month
+                        </label>
+
+                        <input type="month"
+                               name="month"
+                               value="@ViewBag.MonthValue"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            Product
+                        </label>
+
+                        <select name="productNameId"
+                                class="form-select">
+
+                            <option value="">All Products</option>
+
+                            @foreach (var product in products)
+                            {
+                                <option value="@product.Value"
+                                        selected="@(product.Value == productNameId)">
+
+                                    @product.Text
+
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            Warehouse
+                        </label>
+
+                        <select name="warehouseId"
+                                class="form-select">
+
+                            <option value="">All Warehouses</option>
+
+                            @foreach (var warehouse in warehouses)
+                            {
+                                <option value="@warehouse.Value"
+                                        selected="@(warehouse.Value == warehouseId)">
+
+                                    @warehouse.Text
+
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+
+                            <i class="bi bi-funnel"></i>
+                            Filter
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-striped table-hover align-middle">
+
+                    <thead class="table-dark">
+
+                        <tr>
+                            <th rowspan="2">Arrival Date</th>
+                            <th rowspan="2">Shipment No</th>
+                            <th rowspan="2">Product</th>
+                            <th rowspan="2">Colour</th>
+                            <th rowspan="2">MM</th>
+                            <th rowspan="2">Size</th>
+                            <th rowspan="2" class="text-end">Unit Weight (KG)</th>
+
+                            <th colspan="@Model.Warehouses.Count" class="text-center">
+                                Closing Stock By Warehouse (PCS)
+                            </th>
+
+                            <th rowspan="2" class="text-end">Stock (PCS)</th>
+                            <th rowspan="2" class="text-end">
+                                Opening (@Model.MonthStart.ToString("dd-MMM"))
+                            </th>
+                            <th rowspan="2" class="text-end">Arrivals</th>
+                            <th rowspan="2" class="text-end">Sales</th>
+                            <th rowspan="2" class="text-end">Weight Per Pcs (LBS)</th>
+                            <th rowspan="2" class="text-end">Total Weight (KG)</th>
+                            <th rowspan="2" class="text-end">Total Weight (LBS)</th>
+
+                            <th colspan="@Model.DaysInMonth" class="text-center">
+                                Daily Sales (PCS) &mdash; @Model.MonthStart.ToString("MMM yyyy")
+                            </th>
+                        </tr>
+
+                        <tr>
+                            @foreach (var warehouse in Model.Warehouses)
+                            {
+                                <th class="text-end">@warehouse.WarehouseName</th>
+                            }
+
+                            @for (int day = 1; day <= Model.DaysInMonth; day++)
+                            {
+                                <th class="text-end">@day</th>
+                            }
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var row in Model.Rows)
+                        {
+                            <tr>
+
+                                <td class="text-nowrap">
+                                    @(row.ArrivalDate?.ToString("dd-MMM-yyyy") ?? "")
+                                </td>
+
+                                <td class="text-nowrap">@row.ShipmentNo</td>
+
+                                <td class="fw-bold text-nowrap">@row.ProductName</td>
+
+                                <td>@row.ColorName</td>
+
+                                <td>@row.Thickness</td>
+
+                                <td class="text-nowrap">@row.ProductSize</td>
+
+                                <td class="text-end">
+                                    @row.UnitWeightKg.ToString("N2")
+                                </td>
+
+                                @foreach (var warehouse in Model.Warehouses)
+                                {
+                                    <td class="text-end">
+                                        @row.ClosingByWarehouse.GetValueOrDefault(warehouse.WarehouseId).ToString("N0")
+                                    </td>
+                                }
+
+                                <td class="text-end fw-bold">
+                                    @row.ClosingQty.ToString("N0")
+                                </td>
+
+                                <td class="text-end">
+                                    @row.OpeningQty.ToString("N0")
+                                </td>
+
+                                <td class="text-end text-success">
+                                    @(row.ArrivalQty != 0 ? row.ArrivalQty.ToString("N0") : "")
+                                </td>
+
+                                <td class="text-end text-danger">
+                                    @(row.SalesQty != 0 ? row.SalesQty.ToString("N0") : "")
+                                </td>
+
+                                <td class="text-end">
+                                    @row.WeightPerPcsLbs.ToString("N2")
+                                </td>
+
+                                <td class="text-end">
+                                    @row.TotalWeightKg.ToString("N2")
+                                </td>
+
+                                <td class="text-end">
+                                    @row.TotalWeightLbs.ToString("N2")
+                                </td>
+
+                                @for (int day = 1; day <= Model.DaysInMonth; day++)
+                                {
+                                    var qty = row.DailySales.GetValueOrDefault(day);
+
+                                    <td class="text-end">
+                                        @(qty != 0 ? qty.ToString("N0") : "")
+                                    </td>
+                                }
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                    <tfoot class="table-light fw-bold">
+
+                        <tr>
+
+                            <td colspan="7" class="text-end">TOTAL:</td>
+
+                            @foreach (var warehouse in Model.Warehouses)
+                            {
+                                <td class="text-end">
+                                    @Model.Totals.ClosingByWarehouse.GetValueOrDefault(warehouse.WarehouseId).ToString("N0")
+                                </td>
+                            }
+
+                            <td class="text-end">@Model.Totals.ClosingQty.ToString("N0")</td>
+                            <td class="text-end">@Model.Totals.OpeningQty.ToString("N0")</td>
+                            <td class="text-end text-success">@Model.Totals.ArrivalQty.ToString("N0")</td>
+                            <td class="text-end text-danger">@Model.Totals.SalesQty.ToString("N0")</td>
+                            <td></td>
+                            <td class="text-end">@Model.Totals.TotalWeightKg.ToString("N2")</td>
+                            <td class="text-end">@Model.Totals.TotalWeightLbs.ToString("N2")</td>
+
+                            @for (int day = 1; day <= Model.DaysInMonth; day++)
+                            {
+                                var qty = Model.Totals.DailySales.GetValueOrDefault(day);
+
+                                <td class="text-end">
+                                    @(qty != 0 ? qty.ToString("N0") : "")
+                                </td>
+                            }
+
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+            @if (!Model.Rows.Any())
+            {
+                <div class="text-center text-muted py-4">
+                    No stock movement found for the selected month.
+                </div>
+            }
+
+            <small class="text-muted d-block mt-2">
+                Opening = purchases received before the 1st minus sales before the 1st.
+                Arrivals = purchase quantity received in the month.
+                Daily columns show sales quantity only.
+                Closing = Opening + Arrivals &minus; Sales.
+            </small>
+
+        </div>
+
+    </div>
+
+</div>

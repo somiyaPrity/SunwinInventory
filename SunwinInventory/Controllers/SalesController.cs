@@ -48,6 +48,120 @@ namespace SunwinInventory.Controllers
 
 
         // =========================================================
+        // INVOICE LIST / PRINT
+        // =========================================================
+
+        [HttpGet]
+        public async Task<IActionResult> Index(
+            string? invoiceNo,
+            DateTime? fromDate,
+            DateTime? toDate,
+            int? customerId,
+            string? status)
+        {
+            await LoadDropdowns();
+
+            var query =
+                from i in _context.SalesInvoices
+
+                join c in _context.Customers
+                    on i.CustomerId equals c.CustomerId
+
+                join w in _context.Warehouses
+                    on i.WarehouseId equals w.WarehouseId
+
+                select new
+                {
+                    Invoice = i,
+                    Customer = c,
+                    Warehouse = w
+                };
+
+            if (!string.IsNullOrWhiteSpace(invoiceNo))
+            {
+                query = query.Where(x =>
+                    x.Invoice.InvoiceNo.Contains(invoiceNo));
+            }
+
+            if (fromDate.HasValue)
+            {
+                query = query.Where(x =>
+                    x.Invoice.InvoiceDate >= fromDate.Value.Date);
+            }
+
+            if (toDate.HasValue)
+            {
+                var endDate = toDate.Value.Date.AddDays(1);
+
+                query = query.Where(x =>
+                    x.Invoice.InvoiceDate < endDate);
+            }
+
+            if (customerId.HasValue)
+            {
+                query = query.Where(x =>
+                    x.Invoice.CustomerId == customerId.Value);
+            }
+
+            switch (status)
+            {
+                case "paid":
+                    query = query.Where(x =>
+                        (x.Invoice.DueAmount ?? 0) <= 0);
+                    break;
+
+                case "partial":
+                    query = query.Where(x =>
+                        (x.Invoice.DueAmount ?? 0) > 0 &&
+                        (x.Invoice.PaidAmount ?? 0) > 0);
+                    break;
+
+                case "due":
+                    query = query.Where(x =>
+                        (x.Invoice.PaidAmount ?? 0) <= 0 &&
+                        (x.Invoice.DueAmount ?? 0) > 0);
+                    break;
+            }
+
+            var invoices = await query
+                .OrderByDescending(x => x.Invoice.InvoiceDate)
+                .ThenByDescending(x => x.Invoice.SalesInvoiceId)
+                .Select(x => new InvoiceListDto
+                {
+                    SalesInvoiceId = x.Invoice.SalesInvoiceId,
+
+                    InvoiceNo = x.Invoice.InvoiceNo,
+
+                    InvoiceDate = x.Invoice.InvoiceDate,
+
+                    CustomerName = x.Customer.CustomerName,
+
+                    WarehouseName = x.Warehouse.WarehouseName,
+
+                    ItemCount = _context.SalesDetails.Count(d =>
+                        d.SalesInvoiceId == x.Invoice.SalesInvoiceId),
+
+                    TotalAmount = x.Invoice.TotalAmount ?? 0,
+
+                    PaidAmount = x.Invoice.PaidAmount ?? 0,
+
+                    DueAmount = x.Invoice.DueAmount ?? 0,
+
+                    ReceiveMethod = x.Invoice.ReceiveMethod
+                })
+                .ToListAsync();
+
+            ViewBag.InvoiceNo = invoiceNo;
+            ViewBag.FromDate = fromDate?.ToString("yyyy-MM-dd");
+            ViewBag.ToDate = toDate?.ToString("yyyy-MM-dd");
+            ViewBag.CustomerId = customerId;
+            ViewBag.Status = status;
+
+            return View(invoices);
+        }
+
+
+        // =========================================================
         // LOAD CUSTOMER / WAREHOUSE / PRODUCT / COLOR
         // =========================================================
 
@@ -186,12 +300,95 @@ namespace SunwinInventory.Controllers
 
 
         // =========================================================
+        // GET STOCK OPTIONS - AVAILABLE COLORS + THICKNESSES
+        // =========================================================
+
+        [HttpGet]
+        public async Task<IActionResult> GetStockOptions(
+            int warehouseId,
+            int productNameId,
+            int? colorId)
+        {
+            if (warehouseId <= 0 || productNameId <= 0)
+            {
+                return Json(new
+                {
+                    colors = new List<object>(),
+                    thicknesses = new List<decimal>()
+                });
+            }
+
+
+            var query =
+                from stock in _context.StockLedgers
+
+                join purchase in _context.ProductPurchaseDetails
+                    on stock.PurchaseDetailId
+                    equals purchase.PurchaseDetailId
+
+                where
+                    stock.WarehouseId == warehouseId &&
+                    stock.ProductNameId == productNameId &&
+                    stock.AvailableQty > 0
+
+                select purchase;
+
+
+            var colorIds = await query
+                .Select(x => x.ColorId)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToListAsync();
+
+
+            var colorNames = await _context.Colors
+                .Where(x => colorIds.Contains(x.ColorId))
+                .ToDictionaryAsync(x => x.ColorId, x => x.ColorName);
+
+
+            var colors = colorIds
+                .Select(id => new
+                {
+                    value = id,
+                    text = id == 0
+                        ? "No Color"
+                        : colorNames.TryGetValue(id, out var name)
+                            ? name
+                            : $"Color {id}"
+                })
+                .ToList();
+
+
+            var thicknessQuery = query;
+
+            if (colorId.HasValue)
+            {
+                thicknessQuery = thicknessQuery.Where(x =>
+                    x.ColorId == colorId.Value);
+            }
+
+
+            var thicknesses = await thicknessQuery
+                .Where(x => x.Thickness != null)
+                .Select(x => x.Thickness!.Value)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToListAsync();
+
+
+            return Json(new { colors, thicknesses });
+        }
+
+
+        // =========================================================
         // SAVE SALE
         // =========================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SalesEntryDto model)
         {
+            UseFriendlySalesEntryMessages(model);
+
             if (!ModelState.IsValid)
             {
                 await LoadDropdowns();
@@ -227,12 +424,37 @@ namespace SunwinInventory.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Error"] = ex.Message;
+                TempData["Error"] =
+                    ex.InnerException?.Message ?? ex.Message;
 
                 await LoadDropdowns();
                 return View(model);
             }
         }
+        private void UseFriendlySalesEntryMessages(SalesEntryDto model)
+        {
+            if (model.SalesDate == default)
+            {
+                ModelState.Remove(nameof(model.SalesDate));
+                ModelState.AddModelError(nameof(model.SalesDate),
+                    "Please select the sales date.");
+            }
+
+            if (model.CustomerId <= 0)
+            {
+                ModelState.Remove(nameof(model.CustomerId));
+                ModelState.AddModelError(nameof(model.CustomerId),
+                    "Please select a customer.");
+            }
+
+            if (model.WarehouseId <= 0)
+            {
+                ModelState.Remove(nameof(model.WarehouseId));
+                ModelState.AddModelError(nameof(model.WarehouseId),
+                    "Please select a warehouse.");
+            }
+        }
+
         //   [HttpPost]
         //   [ValidateAntiForgeryToken]
         //   public async Task<IActionResult> Create(SalesEntryDto model)
@@ -273,23 +495,6 @@ namespace SunwinInventory.Controllers
         //           return View(model);
         //       }
         //   }
-
-
-        // =========================================================
-        // SALES LIST / REPORT
-        // =========================================================
-
-        [HttpGet]
-        public async Task<IActionResult> Index()
-        {
-            var invoices =
-                await _context.SalesInvoices
-                    .OrderByDescending(x => x.SalesInvoiceId)
-                    .ToListAsync();
-
-
-            return View(invoices);
-        }
 
 
         // =========================================================

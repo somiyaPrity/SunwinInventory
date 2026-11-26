@@ -1,0 +1,28 @@
+<script>
+
+    document.querySelectorAll(".perm-create, .perm-edit, .perm-delete")
+        .forEach(function (checkbox) {
+
+            checkbox.addEventListener("change", function () {
+
+                var row = this.closest("tr");
+
+                var view = row.querySelector(".perm-view");
+
+                if (!view || view.disabled)
+                    return;
+
+                if (this.checked) {
+                    view.checked = true;
+                }
+                else if (!row.querySelector(".perm-create:checked") &&
+                         !row.querySelector(".perm-edit:checked") &&
+                         !row.querySelector(".perm-delete:checked")) {
+                    view.checked = false;
+                }
+
+            });
+
+        });
+
+</script>
