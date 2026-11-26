@@ -43,6 +43,13 @@ public partial class SalesInvoice
     [StringLength(30)]
     public string? ReceiveMethod { get; set; }
 
+    [StringLength(30)]
+    public string? BankName { get; set; }
+
+    [Column("Transection_code")]
+    [StringLength(30)]
+    public string? TransectionCode { get; set; }
+
     [StringLength(500)]
     public string? Remarks { get; set; }
 

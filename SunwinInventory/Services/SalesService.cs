@@ -154,6 +154,8 @@ namespace SunwinInventory.Services
                     DueAmount = dueAmount,
 
                     ReceiveMethod = model.ReceiveMethod,
+                    BankName = model.BankName,
+                    TransectionCode = model.TransactionCode,
                     Remarks = model.Note,
 
                     CreatedBy = userName,

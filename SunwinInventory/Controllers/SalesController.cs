@@ -212,8 +212,13 @@ namespace SunwinInventory.Controllers
                     return View(model);
                 }
 
+                var invoiceNo = await _context.SalesInvoices
+                    .Where(x => x.SalesInvoiceId == salesInvoiceId.Value)
+                    .Select(x => x.InvoiceNo)
+                    .FirstOrDefaultAsync();
+
                 TempData["Success"] =
-                    $"Sale completed successfully. Invoice No: INV-{salesInvoiceId.Value:D5}";
+                    $"Sale completed successfully. Invoice No: {invoiceNo}";
 
                 TempData["SalesInvoiceId"] =
                     salesInvoiceId.Value;
